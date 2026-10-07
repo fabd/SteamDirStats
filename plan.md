@@ -35,8 +35,9 @@ User-facing features, in plain terms. Implementation details are in the function
 4. **Right-click menu on a game.** Right-clicking a game tile opens a small context menu with:
    - **Inspect**: opens the drill-down view for that game (feature 5).
    - **Open folder**: opens the game's install folder in Explorer.
-   - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. Rescan afterwards to refresh sizes.
+   - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. The user then clicks **Refresh** (feature 6) to update sizes.
 5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
+6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode, and the view stays on the current game when inspecting one, if it still exists.
 
 ## Functional requirements
 
@@ -81,12 +82,12 @@ Each game's total is split into categories:
 - Actions on a game:
   - **Open folder** (Explorer, via Python `os.startfile`).
   - **Uninstall** via `steam://uninstall/<appid>`.
-- Rescan button; fast/accurate toggle.
+- Refresh button (top right, feature 6); fast/accurate toggle.
 
 ### 7b. GUI implementation (Vue 3 + Vite)
 - **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
-  - `Toolbar.vue`: rescan, fast/accurate toggle, grouped/mixed layout toggle, settings.
+  - `Toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
   - `Breadcrumb.vue`: All libraries › game (› Workshop); each segment is clickable to go back.
   - `Treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to drill down.
   - `ContextMenu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
