@@ -37,7 +37,7 @@ User-facing features, in plain terms. Implementation details are in the function
    - **Open folder**: opens the game's install folder in Explorer.
    - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. The user then clicks **Refresh** (feature 6) to update sizes.
 5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
-6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode, and the view stays on the current game when inspecting one, if it still exists.
+6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode and always resets the view to the startup view (all libraries combined), clearing any drill-down and selection. This keeps the view valid when the inspected game was just uninstalled.
 
 ## Functional requirements
 
