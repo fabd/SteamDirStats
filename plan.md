@@ -6,7 +6,7 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 
 - **Target OS:** Windows only (10/11).
 - **Tech stack:** Python + **pywebview** (native window rendering HTML/JS/CSS via Edge WebView2).
-- **Distribution:** single `SteamDirStats.exe` built with PyInstaller.
+- **Distribution:** single portable `SteamDirStats.exe` built with PyInstaller (no installer; settings stored next to the exe).
 - **Dev environment:** Windows Python from python.org, driven from Git Bash (no WSL needed).
 
 ## Architecture
@@ -69,8 +69,20 @@ Each game's total is split into categories:
 ### 8. Window state persistence
 - Remember window position, size, and maximized state between runs.
 - Use the Win32 `GetWindowPlacement` / `SetWindowPlacement` (via `ctypes`, using the window handle): handles the restored size while maximized, ignores minimized state, and pulls off-screen windows (unplugged monitor) back onto a visible screen.
-- Store in `%APPDATA%\SteamDirStats\settings.json` along with other preferences (e.g. last scan mode).
+- Store in `settings.json` (see §9) along with other preferences (e.g. last scan mode).
 - Verify behaviour with display scaling (125%/150%).
+
+### 9. Portable settings location
+The app is portable: settings live next to the executable by default.
+- **App folder:**
+  - Packaged exe: the folder of `sys.executable`. With PyInstaller `--onefile`, `__file__` points to a temporary unpack folder that is deleted on exit, so it must not be used.
+  - Development (`python app.py`): the project folder (folder of `app.py`).
+  - Detect packaged mode with `getattr(sys, "frozen", False)`.
+- **Resolution order:**
+  1. If `settings.json` already exists in the app folder, use it.
+  2. Else, if the app folder is writable, create it there.
+  3. Otherwise (e.g. exe placed in `C:\Program Files\`) fall back to `%APPDATA%\SteamDirStats\settings.json`.
+- The Workshop item-name cache follows the same location.
 
 ## Known caveats
 
@@ -94,5 +106,5 @@ pyinstaller --onefile --windowed --add-data "ui;ui" --icon app.ico app.py   # re
 2. pywebview window with a basic treemap (library → game).
 3. Category split (game / Workshop / shader cache) and accurate mode with progress.
 4. Workshop drill-down with item name lookup + cache.
-5. Actions (open folder, uninstall), table view, window state persistence.
+5. Actions (open folder, uninstall), table view, portable settings + window state persistence.
 6. PyInstaller build.
