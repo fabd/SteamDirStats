@@ -25,6 +25,13 @@ ui/dist/        Production build output, loaded by pywebview and bundled by PyIn
 - **Python → JS:** `window.evaluate_js(...)` for push updates (e.g. scan progress).
 - The UI only depends on a small API (`scan()`, `open_folder()`, …), so the backend could later be swapped (e.g. Tauri) without rewriting the UI.
 
+## General features
+
+User-facing features, in plain terms. Implementation details are in the functional requirements below.
+
+1. **Combined default view.** On launch, the treemap shows every installed game from all libraries together in one view, sized by disk space.
+2. **One colour per library.** Each library gets its own distinct colour, so the space taken by each library is visible at a glance. A legend maps each colour to its library (path/drive and total size).
+
 ## Functional requirements
 
 ### 1. Locate Steam
@@ -62,8 +69,8 @@ Each game's total is split into categories:
 - Known limitation: mods installed outside the Workshop (Nexus, manual, mod managers) count as "Game files"; games that copy Workshop items elsewhere (e.g. Documents) are not detected.
 
 ### 7. Treemap UI
-- Squarified treemap, grouped by library/drive → game → category (→ Workshop item).
-- Colour by category; hover tooltip with name, size, path, appid.
+- Squarified treemap. Default view: all games from all libraries combined (see General features 1–2); drill down game → category (→ Workshop item).
+- Colour: by library in the combined view (fixed colour per library, stable across rescans); by category (game / Workshop / shader cache) inside a game. Hover tooltip with name, size, library, path, appid.
 - Legend + a sortable table view as an alternative to the treemap.
 - Actions on a game:
   - **Open folder** (Explorer, via Python `os.startfile`).
