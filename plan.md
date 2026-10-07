@@ -5,7 +5,7 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 ## Scope
 
 - **Target OS:** Windows only (10/11).
-- **Tech stack:** Python + **pywebview** (native window rendering HTML/JS/CSS via Edge WebView2).
+- **Tech stack:** Python + **pywebview** (native window rendering HTML/JS/CSS via Edge WebView2); UI built with **Vue 3 + Vite**.
 - **Distribution:** single portable `SteamDirStats.exe` built with PyInstaller (no installer; settings stored next to the exe).
 - **Dev environment:** Windows Python from python.org, driven from Git Bash (no WSL needed).
 
@@ -13,9 +13,13 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 
 ```
 steam_scan.py   Pure Python, no UI: locate Steam, parse VDF/ACF, measure sizes, return data
-app.py          ~30 lines of glue: creates the pywebview window, exposes the API, window state
-ui/             index.html + JS + CSS: treemap, tooltips, controls
+app.py          Glue: creates the pywebview window, exposes the API, settings, window state
+ui/             Vue 3 + Vite project (package.json, src/, vite.config.js)
+ui/dist/        Production build output, loaded by pywebview and bundled by PyInstaller
 ```
+
+- **Dev:** run `npm run dev` in `ui/`, then `python app.py --dev` points pywebview at the Vite dev server (`http://localhost:5173`) for hot reload.
+- **Release:** `npm run build` produces static files in `ui/dist/`; pywebview loads `ui/dist/index.html`. End users never need Node.
 
 - **JS → Python:** `await window.pywebview.api.<method>(...)` (returns a Promise, JSON-serialised automatically).
 - **Python → JS:** `window.evaluate_js(...)` for push updates (e.g. scan progress).
@@ -66,6 +70,18 @@ Each game's total is split into categories:
   - **Uninstall** via `steam://uninstall/<appid>`.
 - Rescan button; fast/accurate toggle.
 
+### 7b. GUI implementation (Vue 3 + Vite)
+- **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
+- **Components (initial):**
+  - `Toolbar.vue`: rescan, fast/accurate toggle, settings.
+  - `Breadcrumb.vue`: All libraries → library → game → Workshop.
+  - `Treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, double-click to drill down.
+  - `GameTable.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
+  - `StatusBar.vue`: totals, scan progress.
+  - Dialogs (`SettingsDialog.vue`, uninstall confirmation, about) built on native `<dialog>` / `showModal()`.
+- **Native HTML/CSS first:** `<dialog>`, the `popover` attribute for menus, CSS grid for layout (toolbar / resizable treemap–table split / status bar). No UI component library initially.
+- **Python bridge:** wrap `window.pywebview.api` calls in one `api.js` module; wait for the `pywebviewready` event before the first call. Progress pushed from Python via `evaluate_js` updates the store.
+
 ### 8. Window state persistence
 - Remember window position, size, and maximized state between runs.
 - Use the Win32 `GetWindowPlacement` / `SetWindowPlacement` (via `ctypes`, using the window handle): handles the restored size while maximized, ignores minimized state, and pulls off-screen windows (unplugged monitor) back onto a visible screen.
@@ -92,18 +108,28 @@ The app is portable: settings live next to the executable by default.
 
 ## Build & run
 
+Prerequisites: Python 3.12+ and Node.js LTS on Windows; Git Bash as the shell.
+
 ```bash
+# one-time setup
 python -m venv .venv
 source .venv/Scripts/activate          # Git Bash on Windows
 pip install pywebview pyinstaller
-python app.py                          # development
-pyinstaller --onefile --windowed --add-data "ui;ui" --icon app.ico app.py   # release exe
+(cd ui && npm install)
+
+# development (two terminals)
+cd ui && npm run dev                   # Vite dev server with hot reload
+python app.py --dev                    # pywebview window pointed at the dev server
+
+# release exe
+(cd ui && npm run build)               # -> ui/dist/
+pyinstaller --onefile --windowed --add-data "ui/dist;ui/dist" --icon app.ico app.py
 ```
 
 ## Milestones
 
 1. `steam_scan.py`: locate Steam, parse libraries and manifests, fast mode; CLI output for testing against a real install.
-2. pywebview window with a basic treemap (library → game).
+2. Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
 3. Category split (game / Workshop / shader cache) and accurate mode with progress.
 4. Workshop drill-down with item name lookup + cache.
 5. Actions (open folder, uninstall), table view, portable settings + window state persistence.
