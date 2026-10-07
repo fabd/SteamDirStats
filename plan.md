@@ -35,7 +35,7 @@ User-facing features, in plain terms. Implementation details are in the function
 4. **Right-click menu on a game.** Right-clicking a game tile opens a small context menu with:
    - **Inspect**: opens the drill-down view for that game (feature 5).
    - **Open folder**: opens the game's install folder in Explorer.
-   - **Uninstall…**: confirmation dialog, then `steam://uninstall/<appid>`.
+   - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. Rescan afterwards to refresh sizes.
 5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
 
 ## Functional requirements
@@ -92,7 +92,7 @@ Each game's total is split into categories:
   - `ContextMenu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
   - `GameTable.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
   - `StatusBar.vue`: totals, scan progress.
-  - Dialogs (`SettingsDialog.vue`, uninstall confirmation, about) built on native `<dialog>` / `showModal()`.
+  - Dialogs (`SettingsDialog.vue`, about) built on native `<dialog>` / `showModal()`.
 - **Native HTML/CSS first:** `<dialog>`, the `popover` attribute for menus, CSS grid for layout (toolbar / resizable treemap–table split / status bar). No UI component library initially.
 - **Python bridge:** wrap `window.pywebview.api` calls in one `api.js` module; wait for the `pywebviewready` event before the first call. Progress pushed from Python via `evaluate_js` updates the store.
 
