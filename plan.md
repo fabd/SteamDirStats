@@ -36,7 +36,7 @@ User-facing features, in plain terms. Implementation details are in the function
    - **Inspect**: opens the drill-down view for that game (feature 5).
    - **Open folder**: opens the game's install folder in Explorer.
    - **Uninstall…**: confirmation dialog, then `steam://uninstall/<appid>`.
-5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`), **Backspace/Esc**, or the mouse back button. Double-clicking a game tile is a shortcut for *Inspect*.
+5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
 
 ## Functional requirements
 
