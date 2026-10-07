@@ -32,6 +32,11 @@ User-facing features, in plain terms. Implementation details are in the function
 1. **Combined default view.** On launch, the treemap shows every installed game from all libraries together in one view, sized by disk space.
 2. **One colour per library.** Each library gets its own distinct colour, so the space taken by each library is visible at a glance. A legend maps each colour to its library (path/drive and total size).
 3. **Grouped or mixed layout (toggle).** Default is **grouped**: each library's games form one contiguous block, so the block's area shows that library's share. A toggle switches to **mixed**: all games laid out by size regardless of library, which makes the biggest games easier to compare. Tile areas are exact in both layouts. The choice is remembered in settings.
+4. **Right-click menu on a game.** Right-clicking a game tile opens a small context menu with:
+   - **Inspect**: opens the drill-down view for that game (feature 5).
+   - **Open folder**: opens the game's install folder in Explorer.
+   - **Uninstall…**: confirmation dialog, then `steam://uninstall/<appid>`.
+5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`), **Backspace/Esc**, or the mouse back button. Double-clicking a game tile is a shortcut for *Inspect*.
 
 ## Functional requirements
 
@@ -82,8 +87,9 @@ Each game's total is split into categories:
 - **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
   - `Toolbar.vue`: rescan, fast/accurate toggle, grouped/mixed layout toggle, settings.
-  - `Breadcrumb.vue`: All libraries → library → game → Workshop.
-  - `Treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, double-click to drill down.
+  - `Breadcrumb.vue`: All libraries › game (› Workshop); each segment is clickable to go back.
+  - `Treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to drill down.
+  - `ContextMenu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
   - `GameTable.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
   - `StatusBar.vue`: totals, scan progress.
   - Dialogs (`SettingsDialog.vue`, uninstall confirmation, about) built on native `<dialog>` / `showModal()`.
