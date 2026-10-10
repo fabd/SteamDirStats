@@ -115,6 +115,12 @@ The app is portable: settings live next to the executable by default.
   3. Otherwise (e.g. exe placed in `C:\Program Files\`) fall back to `%APPDATA%\SteamDirStats\settings.json`.
 - The Workshop item-name cache follows the same location.
 
+### 10. Per-account data (which Steam account to use)
+Installed games and their sizes are shared by all accounts on the PC, but some data is stored per Steam account under `<Steam>/userdata/<accountid>/` (e.g. playtime and last played in `config/localconfig.vdf`).
+- **Use the account that signed in most recently.** Read `<Steam>/config/loginusers.vdf`: each entry is keyed by SteamID64; pick the one with `"MostRecent" "1"`, falling back to the highest `Timestamp`.
+- Convert SteamID64 to the `userdata` folder name: `accountid = steamid64 - 76561197960265728`.
+- If no account or no `userdata` folder is found, skip per-account data; size scanning still works.
+
 ## Known caveats
 
 - Non-Steam shortcuts are not in the manifests (out of scope).
