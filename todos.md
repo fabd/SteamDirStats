@@ -1,0 +1,114 @@
+# SteamDirStats — Progress checklist
+
+See [plan.md](plan.md) for details on each item.
+
+## Phase one: data modules + command line
+
+Reusable `steamdirstats` package that gathers all the data the UI will display. No UI, no pywebview; output on the command line for testing.
+
+- [ ] Core scanner
+  - [x] Tolerant VDF/ACF parser (`vdf.py`)
+  - [x] Locate Steam (`locate.py`)
+    - [x] Registry `HKCU\Software\Valve\Steam\SteamPath`, then HKLM
+    - [x] Fallback to default install folders
+    - [x] `--steam-path` override
+  - [x] Read all libraries from `libraryfolders.vdf` (`libraries.py`)
+    - [x] Current and legacy (pre-2021) formats
+    - [x] Main Steam folder always included, duplicates removed
+    - [x] Missing library (e.g. unplugged drive) flagged as unavailable
+    - [x] Disk total / free space per library
+  - [x] Read installed games from `appmanifest_*.acf` (`games.py`)
+    - [x] Name, appid, install folder, `SizeOnDisk`, state flags, last updated
+    - [x] Skip unreadable or invalid manifests
+    - [x] Flag games that are not fully installed
+  - [x] Games grouped by library, largest first (`scanner.scan()`)
+  - [x] Data classes with `to_dict()` for JSON (`models.py`)
+- [ ] Command line
+  - [x] Text report grouped by library, with totals
+  - [x] `--json` output
+  - [x] UTF-8 output in Git Bash
+- [ ] Tests
+  - [x] Unit tests with fake Steam folders (`python -m unittest`)
+  - [ ] Run against a real Steam install on Windows and compare with Steam's Storage Manager
+- [ ] Size categories per game
+  - [ ] Game files (`common/<installdir>`)
+  - [ ] Workshop total from `workshop/appworkshop_<appid>.acf`
+  - [ ] Shader cache (`shadercache/<appid>`)
+  - [ ] Pending downloads (`downloading/<appid>`, `temp/<appid>`) (optional)
+- [ ] Scan modes
+  - [x] Fast mode: sizes from manifests
+  - [ ] Accurate mode: walk the real folders for every category
+  - [ ] Progress reporting (callback the UI can hook into later)
+  - [ ] `--accurate` CLI option
+- [ ] Workshop details
+  - [ ] Per-item ID and size from `WorkshopItemsInstalled`
+  - [ ] Per-item size from disk in accurate mode
+  - [ ] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails`
+  - [ ] Cache item names (cache file location passed in by the caller)
+  - [ ] Fallback to item ID + Steam Community link
+- [ ] Per-account data
+  - [ ] Pick the most recently signed-in account from `config/loginusers.vdf`
+  - [ ] Convert SteamID64 to the `userdata` account ID
+  - [ ] Playtime, playtime last 2 weeks, last played from `localconfig.vdf`
+  - [ ] Skip gracefully when no account is found
+- [ ] CLI shows categories, Workshop items and playtime
+
+## Phase two: desktop app (pywebview + Vue 3)
+
+- [ ] Project setup
+  - [ ] Vue 3 + Vite scaffold in `ui/`
+  - [ ] `app.py`: pywebview window
+    - [ ] `--dev` mode pointing at the Vite dev server (hot reload)
+    - [ ] Release mode loading `ui/dist/index.html`
+  - [ ] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
+  - [ ] `api.js` wrapper, waits for `pywebviewready`
+  - [ ] Scan progress pushed to the UI via `evaluate_js`
+  - [ ] Shared store (scan data, drill-down path, selection, progress)
+- [ ] Layout
+  - [ ] Toolbar: fast/accurate toggle, grouped/mixed toggle, settings
+  - [ ] Large Refresh button, top right
+  - [ ] Breadcrumb (`All libraries › <Game>`), clickable segments
+  - [ ] Resizable treemap / table split
+  - [ ] Status bar: totals, scan progress
+- [ ] Treemap (`Treemap.vue`)
+  - [ ] Squarified layout via `d3-hierarchy`, rendered on Canvas
+  - [ ] Combined default view: all games from all libraries
+  - [ ] One colour per library, stable across rescans
+  - [ ] Legend: library colour, path, total size
+  - [ ] Grouped layout by default, toggle to mixed (remembered in settings)
+  - [ ] Hover tooltip: name, size, library, path, appid
+  - [ ] Click to select (syncs with the table)
+- [ ] Context menu (`ContextMenu.vue`)
+  - [ ] Opens on right-click at the cursor; closes on Esc / outside click
+  - [ ] Inspect
+  - [ ] Open folder (Explorer)
+  - [ ] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
+- [ ] Drill-down view
+  - [ ] Inspect replaces the treemap with the selected game
+  - [ ] Split by category, coloured by category
+  - [ ] Workshop items as individual tiles, with names
+  - [ ] Double-click a game tile as a shortcut for Inspect
+  - [ ] Back via breadcrumb, Backspace or Esc
+- [ ] Refresh
+  - [ ] Rescans with the current fast/accurate mode
+  - [ ] Resets to the combined view, clears drill-down and selection
+- [ ] Data table (`GameTable.vue`)
+  - [ ] Sortable columns: name, size, category breakdown, library
+  - [ ] Playtime and last played columns
+  - [ ] Shows the drill-down breakdown when inspecting a game
+  - [ ] Selection synced with the treemap
+- [ ] Dialogs
+  - [ ] Settings (`<dialog>`)
+  - [ ] About
+- [ ] Settings and window state
+  - [ ] Portable `settings.json` next to the exe (`sys.executable` when frozen, project folder in dev)
+  - [ ] Fallback to `%APPDATA%\SteamDirStats\` when the app folder is not writable
+  - [ ] Workshop name cache stored alongside settings
+  - [ ] Save / restore window placement with `GetWindowPlacement` / `SetWindowPlacement`
+  - [ ] Check behaviour with display scaling (125% / 150%)
+- [ ] Packaging
+  - [ ] `npm run build` → `ui/dist/`
+  - [ ] PyInstaller `--onefile --windowed` build with `ui/dist` and icon
+  - [ ] App icon
+  - [ ] Test the exe on a clean Windows PC (no Python / Node)
+  - [ ] Check antivirus false positives; consider `--onedir` or signing
