@@ -12,7 +12,15 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 ## Architecture
 
 ```
-steam_scan.py   Pure Python, no UI: locate Steam, parse VDF/ACF, measure sizes, return data
+steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure sizes, return data
+  vdf.py          tolerant text VDF/ACF parser
+  locate.py       find the Steam folder (registry, default paths)
+  libraries.py    read libraryfolders.vdf (current + legacy formats)
+  games.py        read appmanifest_*.acf per library
+  models.py       Game / Library / SteamData dataclasses (+ to_dict for JSON)
+  scanner.py      scan(): the single entry point used by the CLI and the UI
+  __main__.py     CLI for testing: python -m steamdirstats [--json] [--steam-path]
+tests/          unittest suite using fake Steam folders
 app.py          Glue: creates the pywebview window, exposes the API, settings, window state
 ui/             Vue 3 + Vite project (package.json, src/, vite.config.js)
 ui/dist/        Production build output, loaded by pywebview and bundled by PyInstaller
@@ -149,7 +157,7 @@ pyinstaller --onefile --windowed --add-data "ui/dist;ui/dist" --icon app.ico app
 
 ## Milestones
 
-1. `steam_scan.py`: locate Steam, parse libraries and manifests, fast mode; CLI output for testing against a real install.
+1. **Phase one** (branch `feature/phase-one`): data modules only, no UI or pywebview. `steamdirstats` package: locate Steam, parse libraries and manifests, fast mode; installed games grouped by library; CLI output for testing against a real install.
 2. Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
 3. Category split (game / Workshop / shader cache) and accurate mode with progress.
 4. Workshop drill-down with item name lookup + cache.
