@@ -52,39 +52,47 @@ User-facing features, in plain terms. Implementation details are in the function
 ## Functional requirements
 
 ### 1. Locate Steam
+
 - Registry `HKCU\Software\Valve\Steam\SteamPath`.
 - Fallback: `C:\Program Files (x86)\Steam`.
 
 ### 2. Find all libraries
+
 - Parse `<Steam>/steamapps/libraryfolders.vdf` → every library `path` (plus its `apps` map of appid → size).
 - Library paths contain escaped backslashes (`D:\\SteamLibrary`).
 - Use a tolerant VDF parser (format has varied over the years).
 
 ### 3. Find each installed game
+
 - Each library's `steamapps/appmanifest_<appid>.acf` → `name`, `installdir` (under `steamapps/common/`), `SizeOnDisk` (bytes).
 - Some manifests hold a placeholder name (`appid_823910`) because Steam did not know the name when it wrote the manifest. Steam shows the name from its own cache instead, so fall back to `<Steam>/appcache/appinfo.vdf` (binary KeyValues, `common/name`), then to `installdir`.
 
 ### 4. Size categories per game
+
 Each game's total is split into categories:
 
-| Category | Location (per library) | Fast mode source |
-|---|---|---|
-| Game files | `common/<installdir>/` | `appmanifest_<appid>.acf` → `SizeOnDisk` |
-| Workshop | `workshop/content/<appid>/<itemid>/` | `workshop/appworkshop_<appid>.acf` → `SizeOnDisk` and per-item `size` in `WorkshopItemsInstalled` |
+| Category   | Location (per library)               | Fast mode source                                                                                  |
+| ---------- | ------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Game files | `common/<installdir>/`               | `appmanifest_<appid>.acf` → `SizeOnDisk`                                                          |
+| Workshop   | `workshop/content/<appid>/<itemid>/` | `workshop/appworkshop_<appid>.acf` → `SizeOnDisk` and per-item `size` in `WorkshopItemsInstalled` |
+
 - The game's `SizeOnDisk` excludes Workshop content, so the two add cleanly. On SteamVR: 5.4 GB of game files + 30.3 GB of Workshop = the 35.76 GB Steam's Storage Manager reports.
 - Workshop content lives in the same library as its game.
 - **Out of scope:** shader cache (`shadercache/<appid>/`) and pending downloads (`downloading/<appid>/`, `temp/<appid>/`). Measured here, the whole shader cache was 1.6 GB across three libraries, too small to be worth a category; Steam does not count it per game either.
 
 ### 5. Two scan modes
+
 - **Fast:** manifests only (near-instant).
 - **Accurate:** walk the real folders (manifest sizes can be stale and omit related data). Show progress in the UI.
 
 ### 6. Workshop details
+
 - Drill down into a game's Workshop area to see individual items.
 - Item names are not stored locally (only numeric IDs). Resolve names via Steam's public `ISteamRemoteStorage/GetPublishedFileDetails` web API (no key required) and cache them; fall back to the ID plus a link to `https://steamcommunity.com/sharedfiles/filedetails/?id=<itemid>`.
 - Known limitation: mods installed outside the Workshop (Nexus, manual, mod managers) count as "Game files"; games that copy Workshop items elsewhere (e.g. Documents) are not detected.
 
 ### 7. Treemap UI
+
 - Squarified treemap. Default view: all games from all libraries combined, grouped by library with a toggle for mixed (see General features 1–3); drill down game → category (→ Workshop item).
 - Colour: by library in the combined view (fixed colour per library, stable across rescans); by category (game files / Workshop) inside a game. Hover tooltip with name, size, library, path, appid.
 - Legend + a sortable table view as an alternative to the treemap.
@@ -94,6 +102,7 @@ Each game's total is split into categories:
 - Refresh button (top right, feature 6); fast/accurate toggle.
 
 ### 7b. GUI implementation (Vue 3 + Vite)
+
 - **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
   - `Toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
@@ -107,13 +116,16 @@ Each game's total is split into categories:
 - **Python bridge:** wrap `window.pywebview.api` calls in one `api.js` module; wait for the `pywebviewready` event before the first call. Progress pushed from Python via `evaluate_js` updates the store.
 
 ### 8. Window state persistence
+
 - Remember window position, size, and maximized state between runs.
 - Use the Win32 `GetWindowPlacement` / `SetWindowPlacement` (via `ctypes`, using the window handle): handles the restored size while maximized, ignores minimized state, and pulls off-screen windows (unplugged monitor) back onto a visible screen.
 - Store in `settings.json` (see §9) along with other preferences (e.g. last scan mode).
 - Verify behaviour with display scaling (125%/150%).
 
 ### 9. Portable settings location
+
 The app is portable: settings live next to the executable by default.
+
 - **App folder:**
   - Packaged exe: the folder of `sys.executable`. With PyInstaller `--onefile`, `__file__` points to a temporary unpack folder that is deleted on exit, so it must not be used.
   - Development (`python app.py`): the project folder (folder of `app.py`).
@@ -125,7 +137,9 @@ The app is portable: settings live next to the executable by default.
 - The Workshop item-name cache follows the same location.
 
 ### 10. Per-account data (which Steam account to use)
+
 Installed games and their sizes are shared by all accounts on the PC, but some data is stored per Steam account under `<Steam>/userdata/<accountid>/` (e.g. playtime and last played in `config/localconfig.vdf`).
+
 - **Use the account that signed in most recently.** Read `<Steam>/config/loginusers.vdf`: each entry is keyed by SteamID64; pick the one with `"MostRecent" "1"`, falling back to the highest `Timestamp`.
 - Convert SteamID64 to the `userdata` folder name: `accountid = steamid64 - 76561197960265728`.
 - If no account or no `userdata` folder is found, skip per-account data; size scanning still works.
