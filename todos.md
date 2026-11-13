@@ -6,7 +6,7 @@ See [plan.md](plan.md) for details on each item.
 
 Reusable `steamdirstats` package that gathers all the data the UI will display. No UI, no pywebview; output on the command line for testing.
 
-- [ ] Core scanner
+- [x] Core scanner
   - [x] Tolerant VDF/ACF parser (`vdf.py`)
   - [x] Locate Steam (`locate.py`)
     - [x] Registry `HKCU\Software\Valve\Steam\SteamPath`, then HKLM
@@ -21,15 +21,17 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
     - [x] Name, appid, install folder, `SizeOnDisk`, state flags, last updated
     - [x] Skip unreadable or invalid manifests
     - [x] Flag games that are not fully installed
+    - [x] Real name for placeholder manifest names (`appid_<n>`) from `appcache/appinfo.vdf` (`appinfo.py`)
   - [x] Games grouped by library, largest first (`scanner.scan()`)
   - [x] Data classes with `to_dict()` for JSON (`models.py`)
-- [ ] Command line
+- [x] Command line
   - [x] Text report grouped by library, with totals
   - [x] `--json` output
   - [x] UTF-8 output in Git Bash
-- [ ] Tests
+- [x] Tests
   - [x] Unit tests with fake Steam folders (`python -m unittest`)
-  - [ ] Run against a real Steam install on Windows and compare with Steam's Storage Manager
+  - [x] Run against a real Steam install on Windows (`python -m steamdirstats`, text + `--json`)
+  - [x] Compare the totals with Steam's Storage Manager (manual check)
 - [ ] Size categories per game
   - [ ] Game files (`common/<installdir>`)
   - [ ] Workshop total from `workshop/appworkshop_<appid>.acf`

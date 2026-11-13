@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .appinfo import read_names
 from .games import read_games
 from .libraries import read_libraries
 from .locate import find_steam_path
@@ -16,6 +17,7 @@ def scan(steam_path: str | None = None) -> SteamData:
     """
     path = find_steam_path(steam_path)
     libraries = read_libraries(path)
+    app_names = read_names(path)
     for library in libraries:
-        library.games = read_games(library)
+        library.games = read_games(library, app_names)
     return SteamData(steam_path=path, libraries=libraries)

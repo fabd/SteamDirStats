@@ -7,6 +7,7 @@ from contextlib import redirect_stdout
 
 from steamdirstats import SteamNotFoundError, scan
 from steamdirstats.__main__ import format_size, main
+from tests.test_appinfo import build_appinfo
 
 
 def write(path, text):
@@ -92,6 +93,20 @@ class ScanTest(unittest.TestCase):
         data = scan(self.steam)
         self.assertEqual(len(data.libraries), 1)
         self.assertEqual(len(data.games), 2)
+
+    def test_placeholder_name_comes_from_the_appinfo_cache(self):
+        sa = os.path.join(self.steam, "steamapps")
+        write(os.path.join(sa, "appmanifest_40.acf"), manifest(40, "appid_40", "LastEvil", 4000))
+        write(os.path.join(sa, "appmanifest_50.acf"), manifest(50, "appid_50", "Unknown", 50))
+        cache = os.path.join(self.steam, "appcache", "appinfo.vdf")
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, "wb") as f:
+            f.write(build_appinfo({40: "Last Evil"}))
+
+        games = {g.appid: g.name for g in scan(self.steam).games}
+        self.assertEqual(games[40], "Last Evil")
+        self.assertEqual(games[50], "Unknown")  # not in the cache: use the install folder
+        self.assertEqual(games[20], "Big Game")  # a real manifest name wins
 
     def test_not_a_steam_folder(self):
         with self.assertRaises(SteamNotFoundError):

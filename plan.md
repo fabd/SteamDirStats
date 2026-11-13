@@ -14,6 +14,7 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 ```
 steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure sizes, return data
   vdf.py          tolerant text VDF/ACF parser
+  appinfo.py      appid → name from the binary appcache/appinfo.vdf (placeholder names)
   locate.py       find the Steam folder (registry, default paths)
   libraries.py    read libraryfolders.vdf (current + legacy formats)
   games.py        read appmanifest_*.acf per library
@@ -60,6 +61,7 @@ User-facing features, in plain terms. Implementation details are in the function
 
 ### 3. Find each installed game
 - Each library's `steamapps/appmanifest_<appid>.acf` → `name`, `installdir` (under `steamapps/common/`), `SizeOnDisk` (bytes).
+- Some manifests hold a placeholder name (`appid_823910`) because Steam did not know the name when it wrote the manifest. Steam shows the name from its own cache instead, so fall back to `<Steam>/appcache/appinfo.vdf` (binary KeyValues, `common/name`), then to `installdir`.
 
 ### 4. Size categories per game
 Each game's total is split into categories:
