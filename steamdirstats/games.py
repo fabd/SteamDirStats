@@ -6,13 +6,19 @@ import os
 
 from . import vdf
 from .models import Game, Library
+from .workshop import WorkshopApp
 
 
-def read_games(library: Library, app_names: dict[int, str] | None = None) -> list[Game]:
+def read_games(
+    library: Library,
+    app_names: dict[int, str] | None = None,
+    workshop: dict[int, WorkshopApp] | None = None,
+) -> list[Game]:
     """Return the games installed in `library`, largest first.
 
     `app_names` maps appid to name (from Steam's appinfo cache) and is used for
-    manifests that only hold a placeholder name.
+    manifests that only hold a placeholder name. `workshop` maps appid to the
+    Workshop content installed for it in this library.
     """
     if not library.available:
         return []
@@ -28,9 +34,10 @@ def read_games(library: Library, app_names: dict[int, str] | None = None) -> lis
         if name.startswith("appmanifest_") and name.endswith(".acf"):
             game = read_manifest(entry.path, steamapps, app_names)
             if game:
+                _attach_workshop(game, workshop)
                 games.append(game)
 
-    games.sort(key=lambda g: (-g.size_on_disk, g.name.lower()))
+    games.sort(key=lambda g: (-g.total_size, g.name.lower()))
     return games
 
 
@@ -59,6 +66,13 @@ def read_manifest(
         state_flags=_to_int(state.get("stateflags")) or 0,
         last_updated=_to_int(state.get("lastupdated")),
     )
+
+
+def _attach_workshop(game: Game, workshop: dict[int, WorkshopApp] | None) -> None:
+    app = (workshop or {}).get(game.appid)
+    if app:
+        game.workshop_size = app.size
+        game.workshop_items = app.items
 
 
 def _game_name(

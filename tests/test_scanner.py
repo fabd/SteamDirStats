@@ -8,6 +8,7 @@ from contextlib import redirect_stdout
 from steamdirstats import SteamNotFoundError, scan
 from steamdirstats.__main__ import format_size, main
 from tests.test_appinfo import build_appinfo
+from tests.test_workshop import workshop_manifest
 
 
 def write(path, text):
@@ -52,6 +53,9 @@ class ScanTest(unittest.TestCase):
     "2" {{ "path" "{vdf_path(self.missing)}" "label" "" }}
 }}
 ''')
+        write(os.path.join(self.steam, "steamapps", "workshop", "appworkshop_10.acf"),
+              workshop_manifest(10, {111: 4000, 222: 1000}))
+
         sa2 = os.path.join(self.lib2, "steamapps")
         write(os.path.join(sa2, "appmanifest_30.acf"), manifest(30, "Half-Done", "HD", 300, flags=1026))
 
@@ -63,9 +67,10 @@ class ScanTest(unittest.TestCase):
         self.assertEqual([lib.path for lib in data.libraries], [self.steam, self.lib2, self.missing])
 
         main_lib, lib2, missing = data.libraries
-        self.assertEqual([g.name for g in main_lib.games], ["Big Game", "Small Game"])  # largest first
-        self.assertEqual(main_lib.size_on_disk, 6000)
-        self.assertEqual(main_lib.games[0].install_path, os.path.join(self.steam, "steamapps", "common", "Big"))
+        # Small Game is 1000 of game files but 6000 with its Workshop content.
+        self.assertEqual([g.name for g in main_lib.games], ["Small Game", "Big Game"])  # largest first
+        self.assertEqual(main_lib.size_on_disk, 11000)
+        self.assertEqual(main_lib.games[0].install_path, os.path.join(self.steam, "steamapps", "common", "Small"))
         self.assertIsNotNone(main_lib.disk_total)
 
         self.assertEqual(lib2.label, "Games SSD")
@@ -74,7 +79,8 @@ class ScanTest(unittest.TestCase):
         self.assertFalse(missing.available)
         self.assertEqual(missing.games, [])
 
-        self.assertEqual(data.size_on_disk, 6300)
+        self.assertEqual(data.size_on_disk, 11300)
+        self.assertEqual(data.workshop_size, 5000)
         self.assertEqual(len(data.games), 3)
 
     def test_legacy_libraryfolders_format(self):
@@ -93,6 +99,36 @@ class ScanTest(unittest.TestCase):
         data = scan(self.steam)
         self.assertEqual(len(data.libraries), 1)
         self.assertEqual(len(data.games), 2)
+
+    def test_workshop_content_is_attached_to_its_game(self):
+        games = {g.appid: g for g in scan(self.steam).games}
+        with_workshop, without = games[10], games[20]
+
+        self.assertEqual(with_workshop.size_on_disk, 1000)  # game files only
+        self.assertEqual(with_workshop.workshop_size, 5000)
+        self.assertEqual(with_workshop.total_size, 6000)
+        self.assertEqual([i.size for i in with_workshop.workshop_items], [4000, 1000])
+
+        self.assertEqual(without.workshop_size, 0)
+        self.assertEqual(without.workshop_items, [])
+        self.assertEqual(without.total_size, without.size_on_disk)
+
+    def test_report_shows_workshop_totals_and_items(self):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            main(["--steam-path", self.steam])
+        text = out.getvalue()
+        self.assertIn("( WORKSHOP 4.9 KB )", text)
+        self.assertIn("1.    3.9 KB  111", text)
+        self.assertIn("2.    1000 B  222", text)
+        self.assertIn("(Workshop: 4.9 KB)", text)
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            main(["--steam-path", self.steam, "--no-items"])
+        text = out.getvalue()
+        self.assertIn("( WORKSHOP 4.9 KB )", text)
+        self.assertNotIn("3.9 KB  111", text)
 
     def test_placeholder_name_comes_from_the_appinfo_cache(self):
         sa = os.path.join(self.steam, "steamapps")
@@ -125,7 +161,10 @@ class ScanTest(unittest.TestCase):
         with redirect_stdout(out):
             main(["--steam-path", self.steam, "--json"])
         data = json.loads(out.getvalue())
-        self.assertEqual(data["size_on_disk"], 6300)
+        self.assertEqual(data["size_on_disk"], 11300)
+        game10 = data["libraries"][0]["games"][0]
+        self.assertEqual(game10["total_size"], 6000)
+        self.assertEqual([i["itemid"] for i in game10["workshop_items"]], [111, 222])
         self.assertEqual(data["libraries"][1]["games"][0]["appid"], 30)
 
 

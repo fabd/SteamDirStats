@@ -32,7 +32,9 @@ _TYPE_END = 0x08
 _TYPE_INT64 = 0x0A
 _TYPE_END_ALT = 0x0B
 
-_FIXED_HEADER = 4 + 4 + 8 + 20 + 4  # state, last updated, token, text sha1, change number
+_FIXED_HEADER = (
+    4 + 4 + 8 + 20 + 4
+)  # state, last updated, token, text sha1, change number
 
 
 def read_names(steam_path: str) -> dict[int, str]:

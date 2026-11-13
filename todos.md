@@ -28,22 +28,24 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [x] Text report grouped by library, with totals
   - [x] `--json` output
   - [x] UTF-8 output in Git Bash
+  - [x] Workshop total per game, with one line per item (`--no-items` to hide)
 - [x] Tests
   - [x] Unit tests with fake Steam folders (`python -m unittest`)
   - [x] Run against a real Steam install on Windows (`python -m steamdirstats`, text + `--json`)
   - [x] Compare the totals with Steam's Storage Manager (manual check)
-- [ ] Size categories per game
-  - [ ] Game files (`common/<installdir>`)
-  - [ ] Workshop total from `workshop/appworkshop_<appid>.acf`
-  - [ ] Shader cache (`shadercache/<appid>`)
-  - [ ] Pending downloads (`downloading/<appid>`, `temp/<appid>`) (optional)
+- [x] Size categories per game
+  - [x] Game files (`common/<installdir>`) — manifest `SizeOnDisk`
+  - [x] Workshop total from `workshop/appworkshop_<appid>.acf` (`workshop.py`)
+  - [x] Game total = game files + Workshop, used for library and global totals
+  - [x] IGNORE Shader cache (`shadercache/<appid>`)
+  - [x] IGNORE Pending downloads (`downloading/<appid>`, `temp/<appid>`)
 - [ ] Scan modes
   - [x] Fast mode: sizes from manifests
   - [ ] Accurate mode: walk the real folders for every category
   - [ ] Progress reporting (callback the UI can hook into later)
   - [ ] `--accurate` CLI option
 - [ ] Workshop details
-  - [ ] Per-item ID and size from `WorkshopItemsInstalled`
+  - [x] Per-item ID and size from `WorkshopItemsInstalled`
   - [ ] Per-item size from disk in accurate mode
   - [ ] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails`
   - [ ] Cache item names (cache file location passed in by the caller)

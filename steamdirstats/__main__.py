@@ -7,7 +7,7 @@ import json
 import sys
 
 from .locate import SteamNotFoundError
-from .models import SteamData
+from .models import Game, SteamData
 from .scanner import scan
 
 
@@ -27,7 +27,7 @@ def plural(count: int, word: str) -> str:
     return f"{count} {word}" if count == 1 else f"{count} {word}s"
 
 
-def print_report(data: SteamData) -> None:
+def print_report(data: SteamData, show_items: bool = True) -> None:
     print(f"Steam: {data.steam_path}")
     for lib in data.libraries:
         print()
@@ -42,20 +42,34 @@ def print_report(data: SteamData) -> None:
             print(f"  Disk: {format_size(lib.disk_free)} free of {format_size(lib.disk_total)}")
         for g in lib.games:
             note = "" if g.fully_installed else "  [not fully installed]"
-            print(f"  {format_size(g.size_on_disk):>10}  {g.name}  ({g.appid}){note}")
+            if g.workshop_size:
+                note = f"  ( WORKSHOP {format_size(g.workshop_size)} ){note}"
+            print(f"  {format_size(g.total_size):>10}  {g.name}  ({g.appid}){note}")
+            if show_items:
+                print_workshop_items(g)
 
     available = [lib for lib in data.libraries if lib.available]
+    workshop = f" (Workshop: {format_size(data.workshop_size)})" if data.workshop_size else ""
     print()
     print(
         f"Total: {plural(len(data.games), 'game')}, {format_size(data.size_on_disk)} "
-        f"in {len(available)} {'library' if len(available) == 1 else 'libraries'}"
+        f"in {len(available)} {'library' if len(available) == 1 else 'libraries'}{workshop}"
     )
+
+
+def print_workshop_items(game: Game) -> None:
+    """One indented line per Workshop item, largest first."""
+    for number, item in enumerate(game.workshop_items, start=1):
+        print(f"     {number:>3}. {format_size(item.size):>9}  {item.display_name}")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="steamdirstats", description="List installed Steam games by library.")
     parser.add_argument("--steam-path", help="Steam folder (default: auto-detect)")
     parser.add_argument("--json", action="store_true", help="output JSON instead of a text report")
+    parser.add_argument(
+        "--no-items", action="store_true", help="hide the per-item Workshop lines"
+    )
     args = parser.parse_args(argv)
 
     # Game names can contain any Unicode; Git Bash pipes default to a legacy code page.
@@ -71,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(data.to_dict(), indent=2, ensure_ascii=False))
     else:
-        print_report(data)
+        print_report(data, show_items=not args.no_items)
     return 0
 
 

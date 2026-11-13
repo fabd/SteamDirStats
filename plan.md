@@ -20,7 +20,8 @@ steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure
   games.py        read appmanifest_*.acf per library
   models.py       Game / Library / SteamData dataclasses (+ to_dict for JSON)
   scanner.py      scan(): the single entry point used by the CLI and the UI
-  __main__.py     CLI for testing: python -m steamdirstats [--json] [--steam-path]
+  workshop.py     read appworkshop_*.acf per library (Workshop totals and items)
+  __main__.py     CLI for testing: python -m steamdirstats [--json] [--no-items] [--steam-path]
 tests/          unittest suite using fake Steam folders
 app.py          Glue: creates the pywebview window, exposes the API, settings, window state
 ui/             Vue 3 + Vite project (package.json, src/, vite.config.js)
@@ -45,7 +46,7 @@ User-facing features, in plain terms. Implementation details are in the function
    - **Inspect**: opens the drill-down view for that game (feature 5).
    - **Open folder**: opens the game's install folder in Explorer.
    - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. The user then clicks **Refresh** (feature 6) to update sizes.
-5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop, shader cache), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
+5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
 6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode and always resets the view to the startup view (all libraries combined), clearing any drill-down and selection. This keeps the view valid when the inspected game was just uninstalled.
 
 ## Functional requirements
@@ -70,11 +71,9 @@ Each game's total is split into categories:
 |---|---|---|
 | Game files | `common/<installdir>/` | `appmanifest_<appid>.acf` → `SizeOnDisk` |
 | Workshop | `workshop/content/<appid>/<itemid>/` | `workshop/appworkshop_<appid>.acf` → `SizeOnDisk` and per-item `size` in `WorkshopItemsInstalled` |
-| Shader cache | `shadercache/<appid>/` | disk scan only |
-| Pending (optional) | `downloading/<appid>/`, `temp/<appid>/` | disk scan only |
-
-- The game's `SizeOnDisk` excludes Workshop content, so the two add cleanly.
+- The game's `SizeOnDisk` excludes Workshop content, so the two add cleanly. On SteamVR: 5.4 GB of game files + 30.3 GB of Workshop = the 35.76 GB Steam's Storage Manager reports.
 - Workshop content lives in the same library as its game.
+- **Out of scope:** shader cache (`shadercache/<appid>/`) and pending downloads (`downloading/<appid>/`, `temp/<appid>/`). Measured here, the whole shader cache was 1.6 GB across three libraries, too small to be worth a category; Steam does not count it per game either.
 
 ### 5. Two scan modes
 - **Fast:** manifests only (near-instant).
@@ -87,7 +86,7 @@ Each game's total is split into categories:
 
 ### 7. Treemap UI
 - Squarified treemap. Default view: all games from all libraries combined, grouped by library with a toggle for mixed (see General features 1–3); drill down game → category (→ Workshop item).
-- Colour: by library in the combined view (fixed colour per library, stable across rescans); by category (game / Workshop / shader cache) inside a game. Hover tooltip with name, size, library, path, appid.
+- Colour: by library in the combined view (fixed colour per library, stable across rescans); by category (game files / Workshop) inside a game. Hover tooltip with name, size, library, path, appid.
 - Legend + a sortable table view as an alternative to the treemap.
 - Actions on a game:
   - **Open folder** (Explorer, via Python `os.startfile`).
@@ -134,6 +133,7 @@ Installed games and their sizes are shared by all accounts on the PC, but some d
 ## Known caveats
 
 - Non-Steam shortcuts are not in the manifests (out of scope).
+- Workshop content left behind by an uninstalled game (an `appworkshop_<appid>.acf` with no matching `appmanifest`) belongs to no game, so it is not counted. On the dev machine this was 3.4 MB in total, so it is not worth a report of its own.
 - Exact on-disk size (cluster size, NTFS compression, hard links) only matters for high accuracy; logical file sizes are fine for v1.
 - Unsigned PyInstaller exes can trigger antivirus false positives; `--onedir` or code signing mitigates.
 
@@ -161,7 +161,7 @@ pyinstaller --onefile --windowed --add-data "ui/dist;ui/dist" --icon app.ico app
 
 1. **Phase one** (branch `feature/phase-one`): data modules only, no UI or pywebview. `steamdirstats` package: locate Steam, parse libraries and manifests, fast mode; installed games grouped by library; CLI output for testing against a real install.
 2. Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
-3. Category split (game / Workshop / shader cache) and accurate mode with progress.
+3. Category split (game files / Workshop) and accurate mode with progress.
 4. Workshop drill-down with item name lookup + cache.
 5. Actions (open folder, uninstall), table view, portable settings + window state persistence.
 6. PyInstaller build.
