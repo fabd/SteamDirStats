@@ -8,3 +8,8 @@ settings.json
 ui/node_modules/
 ui/dist/
 workshop-names.json
+
+# local files
+.*
+!.claude
+!.gitignore
