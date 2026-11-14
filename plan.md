@@ -84,8 +84,11 @@ Each game's total is split into categories:
 
 ### 5. Two scan modes
 
-- **Fast:** manifests only (near-instant).
-- **Accurate:** walk the real folders (manifest sizes can be stale and omit related data). Show progress in the UI.
+- **Fast:** manifests only (near-instant). The default.
+- **Accurate:** walk the real folders (manifest sizes can be stale and omit related data). Game folders and Workshop item folders are both measured. Progress is reported per game through a callback (`measure.ScanProgress`), which the CLI prints to stderr and the UI will push to the status bar.
+- Measured on the dev machine: 1.1 s for 54 games and 496 GB, because only directory metadata is read. Accurate came out ~2 GB above fast, the bulk of it one game whose manifest was stale (Tomb Raider, +1.6 GB).
+- **Shared install folders.** Some appids share one folder: Skyrim Special Edition (489830) and its Creation Kit (1946180) are both `common/Skyrim Special Edition`. Measuring per game would count those 15 GB twice, so each folder is walked once and split between its games in the proportion their manifests claimed. Steam does the same thing in effect: it gives the Creation Kit only its own 154 MB.
+- A folder that cannot be read (missing, permissions, mid-update) keeps its manifest size rather than dropping to zero. Junctions and symlinks are not followed.
 
 ### 6. Workshop details
 

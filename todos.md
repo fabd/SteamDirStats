@@ -40,14 +40,16 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [x] Game total = game files + Workshop, used for library and global totals
   - [x] IGNORE Shader cache (`shadercache/<appid>`)
   - [x] IGNORE Pending downloads (`downloading/<appid>`, `temp/<appid>`)
-- [ ] Scan modes
+- [x] Scan modes
   - [x] Fast mode: sizes from manifests
-  - [ ] Accurate mode: walk the real folders for every category
-  - [ ] Progress reporting (callback the UI can hook into later)
-  - [ ] `--accurate` CLI option
-- [ ] Workshop details
+  - [x] Accurate mode: walk the real folders for every category (`measure.py`)
+    - [x] Folders shared by two appids (Skyrim SE + Creation Kit) counted once
+    - [x] Unreadable folder keeps its manifest size; junctions not followed
+  - [x] Progress reporting (callback the UI can hook into later)
+  - [x] `--accurate` CLI option
+- [x] Workshop details
   - [x] Per-item ID and size from `WorkshopItemsInstalled`
-  - [ ] Per-item size from disk in accurate mode
+  - [x] Per-item size from disk in accurate mode
   - [x] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails` (`workshop_names.py`)
     - [x] Batched requests, any failure leaves the name empty instead of raising
     - [x] Status line while requesting; progress callback for the UI

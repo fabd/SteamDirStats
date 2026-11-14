@@ -63,6 +63,8 @@ def plural(count: int, word: str) -> str:
 
 def print_report(data: SteamData, show_items: bool = True, show_urls: bool = False) -> None:
     print(f"Steam: {data.steam_path}")
+    if data.accurate:
+        print("Sizes: measured on disk (accurate mode)")
     if data.account:
         print(f"Account: {data.account.display_name}  ({data.account.accountid})")
     for lib in data.libraries:
@@ -125,6 +127,15 @@ def print_name_stats(stats) -> None:
         print(f"Workshop names: {', '.join(parts)}")
 
 
+def report_scan_progress(done: int, total: int, name: str) -> None:
+    """Overwrite one line on stderr while the folders are being measured."""
+    if done >= total:
+        print("\r" + " " * 78 + "\r", end="", file=sys.stderr, flush=True)
+        return
+    line = f"Measuring {done + 1}/{total} on disk: {name}"
+    print(f"\r{line[:76]:<78}", end="", file=sys.stderr, flush=True)
+
+
 def report_progress(done: int, total: int) -> None:
     """Called while the Workshop names are being fetched."""
     if done == 0:
@@ -146,6 +157,11 @@ def main(argv: list[str] | None = None) -> int:
         "--item-urls", action="store_true", help="show the Steam Community link per Workshop item"
     )
     parser.add_argument(
+        "--accurate",
+        action="store_true",
+        help="measure the folders on disk instead of trusting the manifest sizes",
+    )
+    parser.add_argument(
         "--offline",
         action="store_true",
         help="do not call the Steam web API; use cached Workshop names only",
@@ -162,6 +178,8 @@ def main(argv: list[str] | None = None) -> int:
             workshop_names=True,
             offline=args.offline,
             progress=report_progress,
+            accurate=args.accurate,
+            scan_progress=report_scan_progress,
         )
     except SteamNotFoundError as e:
         print(f"Error: {e}", file=sys.stderr)

@@ -150,6 +150,7 @@ class SteamData:
     steam_path: str
     libraries: list[Library] = field(default_factory=list)
     account: Account | None = None  # the most recently signed-in account, if any
+    accurate: bool = False  # True when the sizes were measured on disk, not read from manifests
     name_stats: object = None  # workshop_names.NameStats, when names were looked up
 
     @property
@@ -168,6 +169,7 @@ class SteamData:
         return {
             "steam_path": self.steam_path,
             "account": self.account.to_dict() if self.account else None,
+            "accurate": self.accurate,
             "size_on_disk": self.size_on_disk,
             "workshop_size": self.workshop_size,
             "libraries": [lib.to_dict() for lib in self.libraries],
