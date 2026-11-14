@@ -38,6 +38,39 @@ class WorkshopItem:
 
 
 @dataclass
+class PlayStats:
+    """What one Steam account records about playing one game."""
+
+    playtime: int | None = None  # minutes, all time
+    playtime_2weeks: int | None = None  # minutes, last two weeks
+    last_played: int | None = None  # Unix timestamp
+
+
+@dataclass
+class Account:
+    """The Steam account whose per-account data we read."""
+
+    steamid64: int
+    accountid: int  # the userdata folder name
+    account_name: str = ""
+    persona_name: str = ""
+    userdata_path: str = ""
+
+    @property
+    def display_name(self) -> str:
+        return self.persona_name or self.account_name or str(self.accountid)
+
+    def to_dict(self) -> dict:
+        return {
+            "steamid64": self.steamid64,
+            "accountid": self.accountid,
+            "account_name": self.account_name,
+            "persona_name": self.persona_name,
+            "userdata_path": self.userdata_path,
+        }
+
+
+@dataclass
 class Game:
     appid: int
     name: str
@@ -48,6 +81,10 @@ class Game:
     last_updated: int | None = None  # Unix timestamp
     workshop_size: int = 0  # Workshop content, which SizeOnDisk excludes
     workshop_items: list[WorkshopItem] = field(default_factory=list)
+    # Per-account, from the signed-in account's localconfig.vdf. None = no record.
+    playtime: int | None = None  # minutes, all time
+    playtime_2weeks: int | None = None  # minutes, last two weeks
+    last_played: int | None = None  # Unix timestamp
 
     @property
     def fully_installed(self) -> bool:
@@ -70,6 +107,9 @@ class Game:
             "state_flags": self.state_flags,
             "fully_installed": self.fully_installed,
             "last_updated": self.last_updated,
+            "playtime": self.playtime,
+            "playtime_2weeks": self.playtime_2weeks,
+            "last_played": self.last_played,
             "workshop_items": [item.to_dict() for item in self.workshop_items],
         }
 
@@ -109,6 +149,7 @@ class Library:
 class SteamData:
     steam_path: str
     libraries: list[Library] = field(default_factory=list)
+    account: Account | None = None  # the most recently signed-in account, if any
     name_stats: object = None  # workshop_names.NameStats, when names were looked up
 
     @property
@@ -126,6 +167,7 @@ class SteamData:
     def to_dict(self) -> dict:
         return {
             "steam_path": self.steam_path,
+            "account": self.account.to_dict() if self.account else None,
             "size_on_disk": self.size_on_disk,
             "workshop_size": self.workshop_size,
             "libraries": [lib.to_dict() for lib in self.libraries],

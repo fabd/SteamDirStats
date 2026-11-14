@@ -145,9 +145,11 @@ The app is portable: settings live next to the executable by default.
 
 Installed games and their sizes are shared by all accounts on the PC, but some data is stored per Steam account under `<Steam>/userdata/<accountid>/` (e.g. playtime and last played in `config/localconfig.vdf`).
 
-- **Use the account that signed in most recently.** Read `<Steam>/config/loginusers.vdf`: each entry is keyed by SteamID64; pick the one with `"MostRecent" "1"`, falling back to the highest `Timestamp`.
-- Convert SteamID64 to the `userdata` folder name: `accountid = steamid64 - 76561197960265728`.
+- **Use the account that signed in most recently**, with no account picker in the UI. Read `<Steam>/config/loginusers.vdf`: each entry is keyed by SteamID64; pick the one with `"MostRecent" "1"`, falling back to the highest `Timestamp`. On the dev machine `MostRecent` is absent entirely, so the timestamp fallback is the normal path, not an edge case.
+- Convert SteamID64 to the `userdata` folder name: `accountid = steamid64 - 76561197960265728`. Ignore `userdata/0` (the offline/anonymous folder).
 - If no account or no `userdata` folder is found, skip per-account data; size scanning still works.
+- Playtime is always collected (one small file, silent on failure) from `userdata/<accountid>/config/localconfig.vdf` → `Software/Valve/Steam/apps/<appid>`: `Playtime` and `Playtime2wks` in **minutes**, `LastPlayed` as a Unix timestamp. Old entries use `0` or `86400` (1970-01-02) to mean "never played"; anything before 2003 is treated as no date.
+- This is the local cache Steam writes as it runs, so it can lag the server by a few minutes. Display matches Steam: hours rounded **up** to one decimal (35443 min = 590.72 h, which Steam shows as 590.8), and a date like `Nov 12`, with the year added outside the current year.
 
 ## Known caveats
 

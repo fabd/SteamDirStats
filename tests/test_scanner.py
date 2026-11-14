@@ -169,6 +169,34 @@ class ScanTest(unittest.TestCase):
         self.assertEqual(games[50], "Unknown")  # not in the cache: use the install folder
         self.assertEqual(games[20], "Big Game")  # a real manifest name wins
 
+    def test_playtime_is_attached_from_the_signed_in_account(self):
+        from tests.test_accounts import localconfig, loginusers
+
+        write(os.path.join(self.steam, "config", "loginusers.vdf"),
+              loginusers([(76561198034268291, {"AccountName": "me", "MostRecent": "1"})]))
+        write(os.path.join(self.steam, "userdata", "74002563", "config", "localconfig.vdf"),
+              localconfig({20: {"LastPlayed": "1794440326", "Playtime": "35443"}}))
+
+        data = scan(self.steam)
+        self.assertEqual(data.account.accountid, 74002563)
+        games = {g.appid: g for g in data.games}
+        self.assertEqual(games[20].playtime, 35443)
+        self.assertEqual(games[20].last_played, 1794440326)
+        self.assertIsNone(games[10].playtime)  # no record for this game
+
+        exit_code, out = run_cli(["--steam-path", self.steam, "--no-items"])
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Account: me  (74002563)", out)
+        self.assertIn("590.8 h", out)
+
+    def test_scan_without_any_account(self):
+        data = scan(self.steam)
+        self.assertIsNone(data.account)
+        self.assertTrue(all(g.playtime is None for g in data.games))
+        exit_code, out = run_cli(["--steam-path", self.steam])
+        self.assertEqual(exit_code, 0)
+        self.assertNotIn("Account:", out)
+
     def test_not_a_steam_folder(self):
         with self.assertRaises(SteamNotFoundError):
             scan(self.tmp.name)

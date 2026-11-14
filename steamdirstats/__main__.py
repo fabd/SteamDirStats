@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
+import math
 import sys
 
 from .locate import SteamNotFoundError
@@ -23,12 +25,46 @@ def format_size(num_bytes: int | None) -> str:
     return f"{size:.2f} TB"
 
 
+def format_playtime(minutes: int | None) -> str | None:
+    """Playtime the way Steam shows it: "45 min", "590.8 h".
+
+    Steam rounds the hours up to one decimal (35443 minutes is 590.72 hours,
+    which Steam displays as 590.8), so round the same way to match it.
+    """
+    if not minutes:
+        return None
+    if minutes < 60:
+        return f"{minutes} min"
+    return f"{math.ceil(minutes / 6) / 10:.1f} h"
+
+
+def format_last_played(timestamp: int | None) -> str | None:
+    """A date like Steam's: "Nov 12", with the year added for older dates."""
+    if not timestamp:
+        return None
+    try:
+        when = datetime.datetime.fromtimestamp(timestamp)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if when.year == datetime.date.today().year:
+        return when.strftime("%b %d").replace(" 0", " ")
+    return when.strftime("%b %d, %Y").replace(" 0", " ")
+
+
+def format_play_note(game: Game) -> str:
+    """The "[590.8 h, Nov 12]" part of a game line, empty when never played."""
+    parts = [p for p in (format_playtime(game.playtime), format_last_played(game.last_played)) if p]
+    return f"  [{', '.join(parts)}]" if parts else ""
+
+
 def plural(count: int, word: str) -> str:
     return f"{count} {word}" if count == 1 else f"{count} {word}s"
 
 
 def print_report(data: SteamData, show_items: bool = True, show_urls: bool = False) -> None:
     print(f"Steam: {data.steam_path}")
+    if data.account:
+        print(f"Account: {data.account.display_name}  ({data.account.accountid})")
     for lib in data.libraries:
         print()
         header = f"Library: {lib.path}"
@@ -44,6 +80,7 @@ def print_report(data: SteamData, show_items: bool = True, show_urls: bool = Fal
             note = "" if g.fully_installed else "  [not fully installed]"
             if g.workshop_size:
                 note = f"  ( WORKSHOP {format_size(g.workshop_size)} ){note}"
+            note += format_play_note(g)
             print(f"  {format_size(g.total_size):>10}  {g.name}  ({g.appid}){note}")
             if show_items:
                 print_workshop_items(g, show_urls)

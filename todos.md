@@ -56,12 +56,17 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
     - [x] Remember misses (deleted items) and retry them after a week
   - [x] Name from the item's own `publish_data.txt` when the API will not describe it
   - [x] Fallback to item ID + Steam Community link (`--item-urls`)
-- [ ] Per-account data
-  - [ ] Pick the most recently signed-in account from `config/loginusers.vdf`
-  - [ ] Convert SteamID64 to the `userdata` account ID
-  - [ ] Playtime, playtime last 2 weeks, last played from `localconfig.vdf`
-  - [ ] Skip gracefully when no account is found
-- [ ] CLI shows categories, Workshop items and playtime
+- [x] Per-account data (`accounts.py`)
+  - [x] Pick the most recently signed-in account from `config/loginusers.vdf`
+    - [x] `MostRecent` when present, else the highest `Timestamp` (often the only one there)
+  - [x] Convert SteamID64 to the `userdata` account ID
+  - [x] Playtime, playtime last 2 weeks, last played from `localconfig.vdf`
+    - [x] Placeholder dates (`0`, `86400`) read as "never played"
+  - [x] Skip gracefully when no account is found
+- [x] CLI report completeness
+  - [x] Game files / Workshop categories per game
+  - [x] Workshop items with names, sizes and ranking
+  - [x] Playtime and last played, formatted like Steam (`590.8 h, Nov 12`)
 
 ## Phase two: desktop app (pywebview + Vue 3)
 
