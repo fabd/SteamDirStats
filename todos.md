@@ -2,6 +2,22 @@
 
 See [plan.md](plan.md) for details on each item.
 
+## Milestones
+
+- [x] Phase one (branch `feature/phase-one`)
+  Data modules only, no UI or pywebview. `steamdirstats` package: locate Steam, parse libraries and manifests, fast mode; installed games grouped by library; CLI output for testing against a real install.
+- [ ] Phase two.
+  Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
+- [ ] Category split (game files / Workshop) and accurate mode with progress.
+  Data side done in phase one (`workshop.py`, `measure.py`, `--accurate`); the UI half is pending.
+- [ ] Workshop drill-down with item name lookup + cache.
+  Names and cache done in phase one (`workshop_names.py`, `appdir.py`); the drill-down UI is pending.
+- [ ] Features
+  - [ ] Actions (open folder, uninstall)
+  - [ ] table view
+  - [ ] portable settings + window state persistence
+- [ ] PyInstaller build.
+
 ## Phase one: data modules + command line
 
 Reusable `steamdirstats` package that gathers all the data the UI will display. No UI, no pywebview; output on the command line for testing.

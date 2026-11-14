@@ -180,12 +180,3 @@ python app.py --dev                    # pywebview window pointed at the dev ser
 (cd ui && npm run build)               # -> ui/dist/
 pyinstaller --onefile --windowed --add-data "ui/dist;ui/dist" --icon app.ico app.py
 ```
-
-## Milestones
-
-1. **Phase one** (branch `feature/phase-one`): data modules only, no UI or pywebview. `steamdirstats` package: locate Steam, parse libraries and manifests, fast mode; installed games grouped by library; CLI output for testing against a real install.
-2. Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
-3. Category split (game files / Workshop) and accurate mode with progress.
-4. Workshop drill-down with item name lookup + cache.
-5. Actions (open folder, uninstall), table view, portable settings + window state persistence.
-6. PyInstaller build.
