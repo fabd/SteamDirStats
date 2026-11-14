@@ -29,6 +29,7 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [x] `--json` output
   - [x] UTF-8 output in Git Bash
   - [x] Workshop total per game, with one line per item (`--no-items` to hide)
+  - [x] Workshop item names, with `--offline`, `--item-urls` and a lookup summary line
 - [x] Tests
   - [x] Unit tests with fake Steam folders (`python -m unittest`)
   - [x] Run against a real Steam install on Windows (`python -m steamdirstats`, text + `--json`)
@@ -47,9 +48,14 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Workshop details
   - [x] Per-item ID and size from `WorkshopItemsInstalled`
   - [ ] Per-item size from disk in accurate mode
-  - [ ] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails`
-  - [ ] Cache item names (cache file location passed in by the caller)
-  - [ ] Fallback to item ID + Steam Community link
+  - [x] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails` (`workshop_names.py`)
+    - [x] Batched requests, any failure leaves the name empty instead of raising
+    - [x] Status line while requesting; progress callback for the UI
+  - [x] Cache item names in `workshop-names.json` in the app folder (`appdir.py`)
+    - [x] Look up only the items the cache is missing; `--offline` uses the cache only
+    - [x] Remember misses (deleted items) and retry them after a week
+  - [x] Name from the item's own `publish_data.txt` when the API will not describe it
+  - [x] Fallback to item ID + Steam Community link (`--item-urls`)
 - [ ] Per-account data
   - [ ] Pick the most recently signed-in account from `config/loginusers.vdf`
   - [ ] Convert SteamID64 to the `userdata` account ID
@@ -107,7 +113,7 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Settings and window state
   - [ ] Portable `settings.json` next to the exe (`sys.executable` when frozen, project folder in dev)
   - [ ] Fallback to `%APPDATA%\SteamDirStats\` when the app folder is not writable
-  - [ ] Workshop name cache stored alongside settings
+  - [ ] Workshop name cache stored alongside settings (`appdir.data_file`, done in phase one)
   - [ ] Save / restore window placement with `GetWindowPlacement` / `SetWindowPlacement`
   - [ ] Check behaviour with display scaling (125% / 150%)
 - [ ] Packaging

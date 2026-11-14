@@ -109,6 +109,7 @@ class Library:
 class SteamData:
     steam_path: str
     libraries: list[Library] = field(default_factory=list)
+    name_stats: object = None  # workshop_names.NameStats, when names were looked up
 
     @property
     def games(self) -> list[Game]:

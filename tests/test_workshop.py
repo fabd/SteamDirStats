@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from steamdirstats.workshop import read_library_workshop, read_manifest
+from steamdirstats.workshop import local_title, read_library_workshop, read_manifest
 
 
 def write(path, text):
@@ -32,6 +32,40 @@ def workshop_manifest(appid, items, size_on_disk=None):
     }}
 }}
 '''
+
+
+class LocalTitleTest(unittest.TestCase):
+    """publish_data.txt, written by the Source 2 publishing tools."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.item = os.path.join(self.tmp.name, "3751064269")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_title_from_the_item_folder(self):
+        write(
+            os.path.join(self.item, "publish_data.txt"),
+            '"publish_data"\n{\n'
+            '    "title"          "byteframe14 Runtime: Scott"\n'
+            '    "source_folder"  "byteframe14_04"\n}\n',
+        )
+        self.assertEqual(local_title(self.item), "byteframe14 Runtime: Scott")
+
+    def test_no_publish_data(self):
+        os.makedirs(self.item)
+        self.assertIsNone(local_title(self.item))
+        self.assertIsNone(local_title(os.path.join(self.tmp.name, "nothing")))
+
+    def test_unusable_publish_data(self):
+        for text in (
+            "garbage {",
+            '"publish_data" { "source_folder" "x" }',
+            '"publish_data" { "title" "" }',
+        ):
+            write(os.path.join(self.item, "publish_data.txt"), text)
+            self.assertIsNone(local_title(self.item))
 
 
 class WorkshopTest(unittest.TestCase):

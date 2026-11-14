@@ -3,7 +3,10 @@ import json
 import os
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
+from unittest import mock
+
+from steamdirstats import workshop_names
 
 from steamdirstats import SteamNotFoundError, scan
 from steamdirstats.__main__ import format_size, main
@@ -34,10 +37,19 @@ def vdf_path(p):
     return p.replace("\\", "\\\\")
 
 
+def run_cli(args):
+    """Run the CLI and return what it printed. Progress goes to stderr."""
+    out = io.StringIO()
+    with redirect_stdout(out), redirect_stderr(io.StringIO()):
+        exit_code = main(args)
+    return exit_code, out.getvalue()
+
+
 class ScanTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         root = self.tmp.name
+        self._isolate_name_lookup(root)
         self.steam = os.path.join(root, "Steam")
         self.lib2 = os.path.join(root, "SteamLibrary")
         self.missing = os.path.join(root, "Unplugged")
@@ -61,6 +73,21 @@ class ScanTest(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def _isolate_name_lookup(self, root):
+        """Keep the tests off the network and away from the real name cache."""
+        cache = os.path.join(root, "workshop-names.json")
+        patches = [
+            mock.patch.object(workshop_names, "data_file", lambda name: cache),
+            mock.patch.object(
+                workshop_names.urllib.request,
+                "urlopen",
+                mock.Mock(side_effect=OSError("no network in tests")),
+            ),
+        ]
+        for patch in patches:
+            patch.start()
+            self.addCleanup(patch.stop)
 
     def test_libraries_and_games(self):
         data = scan(self.steam)
@@ -114,19 +141,17 @@ class ScanTest(unittest.TestCase):
         self.assertEqual(without.total_size, without.size_on_disk)
 
     def test_report_shows_workshop_totals_and_items(self):
-        out = io.StringIO()
-        with redirect_stdout(out):
-            main(["--steam-path", self.steam])
-        text = out.getvalue()
+        _, text = run_cli(["--steam-path", self.steam])
         self.assertIn("( WORKSHOP 4.9 KB )", text)
-        self.assertIn("1.    3.9 KB  111", text)
-        self.assertIn("2.    1000 B  222", text)
+        self.assertIn("1.    3.9 KB  111  [name unavailable]", text)
+        self.assertIn("2.    1000 B  222  [name unavailable]", text)
         self.assertIn("(Workshop: 4.9 KB)", text)
+        self.assertIn("Workshop names: 2 not looked up", text)
 
-        out = io.StringIO()
-        with redirect_stdout(out):
-            main(["--steam-path", self.steam, "--no-items"])
-        text = out.getvalue()
+        _, text = run_cli(["--steam-path", self.steam, "--item-urls"])
+        self.assertIn("filedetails/?id=111", text)
+
+        _, text = run_cli(["--steam-path", self.steam, "--no-items"])
         self.assertIn("( WORKSHOP 4.9 KB )", text)
         self.assertNotIn("3.9 KB  111", text)
 
@@ -149,18 +174,14 @@ class ScanTest(unittest.TestCase):
             scan(self.tmp.name)
 
     def test_cli_text_and_json(self):
-        out = io.StringIO()
-        with redirect_stdout(out):
-            self.assertEqual(main(["--steam-path", self.steam]), 0)
-        text = out.getvalue()
+        exit_code, text = run_cli(["--steam-path", self.steam])
+        self.assertEqual(exit_code, 0)
         self.assertIn("Big Game", text)
         self.assertIn("not found, skipped", text)
         self.assertIn("Total: 3 games", text)
 
-        out = io.StringIO()
-        with redirect_stdout(out):
-            main(["--steam-path", self.steam, "--json"])
-        data = json.loads(out.getvalue())
+        _, text = run_cli(["--steam-path", self.steam, "--json"])
+        data = json.loads(text)
         self.assertEqual(data["size_on_disk"], 11300)
         game10 = data["libraries"][0]["games"][0]
         self.assertEqual(game10["total_size"], 6000)

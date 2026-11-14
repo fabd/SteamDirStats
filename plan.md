@@ -21,6 +21,8 @@ steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure
   models.py       Game / Library / SteamData dataclasses (+ to_dict for JSON)
   scanner.py      scan(): the single entry point used by the CLI and the UI
   workshop.py     read appworkshop_*.acf per library (Workshop totals and items)
+  workshop_names.py  Workshop item names from the Steam web API, cached on disk
+  appdir.py       where our own files live (app folder, %APPDATA% fallback)
   __main__.py     CLI for testing: python -m steamdirstats [--json] [--no-items] [--steam-path]
 tests/          unittest suite using fake Steam folders
 app.py          Glue: creates the pywebview window, exposes the API, settings, window state
@@ -88,8 +90,11 @@ Each game's total is split into categories:
 ### 6. Workshop details
 
 - Drill down into a game's Workshop area to see individual items.
-- Item names are not stored locally (only numeric IDs). Resolve names via Steam's public `ISteamRemoteStorage/GetPublishedFileDetails` web API (no key required) and cache them; fall back to the ID plus a link to `https://steamcommunity.com/sharedfiles/filedetails/?id=<itemid>`.
+- Item names are not stored locally (only numeric IDs). Resolve names via Steam's public `ISteamRemoteStorage/GetPublishedFileDetails` web API (no key required) and cache them in `workshop-names.json` next to the settings (§9); fall back to the ID plus a link to `https://steamcommunity.com/sharedfiles/filedetails/?id=<itemid>`.
+- Items the API will not describe (unlisted or private, `result` 9) can still name themselves on disk: items published with the Source 2 tools keep a `publish_data.txt` in their folder holding the title. It is tried last, because a title edited after publishing is only up to date in the API's answer. This is where Steam's own names for such items come from.
+- Names are looked up automatically for any item the cache does not cover: 100 IDs per POST, 10 s timeout, and the lookup gives up after two failed requests so a machine with no network is not held up. Items the API does not know (deleted or private, `result` 9) are cached as misses and retried after a week. `--offline` skips the network and uses the cache only.
 - Known limitation: mods installed outside the Workshop (Nexus, manual, mod managers) count as "Game files"; games that copy Workshop items elsewhere (e.g. Documents) are not detected.
+- Some names are unavailable via Steam's public `ISteamRemoteStorage/GetPublishedFileDetails` web API. We COULD scrape the community page title for the misses only. The name is in `<title>` (or the og:title meta) on exactly the URL we already build as the fallback link. It's a handful of requests, cached like the rest. Caveat: the 429s in the transcript came from rapid unauthenticated requests; one request at a time with a browser User-Agent and a small delay is the way, and a failure just leaves the ID. IGNORE FOR NOW.
 
 ### 7. Treemap UI
 
@@ -134,7 +139,7 @@ The app is portable: settings live next to the executable by default.
   1. If `settings.json` already exists in the app folder, use it.
   2. Else, if the app folder is writable, create it there.
   3. Otherwise (e.g. exe placed in `C:\Program Files\`) fall back to `%APPDATA%\SteamDirStats\settings.json`.
-- The Workshop item-name cache follows the same location.
+- The Workshop item-name cache (`workshop-names.json`) follows the same location.
 
 ### 10. Per-account data (which Steam account to use)
 

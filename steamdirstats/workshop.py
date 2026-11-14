@@ -2,7 +2,9 @@
 
 Workshop content lives in the same library as the game it belongs to, under
 `steamapps/workshop/`, and the game's own `SizeOnDisk` does not include it.
-Item names are not stored locally, only numeric IDs.
+The manifests hold numeric item IDs, not names; some item folders do carry a
+name of their own (see `local_title`), but the general case needs the web API
+in `workshop_names.py`.
 """
 
 from __future__ import annotations
@@ -81,6 +83,24 @@ def _read_item(itemid, details, workshop_dir: str, appid: int) -> WorkshopItem |
         path=os.path.join(workshop_dir, "content", str(appid), str(item_id)),
         time_updated=_to_int(details.get("timeupdated")),
     )
+
+
+def local_title(item_path: str) -> str | None:
+    """The title stored in an item folder, if the item has one.
+
+    Items published with the Source 2 tools (Half-Life: Alyx, SteamVR Home, ...)
+    keep a `publish_data.txt` next to their files holding the title as it was
+    published. It is the only local source of item names, and it covers items
+    the public web API will not describe, such as unlisted ones.
+    """
+    try:
+        data = vdf.load(os.path.join(item_path, "publish_data.txt")).get("publish_data")
+    except OSError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    title = data.get("title")
+    return title if isinstance(title, str) and title else None
 
 
 def _to_int(value) -> int | None:
