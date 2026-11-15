@@ -31,31 +31,49 @@ declare global {
  */
 const READY_TIMEOUT_MS = import.meta.env.DEV ? 1000 : 5000
 
-let readyPromise: Promise<PywebviewApi | null> | null = null
+let readyPromise: Promise<void> | null = null
 
-function waitForApi(): Promise<PywebviewApi | null> {
-  if (window.pywebview?.api) return Promise.resolve(window.pywebview.api)
+/**
+ * Whether the bridge is usable.
+ *
+ * `window.pywebview.api` exists as an empty placeholder before the methods are
+ * attached, so test for a method rather than for the object: a truthiness
+ * check here reports a backend that cannot yet be called.
+ */
+function isReady(): boolean {
+  return typeof window.pywebview?.api?.scan === 'function'
+}
+
+function waitForApi(): Promise<void> {
+  if (isReady()) return Promise.resolve()
 
   return new Promise((resolve) => {
     const done = () => {
       window.removeEventListener('pywebviewready', done)
       clearTimeout(timer)
-      resolve(window.pywebview?.api ?? null)
+      resolve()
     }
     const timer = setTimeout(done, READY_TIMEOUT_MS)
     window.addEventListener('pywebviewready', done)
   })
 }
 
-/** Resolves to the Python API, or null when running outside pywebview. */
-export function api(): Promise<PywebviewApi | null> {
+/**
+ * Resolves to the Python API, or null when running outside pywebview.
+ *
+ * The object is looked up fresh every time: pywebview replaces it while
+ * setting the bridge up, so a reference kept from before `pywebviewready`
+ * goes stale.
+ */
+export async function api(): Promise<PywebviewApi | null> {
   readyPromise ??= waitForApi()
-  return readyPromise
+  await readyPromise
+  return isReady() ? (window.pywebview?.api ?? null) : null
 }
 
-/** True once we know a Python backend answered. Await `api()` first. */
+/** True once a Python backend is attached and callable. Await `api()` first. */
 export function hasBackend(): boolean {
-  return Boolean(window.pywebview?.api)
+  return isReady()
 }
 
 async function call<T>(name: keyof PywebviewApi, run: (a: PywebviewApi) => Promise<T>): Promise<T> {

@@ -25,7 +25,9 @@ steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure
   appdir.py       where our own files live (app folder, %APPDATA% fallback)
   __main__.py     CLI for testing: python -m steamdirstats [--json] [--no-items] [--steam-path]
 tests/          unittest suite using fake Steam folders
-app.py          Glue: creates the pywebview window, exposes the API, settings, window state
+app.py          Glue: creates the pywebview window and exposes the API to JS
+settings.py     Read/write settings.json (merging, so one writer cannot wipe another's keys)
+requirements.txt  pywebview, and pyinstaller for builds; everything in a local .venv
 ui/             Vue 3 + Vite project (package.json, src/, vite.config.ts)
 ui/dist/        Production build output, loaded by pywebview and bundled by PyInstaller
 ```
@@ -173,7 +175,7 @@ Prerequisites: Python 3.12+ and Node.js LTS on Windows; Git Bash as the shell.
 # one-time setup
 python -m venv .venv
 source .venv/Scripts/activate          # Git Bash on Windows
-pip install pywebview pyinstaller
+pip install -r requirements.txt        # pywebview, plus pyinstaller for builds
 (cd ui && npm install)
 
 # development (two terminals)

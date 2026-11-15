@@ -13,13 +13,14 @@
 ### Python
 
 - Python and `uv` are installed and available in Git Bash on Windows.
-- If a script needs third-party packages, use `uv` and keep everything local to the project folder:
-  - Create the environment in `.venv` (`uv venv`) if it doesn't exist.
-  - Add dependencies with `uv add <package>` (in a project with `pyproject.toml`) or `uv pip install <package>`.
-  - Run scripts with `uv run script.py` so the right environment is used without manual activation.
-- Never install packages into the global Python. Don't use plain `pip install` outside a `.venv`.
+- **Never install packages into the global Python.** Third-party packages always go in a project-local `.venv`; don't use plain `pip install` outside one.
+- This project uses a plain venv, declared in `requirements.txt`:
+  - `python -m venv .venv`, then `pip install -r requirements.txt` with it activated.
+  - Pin versions in `requirements.txt` and say which are build-only.
+  - Run with the venv activated, or call `.venv/Scripts/python.exe` directly.
+- `uv` is optional, for a one-off script or anything wanting a lockfile: `uv venv`, `uv add <package>` (with a `pyproject.toml`) or `uv pip install <package>`, and `uv run script.py` to skip activation. Commit `pyproject.toml` and `uv.lock` when used.
 - If activating a venv manually in Git Bash, use `source .venv/Scripts/activate`.
-- Add `.venv/` to `.gitignore`. Commit `pyproject.toml` and `uv.lock`.
+- Add `.venv/` to `.gitignore`.
 
 ### CSS
 

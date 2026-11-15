@@ -47,7 +47,7 @@
 import { defineComponent } from 'vue'
 
 import type { Game } from '@/api/types'
-import { formatLastPlayed, formatPlaytime, formatSize } from '@/lib/format'
+import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@/lib/format'
 import { colors, games, inspect, libraryOf, scanStore, select } from '@/stores/scan-store'
 
 export default defineComponent({
@@ -74,7 +74,7 @@ export default defineComponent({
     libraryLabel(game: Game): string {
       const library = libraryOf(game)
       if (!library) return ''
-      return library.label || library.path
+      return library.label || formatPath(library.path)
     },
   },
 })

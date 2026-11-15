@@ -1,6 +1,12 @@
-/* The one stylesheet main.ts imports. Tailwind first, then our own CSS, so
-   component rules win over utilities of the same specificity. */
-@import 'tailwindcss';
+/*
+  IMPORTANT
+   Tailwind utilities are imported *after* our own CSS, so component rules
+   can use defaults, and be overridden by utilities in the templates.
+*/
+
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 
 @import './base.css';
 @import './components/toolbar.css';
@@ -17,3 +23,5 @@
   --color-text-dim: #9aa1aa;
   --color-accent: #4a9edd;
 }
+
+@import "tailwindcss/utilities.css";

@@ -91,12 +91,15 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Project setup
   - [x] Vue 3 + Vite scaffold in `ui/` (Vue 3 + TS, Tailwind v4, `@` alias, `base: './'`)
   - [x] Dev fixture (`ui/fixture.json`, gitignored) so the UI runs in a plain browser
-  - [ ] `app.py`: pywebview window
-    - [ ] `--dev` mode pointing at the Vite dev server (hot reload, port 5173)
-    - [ ] Release mode loading `ui/dist/index.html`
-  - [ ] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
+  - [x] Local `.venv` + `requirements.txt` (pywebview, pyinstaller); README setup steps
+  - [x] `app.py`: pywebview window
+    - [x] `--dev` mode pointing at the Vite dev server (hot reload, port 5173)
+    - [x] Release mode loading `ui/dist/index.html`
+  - [x] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
+    - [x] `settings.py`: portable `settings.json`, merged on write
+    - [ ] `open_folder` / `uninstall` unused until the context menu lands
   - [x] `api/bridge.ts` wrapper, waits for `pywebviewready` (TS, not `api.js`)
-  - [x] Scan progress hook for `evaluate_js` (`window.sdScanProgress`)
+  - [x] Scan progress pushed via `evaluate_js` (`window.sdScanProgress`, throttled)
   - [x] Shared store (scan data, selection, inspected game, progress)
 - [ ] Layout
   - [x] Window grid: toolbar / content / status bar (`.sd-App`)

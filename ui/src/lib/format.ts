@@ -44,6 +44,17 @@ export function formatPlayNote(playtime: number | null, lastPlayed: number | nul
   return [formatPlaytime(playtime), formatLastPlayed(lastPlayed)].filter(Boolean).join(', ')
 }
 
+/**
+ * A Windows path for display, with the drive letter upper-cased.
+ *
+ * Steam stores its own folder as the registry spelled it, so the same machine
+ * yields both `e:\steam` and `D:\Steam`. Display only: the path we hand back
+ * to Python for open_folder stays exactly as scanned.
+ */
+export function formatPath(path: string): string {
+  return path.replace(/^([a-z]):/, (_match, drive: string) => `${drive.toUpperCase()}:`)
+}
+
 /** A share of a total, as "12%"; empty when the total is zero. */
 export function formatShare(part: number, total: number): string {
   return total > 0 ? `${Math.round((part / total) * 100)}%` : ''
