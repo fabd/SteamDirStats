@@ -37,6 +37,8 @@
 - use alias `@` in imports in place of `src` (eg. `src/app/file` => `@/app/file`)
 - always end statements with a semicolon; don't rely on ASI
 
+After modifying any TypeScript or Vue code, run `npm run typecheck` (`vue-tsc -b`) from the `ui/` directory and fix any reported errors.
+
 ### Vue
 
 - use the Options API
