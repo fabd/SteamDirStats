@@ -7,6 +7,8 @@ dist/
 settings.json
 ui/node_modules/
 ui/dist/
+# dev fixture: a real library listing
+ui/fixture.json
 workshop-names.json
 
 # local files

@@ -1,0 +1,42 @@
+.sd-Toolbar {
+  background: var(--sd-surface-raised);
+  border-bottom: 1px solid var(--sd-border);
+}
+
+.sd-Toolbar-title {
+  color: var(--sd-text-dim);
+}
+
+.sd-Toolbar-button {
+  background: transparent;
+  color: var(--sd-text);
+  border: 1px solid var(--sd-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sd-Toolbar-button:hover {
+  background: var(--sd-row-hover);
+}
+
+.sd-Toolbar-button.is-active {
+  background: var(--sd-selected);
+  border-color: var(--sd-accent);
+}
+
+.sd-Toolbar-button--refresh {
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  color: #0f1216;
+  font-weight: 600;
+}
+
+.sd-Toolbar-button--refresh:hover {
+  filter: brightness(1.1);
+  background: var(--sd-accent);
+}
+
+.sd-Toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

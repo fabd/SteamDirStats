@@ -1,0 +1,18 @@
+.sd-StatusBar {
+  background: var(--sd-surface-raised);
+  border-top: 1px solid var(--sd-border);
+  color: var(--sd-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-StatusBar-value {
+  color: var(--sd-text);
+}
+
+.sd-StatusBar-note--error {
+  color: #e2756b;
+}
+
+.sd-StatusBar-note--fixture {
+  color: #d8b35c;
+}

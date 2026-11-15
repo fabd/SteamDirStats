@@ -89,20 +89,23 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 ## Phase two: desktop app (pywebview + Vue 3)
 
 - [ ] Project setup
-  - [ ] Vue 3 + Vite scaffold in `ui/`
+  - [x] Vue 3 + Vite scaffold in `ui/` (Vue 3 + TS, Tailwind v4, `@` alias, `base: './'`)
+  - [x] Dev fixture (`ui/fixture.json`, gitignored) so the UI runs in a plain browser
   - [ ] `app.py`: pywebview window
-    - [ ] `--dev` mode pointing at the Vite dev server (hot reload)
+    - [ ] `--dev` mode pointing at the Vite dev server (hot reload, port 5173)
     - [ ] Release mode loading `ui/dist/index.html`
   - [ ] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
-  - [ ] `api.js` wrapper, waits for `pywebviewready`
-  - [ ] Scan progress pushed to the UI via `evaluate_js`
-  - [ ] Shared store (scan data, drill-down path, selection, progress)
+  - [x] `api/bridge.ts` wrapper, waits for `pywebviewready` (TS, not `api.js`)
+  - [x] Scan progress hook for `evaluate_js` (`window.sdScanProgress`)
+  - [x] Shared store (scan data, selection, inspected game, progress)
 - [ ] Layout
+  - [x] Window grid: toolbar / content / status bar (`.sd-App`)
   - [ ] Toolbar: fast/accurate toggle, grouped/mixed toggle, settings
-  - [ ] Large Refresh button, top right
+    - [x] Fast/accurate and grouped/mixed toggles (not wired to the treemap yet)
+  - [x] Large Refresh button, top right
   - [ ] Breadcrumb (`All libraries › <Game>`), clickable segments
   - [ ] Resizable treemap / table split
-  - [ ] Status bar: totals, scan progress
+  - [x] Status bar: totals, scan progress
 - [ ] Treemap (`Treemap.vue`)
   - [ ] Squarified layout via `d3-hierarchy`, rendered on Canvas
   - [ ] Combined default view: all games from all libraries
@@ -125,11 +128,12 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Refresh
   - [ ] Rescans with the current fast/accurate mode
   - [ ] Resets to the combined view, clears drill-down and selection
-- [ ] Data table (`GameTable.vue`)
+- [ ] Data table (`sd-game-table.vue`)
   - [ ] Sortable columns: name, size, category breakdown, library
-  - [ ] Playtime and last played columns
+    - [x] Columns rendered (size-ordered; sorting not implemented)
+  - [x] Playtime and last played columns
   - [ ] Shows the drill-down breakdown when inspecting a game
-  - [ ] Selection synced with the treemap
+  - [ ] Selection synced with the treemap (store side done; no treemap yet)
 - [ ] Dialogs
   - [ ] Settings (`<dialog>`)
   - [ ] About
@@ -140,7 +144,7 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [ ] Save / restore window placement with `GetWindowPlacement` / `SetWindowPlacement`
   - [ ] Check behaviour with display scaling (125% / 150%)
 - [ ] Packaging
-  - [ ] `npm run build` → `ui/dist/`
+  - [x] `npm run build` → `ui/dist/` (relative asset URLs, no fixture in the bundle)
   - [ ] PyInstaller `--onefile --windowed` build with `ui/dist` and icon
   - [ ] App icon
   - [ ] Test the exe on a clean Windows PC (no Python / Node)

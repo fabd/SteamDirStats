@@ -26,7 +26,7 @@ steamdirstats/  Pure Python package, no UI: locate Steam, parse VDF/ACF, measure
   __main__.py     CLI for testing: python -m steamdirstats [--json] [--no-items] [--steam-path]
 tests/          unittest suite using fake Steam folders
 app.py          Glue: creates the pywebview window, exposes the API, settings, window state
-ui/             Vue 3 + Vite project (package.json, src/, vite.config.js)
+ui/             Vue 3 + Vite project (package.json, src/, vite.config.ts)
 ui/dist/        Production build output, loaded by pywebview and bundled by PyInstaller
 ```
 
@@ -113,15 +113,19 @@ Each game's total is split into categories:
 
 - **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
-  - `Toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
-  - `Breadcrumb.vue`: All libraries › game (› Workshop); each segment is clickable to go back.
-  - `Treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to drill down.
-  - `ContextMenu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
-  - `GameTable.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
-  - `StatusBar.vue`: totals, scan progress.
-  - Dialogs (`SettingsDialog.vue`, about) built on native `<dialog>` / `showModal()`.
+  - `sd-toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
+  - `sd-breadcrumb.vue`: All libraries › game (› Workshop); each segment is clickable to go back.
+  - `sd-treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to drill down.
+  - `sd-context-menu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
+  - `sd-game-table.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
+  - `sd-status-bar.vue`: totals, scan progress.
+  - Dialogs (`sd-settings-dialog.vue`, about) built on native `<dialog>` / `showModal()`.
+  - Filenames are kebab-case with an `Sd` component name, per CLAUDE.md.
 - **Native HTML/CSS first:** `<dialog>`, the `popover` attribute for menus, CSS grid for layout (toolbar / resizable treemap–table split / status bar). No UI component library initially.
-- **Python bridge:** wrap `window.pywebview.api` calls in one `api.js` module; wait for the `pywebviewready` event before the first call. Progress pushed from Python via `evaluate_js` updates the store.
+- **Python bridge:** wrap `window.pywebview.api` calls in one `src/api/bridge.ts` module; wait for the `pywebviewready` event before the first call. Progress pushed from Python via `evaluate_js` calls `window.sdScanProgress(done, total, name)`, which updates the store.
+- **Styling:** Tailwind v4 (the Vite plugin, no `tailwind.config.js`) for layout utilities; component styling in `src/styles/components/*.css` using the `sd-` class names, not `<style scoped>` blocks, so the names stay greppable in one place.
+- **Dev without Python:** when no backend answers `pywebviewready`, the store falls back to `ui/fixture.json` (`python -m steamdirstats --json > ui/fixture.json`, gitignored since it lists a real library). It sits outside `src/` so it is served in dev but never bundled into a release build.
+- **Release paths:** Vite is configured with `base: './'` because pywebview loads `ui/dist/index.html` over `file://`, where absolute asset URLs resolve to the drive root.
 
 ### 8. Window state persistence
 

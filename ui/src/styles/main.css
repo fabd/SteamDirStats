@@ -1,0 +1,19 @@
+/* The one stylesheet main.ts imports. Tailwind first, then our own CSS, so
+   component rules win over utilities of the same specificity. */
+@import 'tailwindcss';
+
+@import './base.css';
+@import './components/toolbar.css';
+@import './components/table.css';
+@import './components/status-bar.css';
+
+/* Tokens Tailwind should know about, so `bg-surface` and friends work
+   alongside the custom CSS below. */
+@theme {
+  --color-surface: #1e2126;
+  --color-surface-raised: #272b31;
+  --color-border: #3a3f47;
+  --color-text: #e6e8ea;
+  --color-text-dim: #9aa1aa;
+  --color-accent: #4a9edd;
+}

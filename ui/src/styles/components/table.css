@@ -1,0 +1,48 @@
+.sd-GameTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.sd-GameTable-header {
+  position: sticky;
+  top: 0;
+  background: var(--sd-surface-raised);
+  border-bottom: 1px solid var(--sd-border);
+  color: var(--sd-text-dim);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sd-GameTable-cell {
+  border-bottom: 1px solid color-mix(in srgb, var(--sd-border) 50%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sd-GameTable-cell--size,
+.sd-GameTable-cell--play {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-GameTable-cell--dim {
+  color: var(--sd-text-dim);
+}
+
+.sd-GameTable-row:hover > .sd-GameTable-cell {
+  background: var(--sd-row-hover);
+}
+
+.sd-GameTable-row.is-selected > .sd-GameTable-cell {
+  background: var(--sd-selected);
+}
+
+/* The library's colour, as it will appear on the treemap tiles. */
+.sd-GameTable-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
