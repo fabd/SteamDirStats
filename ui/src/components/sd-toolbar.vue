@@ -33,24 +33,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 
-import { scanStore } from '@/stores/scan-store'
-import { settingsStore, update } from '@/stores/settings-store'
+import { scanStore } from '@/stores/scan-store';
+import { settingsStore, update } from '@/stores/settings-store';
 
 export default defineComponent({
   name: 'SdToolbar',
   emits: ['refresh'],
   data() {
-    return { scan: scanStore, settings: settingsStore }
+    return { scan: scanStore, settings: settingsStore };
   },
   methods: {
     toggleAccurate() {
-      update({ accurate: !this.settings.accurate })
+      update({ accurate: !this.settings.accurate });
     },
     toggleLayout() {
-      update({ layout: this.settings.layout === 'grouped' ? 'mixed' : 'grouped' })
+      update({ layout: this.settings.layout === 'grouped' ? 'mixed' : 'grouped' });
     },
   },
-})
+});
 </script>

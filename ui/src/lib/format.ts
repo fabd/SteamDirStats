@@ -5,15 +5,15 @@
 
 /** Binary units, labelled like Windows Explorer (1 GB = 1024^3 bytes). */
 export function formatSize(numBytes: number | null): string {
-  if (numBytes === null || numBytes === undefined) return '?'
-  let size = numBytes
+  if (numBytes === null || numBytes === undefined) return '?';
+  let size = numBytes;
   for (const unit of ['B', 'KB', 'MB', 'GB']) {
     if (size < 1024) {
-      return unit === 'B' ? `${Math.round(size)} B` : `${size.toFixed(1)} ${unit}`
+      return unit === 'B' ? `${Math.round(size)} B` : `${size.toFixed(1)} ${unit}`;
     }
-    size /= 1024
+    size /= 1024;
   }
-  return `${size.toFixed(2)} TB`
+  return `${size.toFixed(2)} TB`;
 }
 
 /**
@@ -23,25 +23,25 @@ export function formatSize(numBytes: number | null): string {
  * shown as 590.8), so round the same way to match it.
  */
 export function formatPlaytime(minutes: number | null): string {
-  if (!minutes) return ''
-  if (minutes < 60) return `${minutes} min`
-  return `${(Math.ceil(minutes / 6) / 10).toFixed(1)} h`
+  if (!minutes) return '';
+  if (minutes < 60) return `${minutes} min`;
+  return `${(Math.ceil(minutes / 6) / 10).toFixed(1)} h`;
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** A date like Steam's: "Nov 12", with the year added outside this year. */
 export function formatLastPlayed(timestamp: number | null): string {
-  if (!timestamp) return ''
-  const when = new Date(timestamp * 1000)
-  if (Number.isNaN(when.getTime())) return ''
-  const day = `${MONTHS[when.getMonth()]} ${when.getDate()}`
-  return when.getFullYear() === new Date().getFullYear() ? day : `${day}, ${when.getFullYear()}`
+  if (!timestamp) return '';
+  const when = new Date(timestamp * 1000);
+  if (Number.isNaN(when.getTime())) return '';
+  const day = `${MONTHS[when.getMonth()]} ${when.getDate()}`;
+  return when.getFullYear() === new Date().getFullYear() ? day : `${day}, ${when.getFullYear()}`;
 }
 
 /** The "590.8 h, Nov 12" note on a game, empty when never played. */
 export function formatPlayNote(playtime: number | null, lastPlayed: number | null): string {
-  return [formatPlaytime(playtime), formatLastPlayed(lastPlayed)].filter(Boolean).join(', ')
+  return [formatPlaytime(playtime), formatLastPlayed(lastPlayed)].filter(Boolean).join(', ');
 }
 
 /**
@@ -52,10 +52,10 @@ export function formatPlayNote(playtime: number | null, lastPlayed: number | nul
  * to Python for open_folder stays exactly as scanned.
  */
 export function formatPath(path: string): string {
-  return path.replace(/^([a-z]):/, (_match, drive: string) => `${drive.toUpperCase()}:`)
+  return path.replace(/^([a-z]):/, (_match, drive: string) => `${drive.toUpperCase()}:`);
 }
 
 /** A share of a total, as "12%"; empty when the total is zero. */
 export function formatShare(part: number, total: number): string {
-  return total > 0 ? `${Math.round((part / total) * 100)}%` : ''
+  return total > 0 ? `${Math.round((part / total) * 100)}%` : '';
 }

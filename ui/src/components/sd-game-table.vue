@@ -44,20 +44,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 
-import type { Game } from '@/api/types'
-import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@/lib/format'
-import { colors, games, inspect, libraryOf, scanStore, select } from '@/stores/scan-store'
+import type { Game } from '@/api/types';
+import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@/lib/format';
+import { colors, games, inspect, libraryOf, scanStore, select } from '@/stores/scan-store';
 
 export default defineComponent({
   name: 'SdGameTable',
   data() {
-    return { scan: scanStore }
+    return { scan: scanStore };
   },
   computed: {
     rows(): Game[] {
-      return games.value
+      return games.value;
     },
   },
   methods: {
@@ -67,15 +67,15 @@ export default defineComponent({
     select,
     inspect,
     colorOf(game: Game): string {
-      const library = libraryOf(game)
-      return library ? (colors.value.get(library.path) ?? 'transparent') : 'transparent'
+      const library = libraryOf(game);
+      return library ? (colors.value.get(library.path) ?? 'transparent') : 'transparent';
     },
     /** The library's label, or its path when Steam stored no label. */
     libraryLabel(game: Game): string {
-      const library = libraryOf(game)
-      if (!library) return ''
-      return library.label || formatPath(library.path)
+      const library = libraryOf(game);
+      if (!library) return '';
+      return library.label || formatPath(library.path);
     },
   },
-})
+});
 </script>

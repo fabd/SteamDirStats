@@ -9,16 +9,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
-import SdGameTable from "@/components/sd-game-table.vue";
-import SdStatusBar from "@/components/sd-status-bar.vue";
-import SdToolbar from "@/components/sd-toolbar.vue";
-import { load, refresh } from "@/stores/scan-store";
-import { loadSettings, settingsStore } from "@/stores/settings-store";
+import SdGameTable from '@/components/sd-game-table.vue';
+import SdStatusBar from '@/components/sd-status-bar.vue';
+import SdToolbar from '@/components/sd-toolbar.vue';
+import { load, refresh } from '@/stores/scan-store';
+import { loadSettings, settingsStore } from '@/stores/settings-store';
 
 export default defineComponent({
-  name: "SdApp",
+  name: 'SdApp',
   components: { SdGameTable, SdStatusBar, SdToolbar },
   async created() {
     await loadSettings();

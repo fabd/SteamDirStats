@@ -35,6 +35,7 @@
 - use kebab-case for filenames (eg. root-bundle.ts)
 - use PascalCase for classes (eg. KoDialog)
 - use alias `@` in imports in place of `src` (eg. `src/app/file` => `@/app/file`)
+- always end statements with a semicolon; don't rely on ASI
 
 ### Vue
 

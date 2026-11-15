@@ -15,3 +15,5 @@ workshop-names.json
 .*
 !.claude
 !.gitignore
+!.prettierrc.json
+!.prettierignore

@@ -23,30 +23,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 
-import { formatSize } from '@/lib/format'
-import { games, libraries, scanStore } from '@/stores/scan-store'
+import { formatSize } from '@/lib/format';
+import { games, libraries, scanStore } from '@/stores/scan-store';
 
 export default defineComponent({
   name: 'SdStatusBar',
   data() {
-    return { scan: scanStore }
+    return { scan: scanStore };
   },
   computed: {
     games() {
-      return games.value
+      return games.value;
     },
     libraries() {
-      return libraries.value
+      return libraries.value;
     },
     total(): number {
-      return this.scan.data?.size_on_disk ?? 0
+      return this.scan.data?.size_on_disk ?? 0;
     },
     workshopTotal(): number {
-      return this.scan.data?.workshop_size ?? 0
+      return this.scan.data?.workshop_size ?? 0;
     },
   },
   methods: { formatSize },
-})
+});
 </script>

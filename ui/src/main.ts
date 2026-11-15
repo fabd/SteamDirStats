@@ -1,6 +1,6 @@
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 
-import SdApp from '@/app.vue'
-import '@/styles/main.css'
+import SdApp from '@/app.vue';
+import '@/styles/main.css';
 
-createApp(SdApp).mount('#app')
+createApp(SdApp).mount('#app');

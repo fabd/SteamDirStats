@@ -15,20 +15,20 @@ const LIBRARY_COLORS = [
   '#3f7f7f', // teal
   '#6f4f9f', // violet
   '#9f3f4f', // red
-]
+];
 
 /** Colours for the drill-down view, where tiles are categories. */
 export const CATEGORY_COLORS = {
   game: '#2f6f9f',
   workshop: '#9f5a2f',
-} as const
+} as const;
 
-export type Category = keyof typeof CATEGORY_COLORS
+export type Category = keyof typeof CATEGORY_COLORS;
 
 export function libraryColors(paths: string[]): Map<string, string> {
-  const colors = new Map<string, string>()
+  const colors = new Map<string, string>();
   paths.forEach((path, i) => {
-    colors.set(path, LIBRARY_COLORS[i % LIBRARY_COLORS.length])
-  })
-  return colors
+    colors.set(path, LIBRARY_COLORS[i % LIBRARY_COLORS.length]);
+  });
+  return colors;
 }
