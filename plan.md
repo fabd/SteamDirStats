@@ -47,11 +47,23 @@ User-facing features, in plain terms. Implementation details are in the function
 2. **One colour per library.** Each library gets its own distinct colour, so the space taken by each library is visible at a glance. A legend maps each colour to its library (path/drive and total size).
 3. **Grouped or mixed layout (toggle).** Default is **grouped**: each library's games form one contiguous block, so the block's area shows that library's share. A toggle switches to **mixed**: all games laid out by size regardless of library, which makes the biggest games easier to compare. Tile areas are exact in both layouts. The choice is remembered in settings.
 4. **Right-click menu on a game.** Right-clicking a game tile opens a small context menu with:
-   - **Inspect**: opens the drill-down view for that game (feature 5).
+   - **View Workshop Items**: expands that game's Workshop items in the table (feature 5), exactly as the row's own expand control does. Shown **only** on games that have Workshop items, so the menu has one entry fewer on most games.
    - **Open folder**: opens the game's install folder in Explorer.
    - **Uninstall…**: opens `steam://uninstall/<appid>` directly, with no confirmation dialog of our own. Steam comes to the front (starting first if needed) and shows its own uninstall dialog, where the user can still cancel. The user then clicks **Refresh** (feature 6) to update sizes.
-5. **Drill-down view.** *Inspect* replaces the whole treemap with a treemap of that one game, split by category (game files, Workshop), coloured by category, with Workshop items as individual tiles inside the Workshop area. The table shows the same breakdown. Navigate back with the breadcrumb (`All libraries › <Game>`) or **Backspace/Esc**. Double-clicking a game tile is a shortcut for *Inspect*.
-6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode and always resets the view to the startup view (all libraries combined), clearing any drill-down and selection. This keeps the view valid when the inspected game was just uninstalled.
+5. **Workshop items in the table.** There is no drill-down view, and no treemap of a single game: the treemap always shows every game. Instead a game with Workshop content can be **expanded in the table**, listing its items indented underneath it, the way the CLI report does:
+
+   ```
+   SteamVR                    34.8 GB  [v] 29.4 GB   590.8 h   Nov 12   D:\SteamLibrary
+     Advanced Settings                      7.1 GB                      View on Steam Workshop
+     Knuckles Driver                        3.4 GB                      View on Steam Workshop
+   ```
+
+   - An expand/collapse control sits next to the **Workshop** figure on the game row, and only on games that have items. Expanded games stay expanded until the next Refresh.
+   - Three ways in, all the same action: the row's control, **View Workshop Items** in the context menu (feature 4), and double-clicking the game's tile. The two that start from the treemap also scroll the game's row into view, since the table may be scrolled somewhere else entirely.
+   - Item rows are sorted by size, largest first, independently of how the game rows are sorted.
+   - On an item row only two columns carry anything: the item's name (indented) under **Game**, and its size under **Workshop**. **Size**, **Playtime** and **Last played** stay empty, because an item has no game-files size and no playtime of its own.
+   - The **Library** column of an item row holds a dark red **View on Steam Workshop** link (§7c) — the item is already in the game's library, so the column would otherwise repeat it.
+6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode and always resets the view to the startup view (all libraries combined), clearing the selection and collapsing every expanded game. This keeps the view valid when a game that was on screen has just been uninstalled.
 
 ## Functional requirements
 
@@ -94,7 +106,7 @@ Each game's total is split into categories:
 
 ### 6. Workshop details
 
-- Drill down into a game's Workshop area to see individual items.
+- Expand a game in the table to see its individual items (general feature 5).
 - Item names are not stored locally (only numeric IDs). Resolve names via Steam's public `ISteamRemoteStorage/GetPublishedFileDetails` web API (no key required) and cache them in `workshop-names.json` next to the settings (§9); fall back to the ID plus a link to `https://steamcommunity.com/sharedfiles/filedetails/?id=<itemid>`.
 - Items the API will not describe (unlisted or private, `result` 9) can still name themselves on disk: items published with the Source 2 tools keep a `publish_data.txt` in their folder holding the title. It is tried last, because a title edited after publishing is only up to date in the API's answer. This is where Steam's own names for such items come from.
 - Names are looked up automatically for any item the cache does not cover: 100 IDs per POST, 10 s timeout, and the lookup gives up after two failed requests so a machine with no network is not held up. Items the API does not know (deleted or private, `result` 9) are cached as misses and retried after a week. `--offline` skips the network and uses the cache only.
@@ -103,8 +115,8 @@ Each game's total is split into categories:
 
 ### 7. Treemap UI
 
-- Squarified treemap. Default view: all games from all libraries combined, grouped by library with a toggle for mixed (see General features 1–3); drill down game → category (→ Workshop item).
-- Colour: by library in the combined view (fixed colour per library, stable across rescans); by category (game files / Workshop) inside a game. Hover tooltip with name, size, library, path, appid.
+- Squarified treemap, one tile per game: all games from all libraries combined, grouped by library with a toggle for mixed (see General features 1–3).
+- Colour by library (fixed colour per library, stable across rescans). Hover tooltip with name, size, library, path, appid.
 - Legend + a sortable table view as an alternative to the treemap.
 - Actions on a game:
   - **Open folder** (Explorer, via Python `os.startfile`).
@@ -113,13 +125,12 @@ Each game's total is split into categories:
 
 ### 7b. GUI implementation (Vue 3 + Vite)
 
-- **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, current drill-down path, selection, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
+- **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, selection, the set of games expanded in the table, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
   - `sd-toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
-  - `sd-breadcrumb.vue`: All libraries › game (› Workshop); each segment is clickable to go back.
   - `sd-treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to drill down.
-  - `sd-context-menu.vue`: right-click menu (Inspect, Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
-  - `sd-game-table.vue`: plain `<table>` with sortable columns (name, size, category breakdown, library). Virtualisation only if needed (TanStack Table as an option).
+  - `sd-context-menu.vue`: right-click menu (View Workshop Items — only with items — Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
+  - `sd-game-table.vue`: plain `<table>` with sortable columns (name, size, Workshop, playtime, last played, library), plus the expandable Workshop item rows (general feature 5). Rows are a flat list of game and item rows built in one computed property, so the `<table>` stays one `v-for` and the browser keeps the column widths. Virtualisation only if needed (TanStack Table as an option).
   - `sd-status-bar.vue`: totals, scan progress.
   - Dialogs (`sd-settings-dialog.vue`, about) built on native `<dialog>` / `showModal()`.
   - Filenames are kebab-case with an `Sd` component name, per CLAUDE.md.
@@ -128,6 +139,18 @@ Each game's total is split into categories:
 - **Styling:** Tailwind v4 (the Vite plugin, no `tailwind.config.js`) for layout utilities; component styling in `src/styles/components/*.css` using the `sd-` class names, not `<style scoped>` blocks, so the names stay greppable in one place.
 - **Dev without Python:** when no backend answers `pywebviewready`, the store falls back to `ui/fixture.json` (`python -m steamdirstats --json > ui/fixture.json`, gitignored since it lists a real library). It sits outside `src/` so it is served in dev but never bundled into a release build.
 - **Release paths:** Vite is configured with `base: './'` because pywebview loads `ui/dist/index.html` over `file://`, where absolute asset URLs resolve to the drive root.
+
+### 7c. Removing a Workshop item
+
+The **View on Steam Workshop** link on an item row opens the item's page in the Steam client, where **Unsubscribe** removes it.
+
+- Steam exposes **no** `steam://` action that unsubscribes from, or deletes, a single Workshop item. The only documented route is `ISteamUGC::UnsubscribeItem`, which a game calls through the Steamworks SDK from inside its own process — not something an external tool can do.
+- So the link opens `steam://url/CommunityFilePage/<itemid>`, which is documented, and **Unsubscribe** is one click away on that page. Steam then deletes the files itself (after the game exits, for a game that is running).
+- The label says what the link actually does rather than promising a removal we cannot perform. It is styled dark red all the same, because unsubscribing is where it leads; this adds a `--sd-danger` token to `styles/base.css`, which has none yet.
+- Deleting the folder ourselves is deliberately rejected: while the user is still subscribed Steam re-downloads the item, and the entry left in `workshop/appworkshop_<appid>.acf` makes our own sizes wrong until Steam rewrites it.
+- Python side: one more API method next to `uninstall(appid)`, taking the item id and building the URL itself (`os.startfile(f"steam://url/CommunityFilePage/{int(itemid)}")`), so the page never passes a URL to `os.startfile`.
+- The item also carries a `url` from the scan (`workshop_items[].url`, a `steamcommunity.com` address). That is the fallback for a browser, not what this link uses: in the app we want the page inside Steam, where the Unsubscribe button is.
+- Nothing refreshes by itself: the user clicks **Refresh** afterwards, as after a game uninstall.
 
 ### 8. Window state persistence
 

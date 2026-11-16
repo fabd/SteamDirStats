@@ -10,8 +10,8 @@ See [plan.md](plan.md) for details on each item.
   Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
 - [ ] Category split (game files / Workshop) and accurate mode with progress.
   Data side done in phase one (`workshop.py`, `measure.py`, `--accurate`); the UI half is pending.
-- [ ] Workshop drill-down with item name lookup + cache.
-  Names and cache done in phase one (`workshop_names.py`, `appdir.py`); the drill-down UI is pending.
+- [ ] Workshop items expandable in the table, with item name lookup + cache.
+  Names and cache done in phase one (`workshop_names.py`, `appdir.py`); the table rows are pending.
 - [ ] Features
   - [ ] Actions (open folder, uninstall)
   - [ ] table view
@@ -106,7 +106,6 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [ ] Toolbar: fast/accurate toggle, grouped/mixed toggle, settings
     - [x] Fast/accurate and grouped/mixed toggles (grouped/mixed drives the treemap)
   - [x] Large Refresh button, top right
-  - [ ] Breadcrumb (`All libraries › <Game>`), clickable segments
   - [ ] Resizable treemap / table split
   - [x] Status bar: totals, scan progress
 - [x] Treemap (`sd-treemap.vue`)
@@ -120,24 +119,34 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [x] Context menu (`sd-context-menu.vue`)
   - [x] Opens on right-click at the cursor; closes on Esc / outside click
     - [x] `popover="auto"`, kept in view at the window edges
-  - [x] Inspect (sets the inspected game; the drill-down view itself is pending)
   - [x] Open folder (Explorer)
   - [x] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
-- [ ] Drill-down view
-  - [ ] Inspect replaces the treemap with the selected game
-  - [ ] Split by category, coloured by category
-  - [ ] Workshop items as individual tiles, with names
-  - [x] Double-click a game tile as a shortcut for Inspect
-  - [ ] Back via breadcrumb, Backspace or Esc
+  - [ ] View Workshop Items (expands the game in the table), only on games that have items
+- [ ] Remove the drill-down (design change, plan.md general feature 5)
+  - [ ] Drop **Inspect** from the context menu
+  - [ ] Drop `inspecting` / `inspect()` / `inspectedGame` from the store (no view reads them)
+  - [ ] Double-click a game tile expands that game in the table instead
+  - [ ] Expanding from the treemap scrolls the game's row into view
+  - [ ] No breadcrumb component
 - [ ] Refresh
   - [ ] Rescans with the current fast/accurate mode
-  - [ ] Resets to the combined view, clears drill-down and selection
+  - [ ] Resets to the combined view, clears the selection and collapses expanded games
 - [ ] Data table (`sd-game-table.vue`)
-  - [ ] Sortable columns: name, size, category breakdown, library
+  - [ ] Sortable columns: name, size, Workshop, playtime, last played, library
     - [x] Columns rendered (size-ordered; sorting not implemented)
   - [x] Playtime and last played columns
-  - [ ] Shows the drill-down breakdown when inspecting a game
   - [x] Selection synced with the treemap
+  - [ ] Workshop item rows (plan.md general feature 5)
+    - [ ] `expanded: Set<number>` of appids in the store, cleared on refresh
+    - [ ] Expand/collapse control in the Workshop cell, only on games that have items
+    - [ ] Flat row list (game + item rows) in one computed property; items largest first
+    - [ ] Item row: indented name, size in the Workshop column, Size/Playtime/Last played empty
+    - [ ] Item name falls back to the item id when none was resolved
+    - [ ] Clicking an item row selects its parent game
+    - [ ] Dark red **View on Steam Workshop** link in the Library column (plan.md §7c)
+      - [ ] `workshop_page(itemid)` in `app.py` → `steam://url/CommunityFilePage/<itemid>`
+      - [ ] `bridge.ts` wrapper; failures go to the status bar via `notify()`
+    - [ ] CSS in `styles/components/table.css` (`--item` row, toggle, danger link)
 - [ ] Dialogs
   - [ ] Settings (`<dialog>`)
   - [ ] About
