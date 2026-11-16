@@ -36,8 +36,25 @@ body {
   height: 100%;
 }
 
+/* Treemap above, table below. A fixed split for now; making it draggable is
+   its own item. `minmax(0, …)` keeps the rows from being pushed out by their
+   content, so the treemap can shrink and the table scrolls instead. */
 .sd-App-content {
+  display: grid;
+  grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  overflow: hidden;
+}
+
+/* The treemap pane: canvas, with the legend pinned under it. */
+.sd-App-map {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.sd-App-table {
   overflow: auto;
+  border-top: 1px solid var(--sd-border);
 }
 
 ::selection {

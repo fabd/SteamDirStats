@@ -10,6 +10,8 @@
 
 @import './base.css';
 @import './components/toolbar.css';
+@import './components/treemap.css';
+@import './components/legend.css';
 @import './components/table.css';
 @import './components/status-bar.css';
 

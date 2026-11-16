@@ -1,0 +1,51 @@
+/* The treemap fills its pane; the canvas is sized in JS from the pane's box,
+   so it needs no intrinsic size of its own. */
+
+.sd-Treemap {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sd-surface);
+}
+
+.sd-Treemap-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sd-Treemap-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--sd-text-dim);
+  pointer-events: none;
+}
+
+/* Follows the cursor, so it must never eat the mouse events the canvas needs. */
+.sd-Treemap-tooltip {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 1px;
+  background: var(--sd-surface-raised);
+  border: 1px solid var(--sd-border);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 45%);
+  pointer-events: none;
+}
+
+.sd-Treemap-tooltipName {
+  font-weight: 600;
+}
+
+.sd-Treemap-tooltipSize {
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-Treemap-tooltipDim {
+  color: var(--sd-text-dim);
+  overflow-wrap: anywhere;
+}

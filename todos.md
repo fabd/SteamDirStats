@@ -104,19 +104,19 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Layout
   - [x] Window grid: toolbar / content / status bar (`.sd-App`)
   - [ ] Toolbar: fast/accurate toggle, grouped/mixed toggle, settings
-    - [x] Fast/accurate and grouped/mixed toggles (not wired to the treemap yet)
+    - [x] Fast/accurate and grouped/mixed toggles (grouped/mixed drives the treemap)
   - [x] Large Refresh button, top right
   - [ ] Breadcrumb (`All libraries › <Game>`), clickable segments
   - [ ] Resizable treemap / table split
   - [x] Status bar: totals, scan progress
-- [ ] Treemap (`Treemap.vue`)
-  - [ ] Squarified layout via `d3-hierarchy`, rendered on Canvas
-  - [ ] Combined default view: all games from all libraries
-  - [ ] One colour per library, stable across rescans
-  - [ ] Legend: library colour, path, total size
-  - [ ] Grouped layout by default, toggle to mixed (remembered in settings)
-  - [ ] Hover tooltip: name, size, library, path, appid
-  - [ ] Click to select (syncs with the table)
+- [x] Treemap (`sd-treemap.vue`)
+  - [x] Squarified layout via `d3-hierarchy`, rendered on Canvas
+  - [x] Combined default view: all games from all libraries
+  - [x] One colour per library, stable across rescans
+  - [x] Legend: library colour, path, total size (`sd-legend.vue`)
+  - [x] Grouped layout by default, toggle to mixed (remembered in settings)
+  - [x] Hover tooltip: name, size, library, path, appid
+  - [x] Click to select (syncs with the table)
 - [ ] Context menu (`ContextMenu.vue`)
   - [ ] Opens on right-click at the cursor; closes on Esc / outside click
   - [ ] Inspect
@@ -136,7 +136,7 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
     - [x] Columns rendered (size-ordered; sorting not implemented)
   - [x] Playtime and last played columns
   - [ ] Shows the drill-down breakdown when inspecting a game
-  - [ ] Selection synced with the treemap (store side done; no treemap yet)
+  - [x] Selection synced with the treemap
 - [ ] Dialogs
   - [ ] Settings (`<dialog>`)
   - [ ] About

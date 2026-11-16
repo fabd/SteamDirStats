@@ -1,0 +1,29 @@
+/* Maps each treemap colour to its library (plan.md, general feature 2). */
+
+.sd-Legend {
+  list-style: none;
+  margin: 0;
+  border-top: 1px solid var(--sd-border);
+  background: var(--sd-surface-raised);
+  font-size: 12px;
+}
+
+.sd-Legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.sd-Legend-label {
+  font-weight: 600;
+}
+
+.sd-Legend-path,
+.sd-Legend-share {
+  color: var(--sd-text-dim);
+}
+
+.sd-Legend-size {
+  font-variant-numeric: tabular-nums;
+}
