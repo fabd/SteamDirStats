@@ -4,6 +4,7 @@
 }
 
 .sd-GameTable-header {
+  padding: 0.25rem 0.75rem;
   position: sticky;
   top: 0;
   background: var(--sd-surface-raised);
@@ -15,10 +16,17 @@
 }
 
 .sd-GameTable-cell {
+  padding: 0.25rem 0.75rem;
   border-bottom: 1px solid color-mix(in srgb, var(--sd-border) 50%, transparent);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Workshop item rows, indented under their game */
+.sd-GameTable-cell--item {
+  padding-left: 2rem;
+  color: var(--sd-text-dim);
 }
 
 .sd-GameTable-cell--size,
@@ -37,6 +45,57 @@
 
 .sd-GameTable-row.is-selected > .sd-GameTable-cell {
   background: var(--sd-selected);
+}
+
+/* Right-aligned numbers inside the Workshop cell, which also holds the
+   expand control, so the cell itself cannot simply be text-align: right. */
+.sd-GameTable-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The expand/collapse control, on games that have Workshop items. */
+.sd-GameTable-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--sd-text-dim);
+  cursor: pointer;
+}
+
+.sd-GameTable-toggle:hover {
+  background: var(--sd-surface-raised);
+  color: var(--sd-text);
+}
+
+.sd-GameTable-chevron {
+  font-size: 10px;
+  line-height: 1;
+  transition: transform 0.1s ease-out;
+}
+
+.sd-GameTable-toggle.is-expanded > .sd-GameTable-chevron {
+  transform: rotate(90deg);
+}
+
+/* "View on Steam Workshop": a link in all but the markup, where it is a
+   button because it acts rather than navigates. */
+.sd-GameTable-danger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sd-danger);
+  cursor: pointer;
+  font: inherit;
+}
+
+.sd-GameTable-danger:hover {
+  text-decoration: underline;
 }
 
 /* The library's colour, as it will appear on the treemap tiles. */

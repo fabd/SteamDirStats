@@ -7,7 +7,14 @@
     @toggle="onToggle"
     @contextmenu.prevent
   >
-    <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onInspect">Inspect</button>
+    <button
+      v-if="hasWorkshopItems"
+      type="button"
+      class="sd-ContextMenu-item px-3 py-1"
+      @click="onViewWorkshop"
+    >
+      View Workshop Items
+    </button>
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onOpenFolder">
       Browse local files
     </button>
@@ -23,7 +30,7 @@ import { defineComponent } from 'vue';
 
 import { openFolder, uninstall } from '@/api/bridge';
 import type { Game } from '@/api/types';
-import { inspect, notify, select } from '@/stores/scan-store';
+import { expandWorkshop, notify, select } from '@/stores/scan-store';
 
 /** Gap between the cursor and the menu, so the pointer never sits on an item. */
 const CURSOR_OFFSET = 2;
@@ -47,6 +54,11 @@ export default defineComponent({
   computed: {
     position(): Record<string, string> {
       return { left: `${this.left}px`, top: `${this.top}px` };
+    },
+
+    /** Most games have none, and then the entry is left out entirely. */
+    hasWorkshopItems(): boolean {
+      return (this.game?.workshop_items.length ?? 0) > 0;
     },
   },
 
@@ -111,12 +123,13 @@ export default defineComponent({
       this.$emit('open-change', isOpen);
     },
 
-    onInspect(): void {
+    /** Expand the game's Workshop items in the table (plan.md feature 5). */
+    onViewWorkshop(): void {
       const game = this.game;
       this.close();
 
       if (game) {
-        inspect(game.appid);
+        expandWorkshop(game.appid);
       }
     },
 

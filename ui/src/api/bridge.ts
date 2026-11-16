@@ -13,6 +13,7 @@ interface PywebviewApi {
   scan(options: ScanOptions): Promise<SteamData>;
   open_folder(path: string): Promise<boolean>;
   uninstall(appid: number): Promise<boolean>;
+  workshop_page(itemid: number): Promise<boolean>;
   get_settings(): Promise<Record<string, unknown>>;
   set_settings(values: Record<string, unknown>): Promise<Record<string, unknown>>;
 }
@@ -99,6 +100,11 @@ export function openFolder(path: string): Promise<boolean> {
 
 export function uninstall(appid: number): Promise<boolean> {
   return call('uninstall', (a) => a.uninstall(appid));
+}
+
+/** Open a Workshop item's page in Steam, where it can be unsubscribed. */
+export function workshopPage(itemid: number): Promise<boolean> {
+  return call('workshop_page', (a) => a.workshop_page(itemid));
 }
 
 export function getSettings(): Promise<Record<string, unknown>> {

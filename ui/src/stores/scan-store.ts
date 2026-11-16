@@ -29,8 +29,15 @@ interface ScanState {
   isFixture: boolean;
   /** The game the table and treemap highlight, by appid. */
   selected: number | null;
-  /** The game being inspected, or null for the combined view. */
-  inspecting: number | null;
+  /** Appids whose Workshop items are listed in the table. */
+  expanded: Set<number>;
+  /**
+   * A game the table should scroll into view, once.
+   *
+   * Set when the expansion was asked for from the treemap, where the row is
+   * usually off-screen; the table clears it again after scrolling.
+   */
+  revealed: number | null;
 }
 
 export const scanStore = reactive<ScanState>({
@@ -40,7 +47,8 @@ export const scanStore = reactive<ScanState>({
   progress: null,
   isFixture: false,
   selected: null,
-  inspecting: null,
+  expanded: new Set(),
+  revealed: null,
 });
 
 /** Every game across all libraries, largest first. */
@@ -57,10 +65,6 @@ export const libraries = computed<Library[]>(() =>
 /** Library path → colour, stable while the set of libraries is unchanged. */
 export const colors = computed(() =>
   libraryColors((scanStore.data?.libraries ?? []).map((lib) => lib.path)),
-);
-
-export const inspectedGame = computed<Game | null>(
-  () => games.value.find((g) => g.appid === scanStore.inspecting) ?? null,
 );
 
 /** The library a game belongs to; games carry no back-reference. */
@@ -82,7 +86,12 @@ export async function load(options: { accurate?: boolean } = {}): Promise<void> 
 
   try {
     await api();
-    scanStore.data = hasBackend() ? await scan(options) : await loadFixture();
+
+    // workshop_names: the item rows in the table are useless without them,
+    // and the lookup is cached on disk, so only new items cost a request.
+    scanStore.data = hasBackend()
+      ? await scan({ ...options, workshop_names: true })
+      : await loadFixture();
     scanStore.isFixture = !hasBackend();
   } catch (err) {
     scanStore.error = err instanceof Error ? err.message : String(err);
@@ -95,7 +104,8 @@ export async function load(options: { accurate?: boolean } = {}): Promise<void> 
 /** Rescan and reset to the startup view, as the Refresh button does. */
 export async function refresh(options: { accurate?: boolean } = {}): Promise<void> {
   scanStore.selected = null;
-  scanStore.inspecting = null;
+  scanStore.expanded.clear();
+  scanStore.revealed = null;
   await load(options);
 }
 
@@ -108,12 +118,35 @@ export function select(appid: number | null): void {
   scanStore.selected = appid;
 }
 
-export function inspect(appid: number | null): void {
-  scanStore.inspecting = appid;
+export function isExpanded(appid: number): boolean {
+  return scanStore.expanded.has(appid);
+}
 
-  if (appid !== null) {
-    scanStore.selected = appid;
+/** The table's own expand control: a game's items come and go. */
+export function toggleExpanded(appid: number): void {
+  if (scanStore.expanded.has(appid)) {
+    scanStore.expanded.delete(appid);
+  } else {
+    scanStore.expanded.add(appid);
   }
+}
+
+/**
+ * Show a game's Workshop items, from the treemap or the context menu.
+ *
+ * Expands rather than toggles: both callers say "view the items", and a tile
+ * the user double-clicks twice should not fold the rows away again. The row
+ * is scrolled into view because the table is rarely already at that game.
+ */
+export function expandWorkshop(appid: number): void {
+  scanStore.expanded.add(appid);
+  scanStore.selected = appid;
+  scanStore.revealed = appid;
+}
+
+/** Called by the table once it has scrolled; nothing else should clear it. */
+export function clearRevealed(): void {
+  scanStore.revealed = null;
 }
 
 const MISSING_FIXTURE =

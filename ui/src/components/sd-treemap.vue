@@ -35,7 +35,7 @@ import SdContextMenu from '@/components/sd-context-menu.vue';
 
 import type { Game } from '@/api/types';
 import { formatPath, formatSize } from '@/lib/format';
-import { colors, inspect, libraries, scanStore, select } from '@/stores/scan-store';
+import { colors, expandWorkshop, libraries, scanStore, select } from '@/stores/scan-store';
 import { settingsStore } from '@/stores/settings-store';
 
 /** Height of the strip holding a library's name in the grouped layout. */
@@ -444,12 +444,17 @@ export default defineComponent({
       select(tile ? tile.game.appid : null);
     },
 
-    /** Double-click is the shortcut for Inspect (plan.md, feature 5). */
+    /**
+     * Double-click lists the game's Workshop items in the table.
+     *
+     * A game with no items has nothing to show, so it is left alone rather
+     * than scrolling the table to a row that will not change.
+     */
     onDoubleClick(event: MouseEvent): void {
       const tile = this.pointerTile(event);
 
-      if (tile) {
-        inspect(tile.game.appid);
+      if (tile && tile.game.workshop_items.length > 0) {
+        expandWorkshop(tile.game.appid);
       }
     },
 

@@ -76,6 +76,7 @@ class Api:
             workshop_names=bool(options.get("workshop_names")),
             offline=bool(options.get("offline")),
             scan_progress=self._on_scan_progress,
+            progress=self._on_name_progress,
         )
         return data.to_dict()
 
@@ -95,11 +96,29 @@ class Api:
         os.startfile(f"steam://uninstall/{int(appid)}")
         return True
 
+    def workshop_page(self, itemid: int) -> bool:
+        """Open a Workshop item's page in Steam, where Unsubscribe lives.
+
+        Steam has no protocol action that unsubscribes from a single item
+        (plan.md §7c), so we take the user to the page that does. The URL is
+        built here from the item id: the page never hands os.startfile a URL.
+        """
+        os.startfile(f"steam://url/CommunityFilePage/{int(itemid)}")
+        return True
+
     def get_settings(self) -> dict[str, Any]:
         return settings.load()
 
     def set_settings(self, values: dict[str, Any]) -> dict[str, Any]:
         return settings.save(values or {})
+
+    def _on_name_progress(self, done: int, total: int) -> None:
+        """Push Workshop name-lookup progress (workshop_names.Progress).
+
+        It shares the status bar with the accurate scan's progress: the two
+        never run at the same time, the names being looked up last.
+        """
+        self._on_scan_progress(done, total, "Workshop item names")
 
     def _on_scan_progress(self, done: int, total: int, name: str) -> None:
         """Push accurate-scan progress to the UI (measure.ScanProgress)."""

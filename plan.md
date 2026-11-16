@@ -59,8 +59,9 @@ User-facing features, in plain terms. Implementation details are in the function
    ```
 
    - An expand/collapse control sits next to the **Workshop** figure on the game row, and only on games that have items. Expanded games stay expanded until the next Refresh.
-   - Three ways in, all the same action: the row's control, **View Workshop Items** in the context menu (feature 4), and double-clicking the game's tile. The two that start from the treemap also scroll the game's row into view, since the table may be scrolled somewhere else entirely.
+   - Three ways in: the row's own control, **View Workshop Items** in the context menu (feature 4), and double-clicking the game's tile. The two that start from the treemap expand rather than toggle — they ask to see the items, they are not a switch — and they scroll the game's row into view, since the table is rarely already at that game.
    - Item rows are sorted by size, largest first, independently of how the game rows are sorted.
+   - Item names come from the same lookup the CLI uses, so the UI's scan has to ask for them (`workshop_names`, §6); without it the rows would show bare item ids. Progress goes to the status bar like the accurate scan's.
    - On an item row only two columns carry anything: the item's name (indented) under **Game**, and its size under **Workshop**. **Size**, **Playtime** and **Last played** stay empty, because an item has no game-files size and no playtime of its own.
    - The **Library** column of an item row holds a dark red **View on Steam Workshop** link (§7c) — the item is already in the game's library, so the column would otherwise repeat it.
 6. **Refresh button.** A large Refresh button in the top-right corner of the window rescans all libraries (e.g. after uninstalling a game in Steam). It uses the current fast/accurate mode and always resets the view to the startup view (all libraries combined), clearing the selection and collapsing every expanded game. This keeps the view valid when a game that was on screen has just been uninstalled.

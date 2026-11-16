@@ -121,32 +121,35 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
     - [x] `popover="auto"`, kept in view at the window edges
   - [x] Open folder (Explorer)
   - [x] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
-  - [ ] View Workshop Items (expands the game in the table), only on games that have items
-- [ ] Remove the drill-down (design change, plan.md general feature 5)
-  - [ ] Drop **Inspect** from the context menu
-  - [ ] Drop `inspecting` / `inspect()` / `inspectedGame` from the store (no view reads them)
-  - [ ] Double-click a game tile expands that game in the table instead
-  - [ ] Expanding from the treemap scrolls the game's row into view
-  - [ ] No breadcrumb component
+  - [x] View Workshop Items (expands the game in the table), only on games that have items
+- [x] Remove the drill-down (design change, plan.md general feature 5)
+  - [x] Drop **Inspect** from the context menu
+  - [x] Drop `inspecting` / `inspect()` / `inspectedGame` from the store (no view read them)
+  - [x] Double-click a game tile expands that game in the table instead
+  - [x] Expanding from the treemap scrolls the game's row into view
+  - [x] No breadcrumb component
 - [ ] Refresh
   - [ ] Rescans with the current fast/accurate mode
-  - [ ] Resets to the combined view, clears the selection and collapses expanded games
+  - [x] Resets to the combined view, clears the selection and collapses expanded games
 - [ ] Data table (`sd-game-table.vue`)
   - [ ] Sortable columns: name, size, Workshop, playtime, last played, library
     - [x] Columns rendered (size-ordered; sorting not implemented)
   - [x] Playtime and last played columns
   - [x] Selection synced with the treemap
-  - [ ] Workshop item rows (plan.md general feature 5)
-    - [ ] `expanded: Set<number>` of appids in the store, cleared on refresh
-    - [ ] Expand/collapse control in the Workshop cell, only on games that have items
-    - [ ] Flat row list (game + item rows) in one computed property; items largest first
-    - [ ] Item row: indented name, size in the Workshop column, Size/Playtime/Last played empty
-    - [ ] Item name falls back to the item id when none was resolved
-    - [ ] Clicking an item row selects its parent game
-    - [ ] Dark red **View on Steam Workshop** link in the Library column (plan.md §7c)
-      - [ ] `workshop_page(itemid)` in `app.py` → `steam://url/CommunityFilePage/<itemid>`
-      - [ ] `bridge.ts` wrapper; failures go to the status bar via `notify()`
-    - [ ] CSS in `styles/components/table.css` (`--item` row, toggle, danger link)
+  - [x] Workshop item rows (plan.md general feature 5)
+    - [x] `expanded: Set<number>` of appids in the store, cleared on refresh
+    - [x] Expand/collapse control in the Workshop cell, only on games that have items
+    - [x] Flat row list (game + item rows) in one computed property; items largest first
+    - [x] Item row: indented name, size in the Workshop column, Size/Playtime/Last played empty
+    - [x] Scan asks for `workshop_names`, so the rows have names like the CLI report
+      - [x] Lookup progress pushed to the status bar (`progress=` in `app.py`)
+    - [x] Item name falls back to the item id when none was resolved
+    - [x] Clicking an item row selects its parent game
+    - [x] Dark red **View on Steam Workshop** link in the Library column (plan.md §7c)
+      - [x] `workshop_page(itemid)` in `app.py` → `steam://url/CommunityFilePage/<itemid>`
+      - [x] `bridge.ts` wrapper; failures go to the status bar via `notify()`
+    - [x] CSS in `styles/components/table.css` (`--item` row, toggle, danger link)
+    - [ ] Check it in the running app (31 Workshop items on SteamVR in the fixture)
 - [ ] Dialogs
   - [ ] Settings (`<dialog>`)
   - [ ] About
