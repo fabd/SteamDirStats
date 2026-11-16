@@ -36,6 +36,11 @@
 - use PascalCase for classes (eg. KoDialog)
 - use alias `@` in imports in place of `src` (eg. `src/app/file` => `@/app/file`)
 - always end statements with a semicolon; don't rely on ASI
+- braces required for all control structures
+- let code breathe
+  - empty line before a conditional
+  - empty line to separate logical blocks of code
+  - empty line before the return statement, unless it is the only statement
 
 After modifying any TypeScript or Vue code, run `npm run typecheck` (`vue-tsc -b`) from the `ui/` directory and fix any reported errors.
 
