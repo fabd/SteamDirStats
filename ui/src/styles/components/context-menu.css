@@ -19,16 +19,6 @@
   font-size: 13px;
 }
 
-.sd-ContextMenu-title {
-  margin: 0;
-  color: var(--sd-text-dim);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .sd-ContextMenu-item {
   display: block;
   width: 100%;

@@ -7,8 +7,6 @@
     @toggle="onToggle"
     @contextmenu.prevent
   >
-    <p v-if="game" class="sd-ContextMenu-title px-3 py-1">{{ game.name }}</p>
-
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onInspect">Inspect</button>
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onOpenFolder">
       Browse local files
