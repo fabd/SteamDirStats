@@ -5,7 +5,7 @@
     <button
       class="sd-Toolbar-button px-2 py-1"
       :class="{ 'is-active': settings.accurate }"
-      :disabled="scan.loading"
+      :disabled="scan.isLoading"
       type="button"
       @click="toggleAccurate"
     >
@@ -14,7 +14,7 @@
 
     <button
       class="sd-Toolbar-button px-2 py-1"
-      :disabled="scan.loading"
+      :disabled="scan.isLoading"
       type="button"
       @click="toggleLayout"
     >
@@ -23,7 +23,7 @@
 
     <button
       class="sd-Toolbar-button sd-Toolbar-button--refresh px-4 py-1"
-      :disabled="scan.loading"
+      :disabled="scan.isLoading"
       type="button"
       @click="$emit('refresh')"
     >

@@ -102,7 +102,7 @@ export default defineComponent({
       height: 0,
       hovered: null as Tile | null,
       /** True while the context menu is up; the tooltip stands down for it. */
-      menuOpen: false,
+      isMenuOpen: false,
       pointer: { x: 0, y: 0 },
       observer: null as ResizeObserver | null,
     };
@@ -110,8 +110,14 @@ export default defineComponent({
 
   computed: {
     message(): string {
-      if (this.scan.loading) return 'Scanning…';
-      if (this.scan.error) return '';
+      if (this.scan.isLoading) {
+        return 'Scanning…';
+      }
+
+      if (this.scan.error) {
+        return '';
+      }
+
       return this.layout.tiles.length ? '' : 'No installed games found.';
     },
 
@@ -145,7 +151,7 @@ export default defineComponent({
      * and the tooltip would show through from behind it.
      */
     tooltip(): Tile | null {
-      return this.menuOpen ? null : this.hovered;
+      return this.isMenuOpen ? null : this.hovered;
     },
 
     /** Position the tooltip beside the cursor, flipped to stay in view. */
@@ -154,6 +160,7 @@ export default defineComponent({
         this.pointer.x + 14 + TOOLTIP_WIDTH > this.width
           ? Math.max(0, this.pointer.x - 14 - TOOLTIP_WIDTH)
           : this.pointer.x + 14;
+
       return { left: `${left}px`, top: `${this.pointer.y + 16}px`, width: `${TOOLTIP_WIDTH}px` };
     },
   },
@@ -183,18 +190,24 @@ export default defineComponent({
 
     buildLayout(): Layout {
       const empty: Layout = { tiles: [], groups: [] };
-      if (this.width <= 0 || this.height <= 0) return empty;
 
-      const grouped = this.settings.layout === 'grouped';
-      const root: TreeNode = { children: grouped ? this.groupedNodes() : this.mixedNodes() };
-      if (!root.children?.length) return empty;
+      if (this.width <= 0 || this.height <= 0) {
+        return empty;
+      }
+
+      const isGrouped = this.settings.layout === 'grouped';
+      const root: TreeNode = { children: isGrouped ? this.groupedNodes() : this.mixedNodes() };
+
+      if (!root.children?.length) {
+        return empty;
+      }
 
       const laid = treemap<TreeNode>()
         .tile(treemapSquarify)
         .size([this.width, this.height])
         .paddingInner(1)
-        .paddingOuter(grouped ? 2 : 0)
-        .paddingTop(grouped ? GROUP_HEADER : 0)
+        .paddingOuter(isGrouped ? 2 : 0)
+        .paddingTop(isGrouped ? GROUP_HEADER : 0)
         .round(true)(
         hierarchy(root, (node) => node.children)
           .sum((node) => node.value ?? 0)
@@ -204,8 +217,12 @@ export default defineComponent({
       const palette = colors.value;
       const tiles = laid.leaves().flatMap<Tile>((leaf) => {
         const game = leaf.data.game;
+
         // Sub-pixel tiles are invisible but would still answer hit tests.
-        if (!game || leaf.x1 - leaf.x0 < 1 || leaf.y1 - leaf.y0 < 1) return [];
+        if (!game || leaf.x1 - leaf.x0 < 1 || leaf.y1 - leaf.y0 < 1) {
+          return [];
+        }
+
         return [
           {
             x0: leaf.x0,
@@ -219,7 +236,7 @@ export default defineComponent({
         ];
       });
 
-      const groups = grouped
+      const groups = isGrouped
         ? (laid.children ?? []).map((node) => ({
             x0: node.x0,
             y0: node.y0,
@@ -261,19 +278,32 @@ export default defineComponent({
 
     draw(): void {
       const canvas = this.$refs.canvas as HTMLCanvasElement | undefined;
-      if (!canvas || this.width <= 0 || this.height <= 0) return;
+
+      if (!canvas || this.width <= 0 || this.height <= 0) {
+        return;
+      }
 
       // Back the canvas with device pixels, then work in CSS pixels throughout.
       const ratio = window.devicePixelRatio || 1;
       canvas.width = Math.round(this.width * ratio);
       canvas.height = Math.round(this.height * ratio);
+
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+
+      if (!ctx) {
+        return;
+      }
+
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       ctx.clearRect(0, 0, this.width, this.height);
 
-      for (const group of this.layout.groups) this.drawGroup(ctx, group);
-      for (const tile of this.layout.tiles) this.drawTile(ctx, tile);
+      for (const group of this.layout.groups) {
+        this.drawGroup(ctx, group);
+      }
+
+      for (const tile of this.layout.tiles) {
+        this.drawTile(ctx, tile);
+      }
     },
 
     /** The library block: a tinted backing plus its name in the top strip. */
@@ -284,7 +314,11 @@ export default defineComponent({
       ctx.globalAlpha = 1;
 
       const width = group.x1 - group.x0 - 8;
-      if (width < MIN_LABEL_WIDTH) return;
+
+      if (width < MIN_LABEL_WIDTH) {
+        return;
+      }
+
       ctx.save();
       ctx.beginPath();
       ctx.rect(group.x0 + 4, group.y0, width, GROUP_HEADER);
@@ -292,6 +326,7 @@ export default defineComponent({
       ctx.fillStyle = LABEL_COLOR;
       ctx.font = `600 11px ${FONT_STACK}`;
       ctx.textBaseline = 'middle';
+
       const label = `${group.label} — ${formatSize(group.size)}`;
       ctx.fillText(this.fitText(ctx, label, width), group.x0 + 4, group.y0 + GROUP_HEADER / 2);
       ctx.restore();
@@ -300,10 +335,11 @@ export default defineComponent({
     drawTile(ctx: CanvasRenderingContext2D, tile: Tile): void {
       const width = tile.x1 - tile.x0;
       const height = tile.y1 - tile.y0;
-      const selected = tile.game.appid === this.scan.selected;
+      const isSelected = tile.game.appid === this.scan.selected;
 
       ctx.fillStyle = tile.color;
       ctx.fillRect(tile.x0, tile.y0, width, height);
+
       if (tile.game.appid === this.hovered?.game.appid) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
         ctx.fillRect(tile.x0, tile.y0, width, height);
@@ -311,7 +347,7 @@ export default defineComponent({
 
       // The selection outline is drawn inside the tile, so it never covers a
       // neighbour.
-      if (selected && width > 2 && height > 2) {
+      if (isSelected && width > 2 && height > 2) {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.strokeRect(tile.x0 + 1, tile.y0 + 1, width - 2, height - 2);
@@ -321,7 +357,9 @@ export default defineComponent({
         ctx.strokeRect(tile.x0 + 0.5, tile.y0 + 0.5, width - 1, height - 1);
       }
 
-      if (width < MIN_LABEL_WIDTH || height < MIN_LABEL_HEIGHT) return;
+      if (width < MIN_LABEL_WIDTH || height < MIN_LABEL_HEIGHT) {
+        return;
+      }
 
       ctx.save();
       ctx.beginPath();
@@ -331,6 +369,7 @@ export default defineComponent({
       ctx.textBaseline = 'top';
       ctx.font = `12px ${FONT_STACK}`;
       ctx.fillText(this.fitText(ctx, tile.game.name, width - 6), tile.x0 + 3, tile.y0 + 3);
+
       if (height >= MIN_SIZE_LINE_HEIGHT) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.font = `11px ${FONT_STACK}`;
@@ -341,9 +380,16 @@ export default defineComponent({
 
     /** Shorten to fit with an ellipsis, the way the table cells do. */
     fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-      if (ctx.measureText(text).width <= maxWidth) return text;
+      if (ctx.measureText(text).width <= maxWidth) {
+        return text;
+      }
+
       let cut = text.length;
-      while (cut > 1 && ctx.measureText(`${text.slice(0, cut)}…`).width > maxWidth) cut -= 1;
+
+      while (cut > 1 && ctx.measureText(`${text.slice(0, cut)}…`).width > maxWidth) {
+        cut -= 1;
+      }
+
       return `${text.slice(0, cut)}…`;
     },
 
@@ -359,46 +405,61 @@ export default defineComponent({
     pointerTile(event: MouseEvent): Tile | null {
       const box = (event.currentTarget as HTMLCanvasElement).getBoundingClientRect();
       this.pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+
       return this.tileAt(this.pointer.x, this.pointer.y);
     },
 
     /** The menu holds the hover highlight while it is up, and drops it after. */
-    onMenuOpenChange(open: boolean): void {
-      this.menuOpen = open;
+    onMenuOpenChange(isOpen: boolean): void {
+      this.isMenuOpen = isOpen;
+
       // Closing the menu does not move the mouse, and the pointer is rarely
       // back over the tile, so start from no hover rather than a stale one.
-      if (!open) this.hovered = null;
+      if (!isOpen) {
+        this.hovered = null;
+      }
     },
 
     onMove(event: MouseEvent): void {
       // The canvas still sees moves around an open menu; leave the highlight
       // on the tile the menu belongs to.
-      if (this.menuOpen) return;
+      if (this.isMenuOpen) {
+        return;
+      }
 
       this.hovered = this.pointerTile(event);
     },
 
     onLeave(): void {
-      if (this.menuOpen) return;
+      if (this.isMenuOpen) {
+        return;
+      }
 
       this.hovered = null;
     },
 
     onClick(event: MouseEvent): void {
       const tile = this.pointerTile(event);
+
       select(tile ? tile.game.appid : null);
     },
 
     /** Double-click is the shortcut for Inspect (plan.md, feature 5). */
     onDoubleClick(event: MouseEvent): void {
       const tile = this.pointerTile(event);
-      if (tile) inspect(tile.game.appid);
+
+      if (tile) {
+        inspect(tile.game.appid);
+      }
     },
 
     /** Right-click a tile for the game menu; empty space has no menu. */
     onContextMenu(event: MouseEvent): void {
       const tile = this.pointerTile(event);
-      if (!tile) return;
+
+      if (!tile) {
+        return;
+      }
 
       this.hovered = tile;
       (this.$refs.menu as InstanceType<typeof SdContextMenu>).open(event, tile.game);

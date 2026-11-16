@@ -16,36 +16,46 @@ interface SettingsState {
   layout: Layout;
   /** Accurate mode walks the folders instead of trusting the manifests. */
   accurate: boolean;
-  loaded: boolean;
+  isLoaded: boolean;
 }
 
-const DEFAULTS: Omit<SettingsState, 'loaded'> = {
+const DEFAULTS: Omit<SettingsState, 'isLoaded'> = {
   layout: 'grouped',
   accurate: false,
 };
 
-export const settingsStore = reactive<SettingsState>({ ...DEFAULTS, loaded: false });
+export const settingsStore = reactive<SettingsState>({ ...DEFAULTS, isLoaded: false });
 
 export async function loadSettings(): Promise<void> {
   await api();
+
   if (hasBackend()) {
     try {
       const stored = await getSettings();
+
       if (stored.layout === 'grouped' || stored.layout === 'mixed') {
         settingsStore.layout = stored.layout;
       }
-      if (typeof stored.accurate === 'boolean') settingsStore.accurate = stored.accurate;
+
+      if (typeof stored.accurate === 'boolean') {
+        settingsStore.accurate = stored.accurate;
+      }
     } catch {
       // Keep the defaults: a missing or unreadable settings file is not an error.
     }
   }
-  settingsStore.loaded = true;
+
+  settingsStore.isLoaded = true;
 }
 
 /** Change one preference and write it back; failures are not worth a dialog. */
-export async function update(values: Partial<Omit<SettingsState, 'loaded'>>): Promise<void> {
+export async function update(values: Partial<Omit<SettingsState, 'isLoaded'>>): Promise<void> {
   Object.assign(settingsStore, values);
-  if (!hasBackend()) return;
+
+  if (!hasBackend()) {
+    return;
+  }
+
   try {
     await setSettings(values as Record<string, unknown>);
   } catch {

@@ -21,12 +21,12 @@ declare global {
 
 interface ScanState {
   data: SteamData | null;
-  loading: boolean;
+  isLoading: boolean;
   /** Message shown in the status bar when a scan or an action fails. */
   error: string;
   progress: ScanProgress | null;
   /** True while reading the dev fixture instead of a real scan. */
-  fixture: boolean;
+  isFixture: boolean;
   /** The game the table and treemap highlight, by appid. */
   selected: number | null;
   /** The game being inspected, or null for the combined view. */
@@ -35,10 +35,10 @@ interface ScanState {
 
 export const scanStore = reactive<ScanState>({
   data: null,
-  loading: false,
+  isLoading: false,
   error: '',
   progress: null,
-  fixture: false,
+  isFixture: false,
   selected: null,
   inspecting: null,
 });
@@ -76,17 +76,18 @@ export function libraryOf(game: Game): Library | null {
  * never bundles real library data into a release build.
  */
 export async function load(options: { accurate?: boolean } = {}): Promise<void> {
-  scanStore.loading = true;
+  scanStore.isLoading = true;
   scanStore.error = '';
   scanStore.progress = null;
+
   try {
     await api();
     scanStore.data = hasBackend() ? await scan(options) : await loadFixture();
-    scanStore.fixture = !hasBackend();
+    scanStore.isFixture = !hasBackend();
   } catch (err) {
     scanStore.error = err instanceof Error ? err.message : String(err);
   } finally {
-    scanStore.loading = false;
+    scanStore.isLoading = false;
     scanStore.progress = null;
   }
 }
@@ -109,7 +110,10 @@ export function select(appid: number | null): void {
 
 export function inspect(appid: number | null): void {
   scanStore.inspecting = appid;
-  if (appid !== null) scanStore.selected = appid;
+
+  if (appid !== null) {
+    scanStore.selected = appid;
+  }
 }
 
 const MISSING_FIXTURE =
@@ -117,9 +121,16 @@ const MISSING_FIXTURE =
   '(create one with: python -m steamdirstats --json > ui/fixture.json)';
 
 async function loadFixture(): Promise<SteamData> {
-  if (!import.meta.env.DEV) throw new Error('No Python backend');
+  if (!import.meta.env.DEV) {
+    throw new Error('No Python backend');
+  }
+
   const response = await fetch(`${import.meta.env.BASE_URL}fixture.json`);
-  if (!response.ok) throw new Error(MISSING_FIXTURE);
+
+  if (!response.ok) {
+    throw new Error(MISSING_FIXTURE);
+  }
+
   return (await response.json()) as SteamData;
 }
 

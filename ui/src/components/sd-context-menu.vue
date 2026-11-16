@@ -11,7 +11,7 @@
 
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onInspect">Inspect</button>
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onOpenFolder">
-      Open folder
+      Browse local files
     </button>
     <hr class="sd-ContextMenu-separator" />
     <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onUninstall">
@@ -69,9 +69,13 @@ export default defineComponent({
       this.top = event.clientY + CURSOR_OFFSET;
 
       const menu = this.$refs.menu as HTMLElement;
+
       // `popover="auto"` gives us Esc and outside-click dismissal for free,
       // but a second right-click would otherwise land on an open menu.
-      if (menu.matches(':popover-open')) menu.hidePopover();
+      if (menu.matches(':popover-open')) {
+        menu.hidePopover();
+      }
+
       menu.showPopover();
       this.keepInView(menu);
       menu.querySelector<HTMLButtonElement>('.sd-ContextMenu-item')?.focus();
@@ -79,7 +83,10 @@ export default defineComponent({
 
     close(): void {
       const menu = this.$refs.menu as HTMLElement | undefined;
-      if (menu?.matches(':popover-open')) menu.hidePopover();
+
+      if (menu?.matches(':popover-open')) {
+        menu.hidePopover();
+      }
     },
 
     /** Flip the menu back over the cursor when it would fall off-screen. */
@@ -97,26 +104,39 @@ export default defineComponent({
     },
 
     onToggle(event: Event): void {
-      const open = (event as ToggleEvent).newState === 'open';
-      if (!open) this.game = null;
-      this.$emit('open-change', open);
+      const isOpen = (event as ToggleEvent).newState === 'open';
+
+      if (!isOpen) {
+        this.game = null;
+      }
+
+      this.$emit('open-change', isOpen);
     },
 
     onInspect(): void {
       const game = this.game;
       this.close();
-      if (game) inspect(game.appid);
+
+      if (game) {
+        inspect(game.appid);
+      }
     },
 
     /** Explorer, via Python; the path comes from the scan, not from the page. */
     async onOpenFolder(): Promise<void> {
       const game = this.game;
       this.close();
-      if (!game) return;
+
+      if (!game) {
+        return;
+      }
 
       try {
-        const shown = await openFolder(game.install_path);
-        if (!shown) notify(`Folder not found: ${game.install_path}`);
+        const isShown = await openFolder(game.install_path);
+
+        if (!isShown) {
+          notify(`Folder not found: ${game.install_path}`);
+        }
       } catch (err) {
         notify(err instanceof Error ? err.message : String(err));
       }
@@ -129,7 +149,10 @@ export default defineComponent({
     async onUninstall(): Promise<void> {
       const game = this.game;
       this.close();
-      if (!game) return;
+
+      if (!game) {
+        return;
+      }
 
       try {
         await uninstall(game.appid);

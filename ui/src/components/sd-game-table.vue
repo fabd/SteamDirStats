@@ -73,7 +73,11 @@ export default defineComponent({
     /** The library's label, or its path when Steam stored no label. */
     libraryLabel(game: Game): string {
       const library = libraryOf(game);
-      if (!library) return '';
+
+      if (!library) {
+        return '';
+      }
+
       return library.label || formatPath(library.path);
     },
   },

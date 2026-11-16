@@ -45,7 +45,9 @@ function isReady(): boolean {
 }
 
 function waitForApi(): Promise<void> {
-  if (isReady()) return Promise.resolve();
+  if (isReady()) {
+    return Promise.resolve();
+  }
 
   return new Promise((resolve) => {
     const done = () => {
@@ -68,6 +70,7 @@ function waitForApi(): Promise<void> {
 export async function api(): Promise<PywebviewApi | null> {
   readyPromise ??= waitForApi();
   await readyPromise;
+
   return isReady() ? (window.pywebview?.api ?? null) : null;
 }
 
@@ -78,7 +81,11 @@ export function hasBackend(): boolean {
 
 async function call<T>(name: keyof PywebviewApi, run: (a: PywebviewApi) => Promise<T>): Promise<T> {
   const a = await api();
-  if (!a) throw new Error(`No Python backend: ${name}() is unavailable`);
+
+  if (!a) {
+    throw new Error(`No Python backend: ${name}() is unavailable`);
+  }
+
   return run(a);
 }
 

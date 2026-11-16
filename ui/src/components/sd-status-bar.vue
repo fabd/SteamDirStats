@@ -14,9 +14,9 @@
     <span v-if="scan.progress" class="ml-auto">
       {{ scan.progress.done }} / {{ scan.progress.total }} — {{ scan.progress.name }}
     </span>
-    <span v-else-if="scan.loading" class="ml-auto">Scanning…</span>
+    <span v-else-if="scan.isLoading" class="ml-auto">Scanning…</span>
     <span v-else-if="scan.error" class="sd-StatusBar-note--error ml-auto">{{ scan.error }}</span>
-    <span v-else-if="scan.fixture" class="sd-StatusBar-note--fixture ml-auto">
+    <span v-else-if="scan.isFixture" class="sd-StatusBar-note--fixture ml-auto">
       Fixture data (no backend)
     </span>
   </footer>
