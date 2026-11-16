@@ -41,6 +41,7 @@
   - empty line before a conditional
   - empty line to separate logical blocks of code
   - empty line before the return statement, unless it is the only statement
+- booleans named with prefix `is` eg. `isOpen`
 
 After modifying any TypeScript or Vue code, run `npm run typecheck` (`vue-tsc -b`) from the `ui/` directory and fix any reported errors.
 
