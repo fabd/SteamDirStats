@@ -1,0 +1,53 @@
+/* Right-click menu on a game (plan.md, general feature 4).
+
+   Built on the `popover` attribute: the browser puts it in the top layer, so
+   the treemap's `overflow: hidden` cannot clip it, and handles Esc and
+   outside-click dismissal itself. Only the position is ours. */
+
+.sd-ContextMenu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 4px 0;
+  min-width: 160px;
+  max-width: 320px;
+  background: var(--sd-surface-raised);
+  color: var(--sd-text);
+  border: 1px solid var(--sd-border);
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 50%);
+  font-size: 13px;
+}
+
+.sd-ContextMenu-title {
+  margin: 0;
+  color: var(--sd-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sd-ContextMenu-item {
+  display: block;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sd-ContextMenu-item:hover,
+.sd-ContextMenu-item:focus-visible {
+  background: var(--sd-row-hover);
+  outline: none;
+}
+
+.sd-ContextMenu-separator {
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--sd-border);
+}

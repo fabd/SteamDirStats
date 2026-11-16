@@ -97,7 +97,7 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
     - [x] Release mode loading `ui/dist/index.html`
   - [x] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
     - [x] `settings.py`: portable `settings.json`, merged on write
-    - [ ] `open_folder` / `uninstall` unused until the context menu lands
+    - [x] `open_folder` / `uninstall` wired up from the context menu
   - [x] `api/bridge.ts` wrapper, waits for `pywebviewready` (TS, not `api.js`)
   - [x] Scan progress pushed via `evaluate_js` (`window.sdScanProgress`, throttled)
   - [x] Shared store (scan data, selection, inspected game, progress)
@@ -117,16 +117,17 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
   - [x] Grouped layout by default, toggle to mixed (remembered in settings)
   - [x] Hover tooltip: name, size, library, path, appid
   - [x] Click to select (syncs with the table)
-- [ ] Context menu (`ContextMenu.vue`)
-  - [ ] Opens on right-click at the cursor; closes on Esc / outside click
-  - [ ] Inspect
-  - [ ] Open folder (Explorer)
-  - [ ] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
+- [x] Context menu (`sd-context-menu.vue`)
+  - [x] Opens on right-click at the cursor; closes on Esc / outside click
+    - [x] `popover="auto"`, kept in view at the window edges
+  - [x] Inspect (sets the inspected game; the drill-down view itself is pending)
+  - [x] Open folder (Explorer)
+  - [x] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
 - [ ] Drill-down view
   - [ ] Inspect replaces the treemap with the selected game
   - [ ] Split by category, coloured by category
   - [ ] Workshop items as individual tiles, with names
-  - [ ] Double-click a game tile as a shortcut for Inspect
+  - [x] Double-click a game tile as a shortcut for Inspect
   - [ ] Back via breadcrumb, Backspace or Esc
 - [ ] Refresh
   - [ ] Rescans with the current fast/accurate mode

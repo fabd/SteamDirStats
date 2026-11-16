@@ -6,27 +6,32 @@
       @mousemove="onMove"
       @click="onClick"
       @dblclick="onDoubleClick"
+      @contextmenu.prevent="onContextMenu"
     />
 
     <p v-if="message" class="sd-Treemap-message">{{ message }}</p>
 
-    <div v-if="hovered" class="sd-Treemap-tooltip p-2" :style="tooltipStyle">
-      <strong class="sd-Treemap-tooltipName">{{ hovered.game.name }}</strong>
-      <span class="sd-Treemap-tooltipSize">{{ formatSize(hovered.game.total_size) }}</span>
-      <span v-if="hovered.game.workshop_size" class="sd-Treemap-tooltipDim">
-        {{ formatSize(hovered.game.size_on_disk) }} game files +
-        {{ formatSize(hovered.game.workshop_size) }} Workshop
+    <div v-if="tooltip" class="sd-Treemap-tooltip p-2" :style="tooltipStyle">
+      <strong class="sd-Treemap-tooltipName">{{ tooltip.game.name }}</strong>
+      <span class="sd-Treemap-tooltipSize">{{ formatSize(tooltip.game.total_size) }}</span>
+      <span v-if="tooltip.game.workshop_size" class="sd-Treemap-tooltipDim">
+        {{ formatSize(tooltip.game.size_on_disk) }} game files +
+        {{ formatSize(tooltip.game.workshop_size) }} Workshop
       </span>
-      <span class="sd-Treemap-tooltipDim">{{ hovered.libraryLabel }}</span>
-      <span class="sd-Treemap-tooltipDim">{{ formatPath(hovered.game.install_path) }}</span>
-      <span class="sd-Treemap-tooltipDim">appid {{ hovered.game.appid }}</span>
+      <span class="sd-Treemap-tooltipDim">{{ tooltip.libraryLabel }}</span>
+      <span class="sd-Treemap-tooltipDim">{{ formatPath(tooltip.game.install_path) }}</span>
+      <span class="sd-Treemap-tooltipDim">appid {{ tooltip.game.appid }}</span>
     </div>
+
+    <SdContextMenu ref="menu" @open-change="onMenuOpenChange" />
   </div>
 </template>
 
 <script lang="ts">
 import { hierarchy, treemap, treemapSquarify } from 'd3-hierarchy';
 import { defineComponent } from 'vue';
+
+import SdContextMenu from '@/components/sd-context-menu.vue';
 
 import type { Game } from '@/api/types';
 import { formatPath, formatSize } from '@/lib/format';
@@ -86,6 +91,8 @@ interface Layout {
 export default defineComponent({
   name: 'SdTreemap',
 
+  components: { SdContextMenu },
+
   data() {
     return {
       scan: scanStore,
@@ -94,6 +101,8 @@ export default defineComponent({
       width: 0,
       height: 0,
       hovered: null as Tile | null,
+      /** True while the context menu is up; the tooltip stands down for it. */
+      menuOpen: false,
       pointer: { x: 0, y: 0 },
       observer: null as ResizeObserver | null,
     };
@@ -127,6 +136,16 @@ export default defineComponent({
 
     layout(): Layout {
       return this.buildLayout();
+    },
+
+    /**
+     * The tile the tooltip describes, or null for no tooltip.
+     *
+     * Suppressed while the context menu is open: the menu is in the top layer
+     * and the tooltip would show through from behind it.
+     */
+    tooltip(): Tile | null {
+      return this.menuOpen ? null : this.hovered;
     },
 
     /** Position the tooltip beside the cursor, flipped to stay in view. */
@@ -343,11 +362,25 @@ export default defineComponent({
       return this.tileAt(this.pointer.x, this.pointer.y);
     },
 
+    /** The menu holds the hover highlight while it is up, and drops it after. */
+    onMenuOpenChange(open: boolean): void {
+      this.menuOpen = open;
+      // Closing the menu does not move the mouse, and the pointer is rarely
+      // back over the tile, so start from no hover rather than a stale one.
+      if (!open) this.hovered = null;
+    },
+
     onMove(event: MouseEvent): void {
+      // The canvas still sees moves around an open menu; leave the highlight
+      // on the tile the menu belongs to.
+      if (this.menuOpen) return;
+
       this.hovered = this.pointerTile(event);
     },
 
     onLeave(): void {
+      if (this.menuOpen) return;
+
       this.hovered = null;
     },
 
@@ -360,6 +393,15 @@ export default defineComponent({
     onDoubleClick(event: MouseEvent): void {
       const tile = this.pointerTile(event);
       if (tile) inspect(tile.game.appid);
+    },
+
+    /** Right-click a tile for the game menu; empty space has no menu. */
+    onContextMenu(event: MouseEvent): void {
+      const tile = this.pointerTile(event);
+      if (!tile) return;
+
+      this.hovered = tile;
+      (this.$refs.menu as InstanceType<typeof SdContextMenu>).open(event, tile.game);
     },
   },
 });

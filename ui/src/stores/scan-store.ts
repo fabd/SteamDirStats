@@ -22,7 +22,7 @@ declare global {
 interface ScanState {
   data: SteamData | null;
   loading: boolean;
-  /** Message shown in the status bar when a scan fails. */
+  /** Message shown in the status bar when a scan or an action fails. */
   error: string;
   progress: ScanProgress | null;
   /** True while reading the dev fixture instead of a real scan. */
@@ -96,6 +96,11 @@ export async function refresh(options: { accurate?: boolean } = {}): Promise<voi
   scanStore.selected = null;
   scanStore.inspecting = null;
   await load(options);
+}
+
+/** Show a message in the status bar; used by actions that cannot complete. */
+export function notify(message: string): void {
+  scanStore.error = message;
 }
 
 export function select(appid: number | null): void {
