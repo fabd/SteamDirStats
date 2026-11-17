@@ -153,6 +153,8 @@ Reusable `steamdirstats` package that gathers all the data the UI will display. 
 - [ ] Dialogs
   - [ ] Settings (`<dialog>`)
   - [ ] About
+- [ ] Window chrome
+  - [ ] custom title bar with minimize and close buttons
 - [ ] Settings and window state
   - [ ] Portable `settings.json` next to the exe (`sys.executable` when frozen, project folder in dev)
   - [ ] Fallback to `%APPDATA%\SteamDirStats\` when the app folder is not writable
