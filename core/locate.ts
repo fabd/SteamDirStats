@@ -48,7 +48,7 @@ export async function findSteamPath(host: Host, override?: string | null): Promi
     }
   }
 
-  throw new SteamNotFoundError('Could not find Steam. Use --steam-path to point to it.');
+  throw new SteamNotFoundError('Could not find Steam.');
 }
 
 async function registryPaths(host: Host): Promise<string[]> {

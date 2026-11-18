@@ -95,10 +95,10 @@ See [plan.md](plan.md) for details on each item.
     file; close goes through `close()`, so the placement is still saved
   - [x] Checked in the running app: rounded corners and border intact, the
     buttons render and minimize works
-- [ ] Toolbar: settings button
 - [ ] Sortable table columns (name, size, Workshop, playtime, last played, library)
 - [ ] Resizable treemap / table split
-- [ ] Dialogs: settings (`<dialog>`), about
+- [ ] Dialog: about (`<dialog>`)
+  - [ ] TODO : which looks like .... 
 - [ ] Packaging
   - [ ] `npx tauri build` → portable `SteamDirStats.exe`
   - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)

@@ -220,12 +220,12 @@ Each game's total is split into categories:
 
 - **Shared state:** a single store (Pinia, or a plain `reactive()` module) holds scan results, selection, the set of games expanded in the table, and scan progress. All views read from it, so selecting a tile highlights the table row and vice versa.
 - **Components (initial):**
-  - `sd-toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle, settings; large **Refresh** button aligned top right.
+  - `sd-toolbar.vue`: fast/accurate toggle, grouped/mixed layout toggle; large **Refresh** button aligned top right; then the window's own minimize and close buttons (7e).
   - `sd-treemap.vue`: layout via `d3-hierarchy` (squarified), rendered on **Canvas** (handles thousands of Workshop tiles; allows WinDirStat-style cushion shading later). Hover tooltip, click to select, right-click for the context menu, double-click to expand the game in the table.
   - `sd-context-menu.vue`: right-click menu (View Workshop Items — only with items — Open folder, Uninstall…), built on the `popover` attribute and positioned at the cursor; also closes on Esc / outside click.
   - `sd-game-table.vue`: plain `<table>` with sortable columns (name, size, Workshop, playtime, last played, library), plus the expandable Workshop item rows (general feature 5). Rows are a flat list of game and item rows built in one computed property, so the `<table>` stays one `v-for` and the browser keeps the column widths. Virtualisation only if needed (TanStack Table as an option).
   - `sd-status-bar.vue`: totals, scan progress.
-  - Dialogs (`sd-settings-dialog.vue`, about) built on native `<dialog>` / `showModal()`.
+  - An about dialog built on native `<dialog>` / `showModal()`.
   - Filenames are kebab-case with an `Sd` component name, per CLAUDE.md.
 - **Native HTML/CSS first:** `<dialog>`, the `popover` attribute for menus, CSS grid for layout (toolbar / resizable treemap–table split / status bar). No UI component library initially.
 - **No more backend bridge.** `ui/src/api/bridge.ts` shrinks to wiring: it builds the Tauri host (`core/hosts/tauri.ts`), calls `scan(host, options)` from `core/scanner.ts` in the page, and exposes the three opener actions (open folder, uninstall, Workshop page). There is no IPC round trip for a scan and no `pywebviewready`-style wait; `hasBackend()` is a synchronous check for `window.__TAURI_INTERNALS__`.
