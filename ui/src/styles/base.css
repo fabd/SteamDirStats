@@ -1,4 +1,4 @@
-/* Window-level styling. The app fills the pywebview window exactly: no page
+/* Window-level styling. The app fills the app window exactly: no page
    scrolling, the panes scroll instead. */
 
 :root {

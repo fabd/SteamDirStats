@@ -90,8 +90,8 @@
 import { defineComponent } from 'vue';
 
 import { workshopPage } from '@/api/bridge';
-import type { Game, WorkshopItem } from '@/api/types';
-import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@/lib/format';
+import type { Game, WorkshopItem } from '@core/models.ts';
+import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@core/format.ts';
 import {
   clearRevealed,
   colors,

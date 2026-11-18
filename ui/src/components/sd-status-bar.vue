@@ -25,7 +25,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { formatSize } from '@/lib/format';
+import { formatSize } from '@core/format.ts';
 import { games, libraries, scanStore } from '@/stores/scan-store';
 
 export default defineComponent({

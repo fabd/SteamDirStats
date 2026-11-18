@@ -4,166 +4,86 @@ See [plan.md](plan.md) for details on each item.
 
 ## Milestones
 
-- [x] Phase one (branch `feature/phase-one`)
-  Data modules only, no UI or pywebview. `steamdirstats` package: locate Steam, parse libraries and manifests, fast mode; installed games grouped by library; CLI output for testing against a real install.
-- [ ] Phase two.
-  Vue 3 + Vite scaffold in `ui/`, pywebview window (dev + dist modes), basic Canvas treemap (library → game) and game table sharing one store.
-- [ ] Category split (game files / Workshop) and accurate mode with progress.
-  Data side done in phase one (`workshop.py`, `measure.py`, `--accurate`); the UI half is pending.
-- [ ] Workshop items expandable in the table, with item name lookup + cache.
-  Names and cache done in phase one (`workshop_names.py`, `appdir.py`); the table rows are pending.
-- [ ] Features
-  - [ ] Actions (open folder, uninstall)
-  - [ ] table view
-  - [ ] portable settings + window state persistence
-- [ ] PyInstaller build.
+- [x] Phase one — data modules + CLI (branch `feature/phase-one`, Python)
+- [x] Phase two — Vue 3 + Vite UI on pywebview: treemap, table, legend, context menu, Workshop rows
+- [x] Phase three — TypeScript rewrite on Tauri (branch `refactor/use-rust-tauri`)
+  The scanner is now host-agnostic TypeScript in `core/`, run by both the app and `node tools/steamdirstats-cli.ts`; Rust is a five-command shell. Phases one and two are history: the Python package, its tests and `app.py` are gone, and live in git history up to `9aecbf1` if they are ever wanted.
+- [ ] Release build: portable exe, real icon, tested on a clean Windows PC.
 
-## Phase one: data modules + command line
+## Phase three: TypeScript rewrite on Tauri
 
-Reusable `steamdirstats` package that gathers all the data the UI will display. No UI, no pywebview; output on the command line for testing.
+- [x] Clean up the Python side
+  - [x] Delete the `steamdirstats` package and `tests/`
+  - [x] Delete `app.py`, `settings.py`, `requirements.txt`
+  - [x] `.gitignore` / `.prettierignore`: Node and Rust artefacts, no Python ones
+  - [x] README: Node + Rust setup, `npx tauri dev`, `node tools/steamdirstats-cli.ts`
+  - [x] CLAUDE.md: `core/` rules (no `node:*`, no `@tauri-apps/*`, erasable syntax) and Rust conventions
+  - [x] `tools/shot.mjs` kept, and checked against the WebView2 devtools port
+  - [ ] Delete the leftovers git never tracked: `.venv/`, `.webview-dev-profile/`, `.tools/vdf_viewer.py`
+- [x] Project layout and toolchain
+  - [x] One `package.json` + `node_modules/` at the project root
+  - [x] `vite.config.ts` at the root with `root: 'ui'`, `@` → `ui/src`, `@core` → `core`, `clearScreen: false`
+  - [x] Three tsconfigs; `tsconfig.core.json` has no DOM and no `@types/node`, so a stray `window` in `core/` fails to compile (checked)
+  - [x] Node 24.20 runs the `.ts` directly; `erasableSyntaxOnly` on for `core/` and `tools/`
+  - [x] `@tauri-apps/api` + fs / http / opener plugins; `@tauri-apps/cli` as a dev dependency
+  - [x] `src-tauri/` written by hand rather than `tauri init`: conf, capabilities, build.rs
+  - [x] `tauri.conf.json`: `"visible": false`, dev server on 5173, `frontendDist: ../ui/dist`
+- [x] Host interface and the two adapters
+  - [x] `core/host.ts`: fs, http, registry, dirSizes, allowFolder, dataDir
+  - [x] `core/hosts/node.ts`: `node:fs`, `reg query`, global fetch, its own walk (one `lstat` per file, issued a folder at a time)
+  - [x] `core/hosts/tauri.ts`: fs + http plugins, `invoke()` for the five commands, `scan-progress` → callback
+  - [x] Tests run on the real filesystem in a temp folder; only the network is faked
+- [x] Port the scanner to `core/`
+  - [x] `models.ts` (owns the JSON shape the UI reads), `paths.ts`, `format.ts`
+  - [x] `vdf.ts`, `locate.ts`, `libraries.ts`, `games.ts`, `appinfo.ts` (binary KeyValues over a DataView)
+  - [x] `workshop.ts`, `accounts.ts` (SteamID64 as BigInt), `measure.ts`, `workshop-names.ts`, `settings.ts`, `scanner.ts`
+  - [x] 43 tests under `npm test`, over the same ground as the Python suite
+  - [x] `--json` diffed against the Python CLI: identical but for `steamid64`, now a string (plan.md, Known caveats)
+- [x] CLI (`tools/steamdirstats-cli.ts`)
+  - [x] Text report identical to the Python one, byte for byte
+  - [x] `--json`, `--accurate`, `--no-items`, `--item-urls`, `--offline`, `--steam-path`, `--help`
+  - [x] Progress on stderr; `ui/fixture.json` regenerated from it
+- [x] Rust shell (`src-tauri/`, ~250 lines)
+  - [x] `read_registry(hive, key, value)` — HKCU/HKLM strings only
+  - [x] `allow_steam_folder(path)` — grants only a folder that really holds `steamapps`
+  - [x] `dir_sizes(paths)` — `walkdir` on a blocking thread, `scan-progress` events, scope-checked, `null` for an unreadable folder
+  - [x] `disk_usage(path)` — `GetDiskFreeSpaceExW` for the legend
+  - [x] `data_dir()` — exe folder with the `%APPDATA%` fallback, writability probed by writing
+  - [x] `capabilities/default.json`: no static fs scope, http scope `api.steampowered.com`, opener url scope `steam://*`
+  - [x] Checked against a second drive (`D:\Steam`) and an unplugged library (`H:\SteamLibrary`)
+- [x] Frontend
+  - [x] `api/bridge.ts` reduced to host wiring + the three opener actions
+  - [x] `api/types.ts` deleted; the UI imports `@core/models.ts`
+  - [x] Progress via the `scan()` callback; `window.sdScanProgress` gone
+  - [x] Settings read and written by `core/settings.ts` through the same host
+  - [x] Fixture fallback still works in a plain browser
+  - [x] `npm run typecheck` clean
+- [x] Window and settings
+  - [x] `ui/src/lib/window-state.ts`: restore, then `show()`; saved on close and on `pagehide`
+  - [x] Off-screen placement falls back to centring
+  - [x] Verified on a cold start: a hand-placed 1243×959 at 815,97 comes back exactly
+  - [x] Needed `core:window:allow-set-focus` and `core:window:allow-center` in the capability file; without them the restore failed silently and the window opened where Tauri put it
+  - [x] Needed `core:window:allow-destroy` too: attaching `onCloseRequested` hands the closing to the page, so without it the title bar's close button saved the placement and then did nothing
+  - [x] Full cycle checked: move to 500,300 → close → placement saved, process exits 0 → relaunch restores 500,300 exactly
+  - [x] `isOnScreen()` fails closed: monitors that cannot be enumerated (which happens while the window is hidden) keep the saved position rather than centring the window
+  - [ ] Check display scaling at 125% / 150%
+  - [ ] Check the `%APPDATA%` fallback with the exe in a read-only folder
+- [x] Checked in the running app
+  - [x] Real scan: 53 games, 3 libraries, 493.7 GB
+  - [x] Workshop item names fetched through the http plugin and cached next to the exe
+  - [x] Workshop rows expand with their names (31 items on SteamVR)
+  - [x] Accurate refresh: per-game progress in the status bar, total 493.7 → 495.6 GB
+  - [x] Toggling a setting writes `settings.json` next to the exe, merged with the window key
 
-- [x] Core scanner
-  - [x] Tolerant VDF/ACF parser (`vdf.py`)
-  - [x] Locate Steam (`locate.py`)
-    - [x] Registry `HKCU\Software\Valve\Steam\SteamPath`, then HKLM
-    - [x] Fallback to default install folders
-    - [x] `--steam-path` override
-  - [x] Read all libraries from `libraryfolders.vdf` (`libraries.py`)
-    - [x] Current and legacy (pre-2021) formats
-    - [x] Main Steam folder always included, duplicates removed
-    - [x] Missing library (e.g. unplugged drive) flagged as unavailable
-    - [x] Disk total / free space per library
-  - [x] Read installed games from `appmanifest_*.acf` (`games.py`)
-    - [x] Name, appid, install folder, `SizeOnDisk`, state flags, last updated
-    - [x] Skip unreadable or invalid manifests
-    - [x] Flag games that are not fully installed
-    - [x] Real name for placeholder manifest names (`appid_<n>`) from `appcache/appinfo.vdf` (`appinfo.py`)
-  - [x] Games grouped by library, largest first (`scanner.scan()`)
-  - [x] Data classes with `to_dict()` for JSON (`models.py`)
-- [x] Command line
-  - [x] Text report grouped by library, with totals
-  - [x] `--json` output
-  - [x] UTF-8 output in Git Bash
-  - [x] Workshop total per game, with one line per item (`--no-items` to hide)
-  - [x] Workshop item names, with `--offline`, `--item-urls` and a lookup summary line
-- [x] Tests
-  - [x] Unit tests with fake Steam folders (`python -m unittest`)
-  - [x] Run against a real Steam install on Windows (`python -m steamdirstats`, text + `--json`)
-  - [x] Compare the totals with Steam's Storage Manager (manual check)
-- [x] Size categories per game
-  - [x] Game files (`common/<installdir>`) — manifest `SizeOnDisk`
-  - [x] Workshop total from `workshop/appworkshop_<appid>.acf` (`workshop.py`)
-  - [x] Game total = game files + Workshop, used for library and global totals
-  - [x] IGNORE Shader cache (`shadercache/<appid>`)
-  - [x] IGNORE Pending downloads (`downloading/<appid>`, `temp/<appid>`)
-- [x] Scan modes
-  - [x] Fast mode: sizes from manifests
-  - [x] Accurate mode: walk the real folders for every category (`measure.py`)
-    - [x] Folders shared by two appids (Skyrim SE + Creation Kit) counted once
-    - [x] Unreadable folder keeps its manifest size; junctions not followed
-  - [x] Progress reporting (callback the UI can hook into later)
-  - [x] `--accurate` CLI option
-- [x] Workshop details
-  - [x] Per-item ID and size from `WorkshopItemsInstalled`
-  - [x] Per-item size from disk in accurate mode
-  - [x] Resolve item names via `ISteamRemoteStorage/GetPublishedFileDetails` (`workshop_names.py`)
-    - [x] Batched requests, any failure leaves the name empty instead of raising
-    - [x] Status line while requesting; progress callback for the UI
-  - [x] Cache item names in `workshop-names.json` in the app folder (`appdir.py`)
-    - [x] Look up only the items the cache is missing; `--offline` uses the cache only
-    - [x] Remember misses (deleted items) and retry them after a week
-  - [x] Name from the item's own `publish_data.txt` when the API will not describe it
-  - [x] Fallback to item ID + Steam Community link (`--item-urls`)
-- [x] Per-account data (`accounts.py`)
-  - [x] Pick the most recently signed-in account from `config/loginusers.vdf`
-    - [x] `MostRecent` when present, else the highest `Timestamp` (often the only one there)
-  - [x] Convert SteamID64 to the `userdata` account ID
-  - [x] Playtime, playtime last 2 weeks, last played from `localconfig.vdf`
-    - [x] Placeholder dates (`0`, `86400`) read as "never played"
-  - [x] Skip gracefully when no account is found
-- [x] CLI report completeness
-  - [x] Game files / Workshop categories per game
-  - [x] Workshop items with names, sizes and ranking
-  - [x] Playtime and last played, formatted like Steam (`590.8 h, Nov 12`)
+## Still to do (carried over from phase two)
 
-## Phase two: desktop app (pywebview + Vue 3)
-
-- [ ] Project setup
-  - [x] Vue 3 + Vite scaffold in `ui/` (Vue 3 + TS, Tailwind v4, `@` alias, `base: './'`)
-  - [x] Dev fixture (`ui/fixture.json`, gitignored) so the UI runs in a plain browser
-  - [x] Local `.venv` + `requirements.txt` (pywebview, pyinstaller); README setup steps
-  - [x] `app.py`: pywebview window
-    - [x] `--dev` mode pointing at the Vite dev server (hot reload, port 5173)
-    - [x] Release mode loading `ui/dist/index.html`
-  - [x] Python API exposed to JS (`scan`, `open_folder`, `uninstall`, settings)
-    - [x] `settings.py`: portable `settings.json`, merged on write
-    - [x] `open_folder` / `uninstall` wired up from the context menu
-  - [x] `api/bridge.ts` wrapper, waits for `pywebviewready` (TS, not `api.js`)
-  - [x] Scan progress pushed via `evaluate_js` (`window.sdScanProgress`, throttled)
-  - [x] Shared store (scan data, selection, inspected game, progress)
-- [ ] Layout
-  - [x] Window grid: toolbar / content / status bar (`.sd-App`)
-  - [ ] Toolbar: fast/accurate toggle, grouped/mixed toggle, settings
-    - [x] Fast/accurate and grouped/mixed toggles (grouped/mixed drives the treemap)
-  - [x] Large Refresh button, top right
-  - [ ] Resizable treemap / table split
-  - [x] Status bar: totals, scan progress
-- [x] Treemap (`sd-treemap.vue`)
-  - [x] Squarified layout via `d3-hierarchy`, rendered on Canvas
-  - [x] Combined default view: all games from all libraries
-  - [x] One colour per library, stable across rescans
-  - [x] Legend: library colour, path, total size (`sd-legend.vue`)
-  - [x] Grouped layout by default, toggle to mixed (remembered in settings)
-  - [x] Hover tooltip: name, size, library, path, appid
-  - [x] Click to select (syncs with the table)
-- [x] Context menu (`sd-context-menu.vue`)
-  - [x] Opens on right-click at the cursor; closes on Esc / outside click
-    - [x] `popover="auto"`, kept in view at the window edges
-  - [x] Open folder (Explorer)
-  - [x] Uninstall… via `steam://uninstall/<appid>` (no confirmation of our own)
-  - [x] View Workshop Items (expands the game in the table), only on games that have items
-- [x] Remove the drill-down (design change, plan.md general feature 5)
-  - [x] Drop **Inspect** from the context menu
-  - [x] Drop `inspecting` / `inspect()` / `inspectedGame` from the store (no view read them)
-  - [x] Double-click a game tile expands that game in the table instead
-  - [x] Expanding from the treemap scrolls the game's row into view
-  - [x] No breadcrumb component
-- [ ] Refresh
-  - [ ] Rescans with the current fast/accurate mode
-  - [x] Resets to the combined view, clears the selection and collapses expanded games
-- [ ] Data table (`sd-game-table.vue`)
-  - [ ] Sortable columns: name, size, Workshop, playtime, last played, library
-    - [x] Columns rendered (size-ordered; sorting not implemented)
-  - [x] Playtime and last played columns
-  - [x] Selection synced with the treemap
-  - [x] Workshop item rows (plan.md general feature 5)
-    - [x] `expanded: Set<number>` of appids in the store, cleared on refresh
-    - [x] Expand/collapse control in the Workshop cell, only on games that have items
-    - [x] Flat row list (game + item rows) in one computed property; items largest first
-    - [x] Item row: indented name, size in the Workshop column, Size/Playtime/Last played empty
-    - [x] Scan asks for `workshop_names`, so the rows have names like the CLI report
-      - [x] Lookup progress pushed to the status bar (`progress=` in `app.py`)
-    - [x] Item name falls back to the item id when none was resolved
-    - [x] Clicking an item row selects its parent game
-    - [x] Dark red **View on Steam Workshop** link in the Library column (plan.md §7c)
-      - [x] `workshop_page(itemid)` in `app.py` → `steam://url/CommunityFilePage/<itemid>`
-      - [x] `bridge.ts` wrapper; failures go to the status bar via `notify()`
-    - [x] CSS in `styles/components/table.css` (`--item` row, toggle, danger link)
-    - [ ] Check it in the running app (31 Workshop items on SteamVR in the fixture)
-- [ ] Dialogs
-  - [ ] Settings (`<dialog>`)
-  - [ ] About
-- [ ] Window chrome
-  - [ ] custom title bar with minimize and close buttons
-- [ ] Settings and window state
-  - [ ] Portable `settings.json` next to the exe (`sys.executable` when frozen, project folder in dev)
-  - [ ] Fallback to `%APPDATA%\SteamDirStats\` when the app folder is not writable
-  - [ ] Workshop name cache stored alongside settings (`appdir.data_file`, done in phase one)
-  - [ ] Save / restore window placement with `GetWindowPlacement` / `SetWindowPlacement`
-  - [ ] Check behaviour with display scaling (125% / 150%)
+- [ ] Toolbar: settings button
+- [ ] Sortable table columns (name, size, Workshop, playtime, last played, library)
+- [ ] Resizable treemap / table split
+- [ ] Dialogs: settings (`<dialog>`), about
+- [ ] Custom title bar with minimize and close buttons
 - [ ] Packaging
-  - [x] `npm run build` → `ui/dist/` (relative asset URLs, no fixture in the bundle)
-  - [ ] PyInstaller `--onefile --windowed` build with `ui/dist` and icon
-  - [ ] App icon
-  - [ ] Test the exe on a clean Windows PC (no Python / Node)
-  - [ ] Check antivirus false positives; consider `--onedir` or signing
+  - [ ] `npx tauri build` → portable `SteamDirStats.exe`
+  - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)
+  - [ ] Run the exe on a clean Windows PC (no Node / Rust); note the WebView2 requirement
+  - [ ] Check antivirus / SmartScreen behaviour; consider signing

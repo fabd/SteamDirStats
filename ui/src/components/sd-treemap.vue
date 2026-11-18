@@ -33,8 +33,8 @@ import { defineComponent } from 'vue';
 
 import SdContextMenu from '@/components/sd-context-menu.vue';
 
-import type { Game } from '@/api/types';
-import { formatPath, formatSize } from '@/lib/format';
+import type { Game } from '@core/models.ts';
+import { formatPath, formatSize } from '@core/format.ts';
 import { colors, expandWorkshop, libraries, scanStore, select } from '@/stores/scan-store';
 import { settingsStore } from '@/stores/settings-store';
 

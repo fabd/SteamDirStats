@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { formatPath, formatShare, formatSize } from '@/lib/format';
+import { formatPath, formatShare, formatSize } from '@core/format.ts';
 import { colors, libraries, scanStore } from '@/stores/scan-store';
 
 interface Entry {

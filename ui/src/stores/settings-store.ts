@@ -1,13 +1,16 @@
 /**
- * User preferences, persisted by Python in settings.json (plan.md §9).
+ * User preferences, stored in settings.json next to the exe (plan.md §9).
  *
- * Without a backend the values live for the session only, so the UI behaves
- * the same in a plain browser.
+ * The file is read and written by `core/settings.ts` through the same host the
+ * scanner uses, so there is no backend call of our own here. Without the app
+ * (a plain browser) the values live for the session only, and the UI behaves
+ * the same.
  */
 
 import { reactive } from 'vue';
 
-import { getSettings, hasBackend, api, setSettings } from '@/api/bridge';
+import { hasBackend, host } from '@/api/bridge';
+import { load as loadStored, save as saveStored } from '@core/settings.ts';
 
 /** Grouped keeps each library's games in one contiguous block. */
 export type Layout = 'grouped' | 'mixed';
@@ -27,11 +30,9 @@ const DEFAULTS: Omit<SettingsState, 'isLoaded'> = {
 export const settingsStore = reactive<SettingsState>({ ...DEFAULTS, isLoaded: false });
 
 export async function loadSettings(): Promise<void> {
-  await api();
-
   if (hasBackend()) {
     try {
-      const stored = await getSettings();
+      const stored = await loadStored(host());
 
       if (stored.layout === 'grouped' || stored.layout === 'mixed') {
         settingsStore.layout = stored.layout;
@@ -57,7 +58,7 @@ export async function update(values: Partial<Omit<SettingsState, 'isLoaded'>>): 
   }
 
   try {
-    await setSettings(values as Record<string, unknown>);
+    await saveStored(host(), values);
   } catch {
     // Ignore: the value still applies for this session.
   }

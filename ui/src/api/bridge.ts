@@ -1,116 +1,66 @@
 /**
- * The only place that touches `window.pywebview`.
+ * The only place that knows the app is running inside Tauri.
  *
- * pywebview injects its API asynchronously and fires `pywebviewready` when the
- * bridge is usable, so every call waits for that first. In a plain browser the
- * event never comes: `hasBackend()` is false and callers fall back to the dev
- * fixture (see stores/scan-store.ts).
+ * There is no backend to call for a scan any more: `core/` runs in the page,
+ * on the Tauri host, and only reaches Rust for the registry, the file-scope
+ * grants and the folder sizes (plan.md, "What Rust is for"). What is left here
+ * is the wiring — building the host once, and the three actions that hand a
+ * path or a URL to the shell.
  */
 
-import type { ScanOptions, SteamData } from '@/api/types';
+import { openPath, openUrl } from '@tauri-apps/plugin-opener';
 
-interface PywebviewApi {
-  scan(options: ScanOptions): Promise<SteamData>;
-  open_folder(path: string): Promise<boolean>;
-  uninstall(appid: number): Promise<boolean>;
-  workshop_page(itemid: number): Promise<boolean>;
-  get_settings(): Promise<Record<string, unknown>>;
-  set_settings(values: Record<string, unknown>): Promise<Record<string, unknown>>;
-}
-
-declare global {
-  interface Window {
-    pywebview?: { api: PywebviewApi };
-  }
-}
+import { createTauriHost } from '@core/hosts/tauri.ts';
+import type { Host } from '@core/host.ts';
+import type { ScanOptions, ScanResult } from '@core/scanner.ts';
+import { scan as runScan } from '@core/scanner.ts';
+import { workshopItemUrl } from '@core/models.ts';
 
 /**
- * How long we wait for `pywebviewready` before giving up on the backend.
+ * True when the page is running inside the app.
  *
- * Shorter in dev, where the event is never coming and the wait only delays the
- * fixture fallback on every reload.
+ * Tauri injects its IPC before the page's own scripts run, so this is a plain
+ * check rather than a wait for a ready event: in a browser it is simply false
+ * and the store falls back to the dev fixture.
  */
-const READY_TIMEOUT_MS = import.meta.env.DEV ? 1000 : 5000;
-
-let readyPromise: Promise<void> | null = null;
-
-/**
- * Whether the bridge is usable.
- *
- * `window.pywebview.api` exists as an empty placeholder before the methods are
- * attached, so test for a method rather than for the object: a truthiness
- * check here reports a backend that cannot yet be called.
- */
-function isReady(): boolean {
-  return typeof window.pywebview?.api?.scan === 'function';
-}
-
-function waitForApi(): Promise<void> {
-  if (isReady()) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    const done = () => {
-      window.removeEventListener('pywebviewready', done);
-      clearTimeout(timer);
-      resolve();
-    };
-    const timer = setTimeout(done, READY_TIMEOUT_MS);
-    window.addEventListener('pywebviewready', done);
-  });
-}
-
-/**
- * Resolves to the Python API, or null when running outside pywebview.
- *
- * The object is looked up fresh every time: pywebview replaces it while
- * setting the bridge up, so a reference kept from before `pywebviewready`
- * goes stale.
- */
-export async function api(): Promise<PywebviewApi | null> {
-  readyPromise ??= waitForApi();
-  await readyPromise;
-
-  return isReady() ? (window.pywebview?.api ?? null) : null;
-}
-
-/** True once a Python backend is attached and callable. Await `api()` first. */
 export function hasBackend(): boolean {
-  return isReady();
+  return '__TAURI_INTERNALS__' in window;
 }
 
-async function call<T>(name: keyof PywebviewApi, run: (a: PywebviewApi) => Promise<T>): Promise<T> {
-  const a = await api();
+let cachedHost: Host | null = null;
 
-  if (!a) {
-    throw new Error(`No Python backend: ${name}() is unavailable`);
-  }
+/** The one host for this page. */
+export function host(): Host {
+  cachedHost ??= createTauriHost();
 
-  return run(a);
+  return cachedHost;
 }
 
-export function scan(options: ScanOptions = {}): Promise<SteamData> {
-  return call('scan', (a) => a.scan(options));
+export function scan(options: ScanOptions = {}): Promise<ScanResult> {
+  return runScan(host(), options);
 }
 
-export function openFolder(path: string): Promise<boolean> {
-  return call('open_folder', (a) => a.open_folder(path));
+/** Open a game's install folder in Explorer. */
+export function openFolder(path: string): Promise<void> {
+  return openPath(path);
 }
 
-export function uninstall(appid: number): Promise<boolean> {
-  return call('uninstall', (a) => a.uninstall(appid));
+/**
+ * Hand the uninstall to Steam, which shows its own confirmation.
+ *
+ * The URL is built here from the numeric appid, and the opener's permission
+ * scope only allows `steam://`, so a bad id cannot become some other scheme.
+ */
+export function uninstall(appid: number): Promise<void> {
+  return openUrl(`steam://uninstall/${Math.trunc(appid)}`);
 }
 
 /** Open a Workshop item's page in Steam, where it can be unsubscribed. */
-export function workshopPage(itemid: number): Promise<boolean> {
-  return call('workshop_page', (a) => a.workshop_page(itemid));
+export function workshopPage(itemid: number): Promise<void> {
+  return openUrl(`steam://url/CommunityFilePage/${Math.trunc(itemid)}`);
 }
 
-export function getSettings(): Promise<Record<string, unknown>> {
-  return call('get_settings', (a) => a.get_settings());
-}
-
-export function setSettings(values: Record<string, unknown>): Promise<Record<string, unknown>> {
-  return call('set_settings', (a) => a.set_settings(values));
+/** The item's page on the web, for a browser rather than the Steam client. */
+export function workshopWebUrl(itemid: number): string {
+  return workshopItemUrl(itemid);
 }

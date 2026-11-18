@@ -4,63 +4,82 @@ A WinDirStat-style view of the disk space used by installed Steam games, across 
 
 ## Setting up
 
-Requires Python 3.10+ and Node.js LTS on Windows. Commands are for Git Bash.
+Requires Node.js 22.18+ (it runs the TypeScript directly), Rust and the
+Microsoft C++ Build Tools. Commands are for Git Bash.
 
 ```bash
-python -m venv .venv
-source .venv/Scripts/activate
-pip install -r requirements.txt
-(cd ui && npm install)
+npm install
 ```
 
-`requirements.txt` holds `pywebview` (the native window) and `pyinstaller`
-(only needed to build the exe). Nothing is installed globally; activate the
-venv in each new shell, or call `.venv/Scripts/python.exe` directly.
+Create the app icons
+```bash
+npx tauri icon app-icon.png
+```
+
+One `package.json` at the project root covers the UI, the CLI and the Tauri
+CLI. The Rust side (`src-tauri/`) builds itself on the first `tauri dev`.
 
 ## The desktop app
 
 ```bash
-cd ui && npm run dev                 # terminal 1: Vite dev server on :5173
-python app.py --dev                  # terminal 2: window pointed at it, devtools on
+npx tauri dev                        # Vite dev server + the app window, hot reload
+npx tauri build                      # -> src-tauri/target/release/SteamDirStats.exe
 
-(cd ui && npm run build)             # build the UI once
-python app.py                        # window loading ui/dist/index.html
+npm run dev                          # the UI alone, in a browser, on ui/fixture.json
 ```
 
-`python app.py --steam-path "D:/Steam"` scans a given folder instead of
-auto-detecting. Settings are written to `settings.json` next to the app.
+Settings are written to `settings.json` next to the executable, falling back to
+`%APPDATA%\SteamDirStats\` when that folder is read-only.
 
-To screenshot what the window is showing (the page, not the window frame),
-in two terminals:
+To screenshot what the window is showing (the page, not the window frame), in
+two terminals:
 
 ```bash
-WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222" .venv/Scripts/python app.py
+WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222" npx tauri dev
 node tools/shot.mjs window.png       # waits for the window, then writes the PNG
 ```
 
-Either order works: the script polls for up to 30 seconds. To stay in one
-terminal, put the `&` at the end of the app's own line, not mid-command.
+Either order works: the script polls for up to 30 seconds.
 
 ## Command-line scanner
 
-The `steamdirstats` package needs no third-party packages, so it runs on a
-plain Python too.
+The same `core/` the app runs, on the Node host instead of the Tauri one. No
+build step and no dependencies.
 
 ```bash
-python -m steamdirstats                     # auto-detect Steam, list games by library
-python -m steamdirstats --json              # same data as JSON
-python -m steamdirstats --steam-path "D:/Steam"
-python -m unittest                          # run the tests
+node tools/steamdirstats-cli.ts                     # list games by library
+node tools/steamdirstats-cli.ts --json              # same data as JSON
+node tools/steamdirstats-cli.ts --accurate          # walk the folders, not the manifests
+node tools/steamdirstats-cli.ts --steam-path "D:/Steam"
+node tools/steamdirstats-cli.ts --json > ui/fixture.json   # refresh the dev fixture
+
+npm test                                            # node --test over core/
+npm run typecheck                                   # all three tsconfigs
 ```
 
-From other Python code:
+From other TypeScript:
 
-```python
-from steamdirstats import scan
+```ts
+import { createNodeHost } from './core/hosts/node.ts';
+import { scan } from './core/scanner.ts';
 
-data = scan()
-for library in data.libraries:
-    print(library.path, library.size_on_disk)
-    for game in library.games:
-        print("  ", game.name, game.size_on_disk)
+const { data } = await scan(createNodeHost());
+
+for (const library of data.libraries) {
+  console.log(library.path, library.size_on_disk);
+
+  for (const game of library.games) {
+    console.log('  ', game.name, game.total_size);
+  }
+}
 ```
+
+## Layout
+
+| Folder       | What it holds                                                        |
+| ------------ | -------------------------------------------------------------------- |
+| `core/`      | All the logic, host-agnostic: no `node:*`, no `@tauri-apps/*`, no DOM |
+| `core/hosts/`| The two adapters (`node.ts`, `tauri.ts`) that give `core/` its IO     |
+| `ui/`        | The Vue 3 + Vite app                                                  |
+| `tools/`     | The CLI and the screenshot helper                                     |
+| `src-tauri/` | The Rust shell: five commands and three plugins                       |

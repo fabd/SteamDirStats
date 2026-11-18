@@ -8,15 +8,16 @@
 
 import { computed, reactive } from 'vue';
 
-import { hasBackend, api, scan } from '@/api/bridge';
-import type { Game, Library, ScanProgress, SteamData } from '@/api/types';
+import { hasBackend, scan } from '@/api/bridge';
+import type { Game, Library, SteamData } from '@core/models.ts';
 import { libraryColors } from '@/lib/colors';
 
-declare global {
-  interface Window {
-    /** Called from Python via evaluate_js() while an accurate scan runs. */
-    sdScanProgress?: (done: number, total: number, name: string) => void;
-  }
+/** What the status bar shows while an accurate scan runs. */
+export interface ScanProgress {
+  done: number;
+  total: number;
+  /** The game being measured. */
+  name: string;
 }
 
 interface ScanState {
@@ -73,7 +74,7 @@ export function libraryOf(game: Game): Library | null {
 }
 
 /**
- * Scan, or fall back to the dev fixture when no Python backend answered.
+ * Scan, or fall back to the dev fixture when running outside the app.
  *
  * The fixture lets the UI be built in a plain browser with `npm run dev`. It
  * lives at `ui/fixture.json`, outside `src/`, so Vite serves it in dev but
@@ -85,13 +86,24 @@ export async function load(options: { accurate?: boolean } = {}): Promise<void> 
   scanStore.progress = null;
 
   try {
-    await api();
+    if (hasBackend()) {
+      // workshopNames: the item rows in the table are useless without them,
+      // and the lookup is cached on disk, so only new items cost a request.
+      const { data } = await scan({
+        accurate: options.accurate,
+        workshopNames: true,
+        onScanProgress: (done, total, name) => {
+          scanStore.progress = { done, total, name };
+        },
+        onNameProgress: (done, total) => {
+          scanStore.progress = { done, total, name: 'Workshop item names' };
+        },
+      });
+      scanStore.data = data;
+    } else {
+      scanStore.data = await loadFixture();
+    }
 
-    // workshop_names: the item rows in the table are useless without them,
-    // and the lookup is cached on disk, so only new items cost a request.
-    scanStore.data = hasBackend()
-      ? await scan({ ...options, workshop_names: true })
-      : await loadFixture();
     scanStore.isFixture = !hasBackend();
   } catch (err) {
     scanStore.error = err instanceof Error ? err.message : String(err);
@@ -150,12 +162,12 @@ export function clearRevealed(): void {
 }
 
 const MISSING_FIXTURE =
-  'No Python backend and no ui/fixture.json ' +
-  '(create one with: python -m steamdirstats --json > ui/fixture.json)';
+  'Not running in the app, and no ui/fixture.json ' +
+  '(create one with: node tools/steamdirstats-cli.ts --json > ui/fixture.json)';
 
 async function loadFixture(): Promise<SteamData> {
   if (!import.meta.env.DEV) {
-    throw new Error('No Python backend');
+    throw new Error('Not running in the app: no scan is possible');
   }
 
   const response = await fetch(`${import.meta.env.BASE_URL}fixture.json`);
@@ -166,7 +178,3 @@ async function loadFixture(): Promise<SteamData> {
 
   return (await response.json()) as SteamData;
 }
-
-window.sdScanProgress = (done, total, name) => {
-  scanStore.progress = { done, total, name };
-};

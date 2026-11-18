@@ -1,6 +1,0 @@
-# Runtime: the native window. Pulls in pythonnet, which pywebview needs for
-# the Edge WebView2 backend on Windows.
-pywebview==6.2.1
-
-# Build only: used to produce the portable SteamDirStats.exe.
-pyinstaller==6.22.3

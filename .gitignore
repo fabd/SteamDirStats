@@ -1,15 +1,19 @@
-__pycache__/
-*.pyc
-.venv/
-build/
-dist/
-*.spec
-settings.json
-ui/node_modules/
+node_modules/
+
+# build files
 ui/dist/
+src-tauri/target/
+src-tauri/gen/
+
+# recreate them with `npx tauri icon app-icon.png`
+src-tauri/icons
+
+# files created by the app
+settings.json
+workshop-names.json
+
 # dev fixture: a real library listing
 ui/fixture.json
-workshop-names.json
 
 # local files
 .*

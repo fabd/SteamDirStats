@@ -8,19 +8,32 @@
 ## Coding Standards
 
 - Use 2-space indentation for TypeScript, CSS and Vue templates
-- Use 4 spaces per indentation level for Python
+- Use 4 spaces per indentation level for Rust
 
-### Python
+### core/
 
-- Python and `uv` are installed and available in Git Bash on Windows.
-- **Never install packages into the global Python.** Third-party packages always go in a project-local `.venv`; don't use plain `pip install` outside one.
-- This project uses a plain venv, declared in `requirements.txt`:
-  - `python -m venv .venv`, then `pip install -r requirements.txt` with it activated.
-  - Pin versions in `requirements.txt` and say which are build-only.
-  - Run with the venv activated, or call `.venv/Scripts/python.exe` directly.
-- `uv` is optional, for a one-off script or anything wanting a lockfile: `uv venv`, `uv add <package>` (with a `pyproject.toml`) or `uv pip install <package>`, and `uv run script.py` to skip activation. Commit `pyproject.toml` and `uv.lock` when used.
-- If activating a venv manually in Git Bash, use `source .venv/Scripts/activate`.
-- Add `.venv/` to `.gitignore`.
+All the logic lives in `core/`, which runs in two hosts: the app window and
+Node (the CLI). Keeping it host-agnostic is what makes that possible.
+
+- **No `node:*`, no `@tauri-apps/*`, no DOM** in `core/*.ts`. IO goes through
+  the `Host` interface in `core/host.ts`; the adapters are `core/hosts/node.ts`
+  and `core/hosts/tauri.ts`. `tsconfig.core.json` enforces this by giving the
+  folder neither Node nor DOM types, so a stray `window` fails to compile.
+- Node runs the TypeScript directly, so `core/` and `tools/` must stay
+  **erasable**: no enums, no namespaces, no parameter properties, and relative
+  imports spell the `.ts` extension (`./vdf.ts`).
+- Tests are `core/*.test.ts` under `node --test`; shared fixtures are in
+  `core/test-support.ts` (Node-only, excluded from `tsconfig.core.json`).
+
+### Rust
+
+- `src-tauri/` is a thin shell: only what TypeScript cannot do (the registry,
+  the runtime file-scope grants, the directory walk, free disk space, the exe
+  folder). Before adding a command, check the work cannot live in `core/`.
+- `cargo fmt` and `cargo clippy` from `src-tauri/`.
+- A new command goes in `commands.rs` and must be registered in `lib.rs`.
+- A new plugin capability goes in `src-tauri/capabilities/default.json`, as
+  narrowly scoped as the feature allows.
 
 ### CSS
 

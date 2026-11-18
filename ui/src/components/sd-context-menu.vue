@@ -29,7 +29,7 @@
 import { defineComponent } from 'vue';
 
 import { openFolder, uninstall } from '@/api/bridge';
-import type { Game } from '@/api/types';
+import type { Game } from '@core/models.ts';
 import { expandWorkshop, notify, select } from '@/stores/scan-store';
 
 /** Gap between the cursor and the menu, so the pointer never sits on an item. */
@@ -133,7 +133,7 @@ export default defineComponent({
       }
     },
 
-    /** Explorer, via Python; the path comes from the scan, not from the page. */
+    /** Explorer, via the opener plugin; the path comes from the scan, not the page. */
     async onOpenFolder(): Promise<void> {
       const game = this.game;
       this.close();
@@ -143,13 +143,11 @@ export default defineComponent({
       }
 
       try {
-        const isShown = await openFolder(game.install_path);
-
-        if (!isShown) {
-          notify(`Folder not found: ${game.install_path}`);
-        }
-      } catch (err) {
-        notify(err instanceof Error ? err.message : String(err));
+        // A folder that is gone (uninstalled since the scan) makes the opener
+        // itself fail, so there is no separate "did it open?" answer to check.
+        await openFolder(game.install_path);
+      } catch {
+        notify(`Could not open the folder: ${game.install_path}`);
       }
     },
 
