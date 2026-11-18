@@ -133,7 +133,7 @@ export default defineComponent({
       }
     },
 
-    /** Explorer, via the opener plugin; the path comes from the scan, not the page. */
+    /** Explorer, via the `open_folder` command; the path comes from the scan. */
     async onOpenFolder(): Promise<void> {
       const game = this.game;
       this.close();
@@ -143,11 +143,11 @@ export default defineComponent({
       }
 
       try {
-        // A folder that is gone (uninstalled since the scan) makes the opener
+        // A folder that is gone (uninstalled since the scan) makes the command
         // itself fail, so there is no separate "did it open?" answer to check.
         await openFolder(game.install_path);
-      } catch {
-        notify(`Could not open the folder: ${game.install_path}`);
+      } catch (err) {
+        notify(`Could not open the folder: ${err instanceof Error ? err.message : String(err)}`);
       }
     },
 

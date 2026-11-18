@@ -16,6 +16,7 @@ pub fn run() {
             commands::read_registry,
             commands::allow_steam_folder,
             commands::dir_sizes,
+            commands::open_folder,
             commands::disk_usage,
             commands::data_dir,
         ])

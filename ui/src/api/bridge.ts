@@ -8,7 +8,8 @@
  * path or a URL to the shell.
  */
 
-import { openPath, openUrl } from '@tauri-apps/plugin-opener';
+import { invoke } from '@tauri-apps/api/core';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { createTauriHost } from '@core/hosts/tauri.ts';
 import type { Host } from '@core/host.ts';
@@ -40,9 +41,15 @@ export function scan(options: ScanOptions = {}): Promise<ScanResult> {
   return runScan(host(), options);
 }
 
-/** Open a game's install folder in Explorer. */
+/**
+ * Open a game's install folder in Explorer.
+ *
+ * Not the opener plugin: its path scope is fixed in the capability file, which
+ * cannot name library drives it has never seen. Rust opens the folder instead,
+ * and only one already inside the scan's runtime grant.
+ */
 export function openFolder(path: string): Promise<void> {
-  return openPath(path);
+  return invoke('open_folder', { path });
 }
 
 /**

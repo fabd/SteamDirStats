@@ -12,6 +12,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Runtime};
 use tauri_plugin_fs::FsExt;
+use tauri_plugin_opener::OpenerExt;
 use walkdir::WalkDir;
 
 const APP_NAME: &str = "SteamDirStats";
@@ -116,6 +117,29 @@ pub async fn dir_sizes<R: Runtime>(app: AppHandle<R>, paths: Vec<String>) -> Vec
     })
     .await
     .unwrap_or_default()
+}
+
+/// Show one scanned folder in the file manager.
+///
+/// The opener plugin's own path scope has to be written in the capability file,
+/// where the library drives are not known, so the window asks Rust instead and
+/// the gate is the one the scan already passed: only a folder inside a granted
+/// Steam library can be opened (plan.md 7d).
+#[tauri::command]
+pub fn open_folder<R: Runtime>(app: AppHandle<R>, path: String) -> Result<(), String> {
+    let folder = PathBuf::from(&path);
+
+    if !app.fs_scope().is_allowed(&folder) {
+        return Err(format!("Not an allowed folder: {path}"));
+    }
+
+    if !folder.is_dir() {
+        return Err(format!("Folder not found: {path}"));
+    }
+
+    app.opener()
+        .open_path(folder.to_string_lossy(), None::<&str>)
+        .map_err(|err| err.to_string())
 }
 
 /// Total and free bytes of the volume holding `path`.
