@@ -264,6 +264,16 @@ Tauri denies everything that is not explicitly allowed, and the folders we need 
 - `dir_sizes` checks the scope itself (`fs_scope().is_allowed`) before walking, so the one command that could measure the whole disk is held to the same folders as the reads.
 - Validation lives in Rust rather than TypeScript, because the webview is the untrusted side of this boundary.
 
+### 7e. Custom title bar
+
+The window is undecorated (`"decorations": false` in `tauri.conf.json`) and the toolbar row doubles as its title bar: app icon, title, then the app's own buttons and, after a separator, minimize and close. There is no maximize button — double-clicking the row still toggles maximize, which is what Windows does and what §8 already saves.
+
+- **The frame is kept, only the caption is ours.** `"shadow": true` alongside `"decorations": false` leaves Windows 11 its drop shadow, its thin border and its rounded corners, and — the reason it matters here — its resize borders: tao hit-tests the top edge itself and leaves the other three to the DWM frame, so an undecorated window with a shadow stays resizable from every edge. `"decorations": false` on its own gives a bare rectangle that cannot be resized by dragging.
+- **Dragging** is `data-tauri-drag-region="deep"` on the `<header>`: Tauri's injected script walks up from the click and treats buttons as clickable, so the whole row drags except the buttons. It needs `core:window:allow-start-dragging`; the double-click maximize is `allow-internal-toggle-maximize`, which `core:default` already grants. The row is `user-select: none` so dragging the window does not sweep a text selection along with it.
+- **The buttons** call `minimize()` and `close()` in `ui/src/lib/window-state.ts` — `close()`, not `destroy()`, so the close request still runs the handler that saves the placement (§8). Minimize needs `core:window:allow-minimize`. They are rendered only when `hasBackend()` is true: in a browser there is no window to act on.
+- **Icons** are inline SVG strokes rather than a font or an icon package: a chevron down for minimize, a cross in `--sd-danger` for close, which turns white on a red fill on hover.
+- **The app icon** is imported through the `@icons` alias (`src-tauri/icons/`) rather than copied into `ui/public/`, so the title bar shows whatever icon the window and the exe carry, including the day the placeholder is replaced.
+
 ### 8. Window state persistence
 
 - Remember window position, size, and maximized state between runs.

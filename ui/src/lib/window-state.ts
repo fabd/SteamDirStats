@@ -163,3 +163,32 @@ async function isOnScreen(placement: WindowPlacement): Promise<boolean> {
     );
   });
 }
+
+/**
+ * Send the window to the taskbar.
+ *
+ * Here rather than in the toolbar component because the window is this
+ * module's business, and the custom title bar's buttons are the only reason
+ * `allow-minimize` is in the capability file.
+ */
+export async function minimize(): Promise<void> {
+  if (!hasBackend()) {
+    return;
+  }
+
+  await getCurrentWindow().minimize();
+}
+
+/**
+ * Close the window the way the system title bar used to.
+ *
+ * `close()` rather than `destroy()`: it fires the close request that `watch()`
+ * listens for, so the placement is saved before the window goes away.
+ */
+export async function close(): Promise<void> {
+  if (!hasBackend()) {
+    return;
+  }
+
+  await getCurrentWindow().close();
+}

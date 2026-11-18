@@ -1,6 +1,10 @@
+/* Also the window's title bar (the window is undecorated), so the row must
+   not be selectable: dragging the window should not sweep a text selection
+   along with it. */
 .sd-Toolbar {
   background: var(--sd-surface-raised);
   border-bottom: 1px solid var(--sd-border);
+  user-select: none;
 }
 
 .sd-Toolbar-title {
@@ -39,4 +43,53 @@
 .sd-Toolbar-button:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.sd-Toolbar-icon {
+  flex: none;
+}
+
+/* Breathing room between the app's own buttons and the window's. */
+.sd-Toolbar-separator {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 0.25rem;
+  background: var(--sd-border);
+}
+
+.sd-Toolbar-windowButton {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 1.75rem;
+  padding: 0;
+  background: transparent;
+  color: var(--sd-text-dim);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sd-Toolbar-windowButton svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sd-Toolbar-windowButton:hover {
+  background: var(--sd-row-hover);
+  color: var(--sd-text);
+}
+
+.sd-Toolbar-windowButton--close {
+  color: var(--sd-danger);
+}
+
+.sd-Toolbar-windowButton--close:hover {
+  background: var(--sd-danger);
+  color: #fff;
 }

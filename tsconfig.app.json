@@ -5,7 +5,8 @@
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./ui/src/*"],
-      "@core/*": ["./core/*"]
+      "@core/*": ["./core/*"],
+      "@icons/*": ["./src-tauri/icons/*"]
     },
     "allowArbitraryExtensions": true,
     "allowImportingTsExtensions": true,

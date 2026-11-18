@@ -15,6 +15,8 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./ui/src', import.meta.url)),
       '@core': fileURLToPath(new URL('./core', import.meta.url)),
+      // The title bar shows the same icon the window and the exe carry.
+      '@icons': fileURLToPath(new URL('./src-tauri/icons', import.meta.url)),
     },
   },
   server: {

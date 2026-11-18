@@ -77,11 +77,28 @@ See [plan.md](plan.md) for details on each item.
 
 ## Still to do (carried over from phase two)
 
+- [x] Custom title bar with minimize and close buttons (plan.md 7e)
+  - [x] `"decorations": false` with `"shadow": true`, so the window keeps the
+    Windows frame; the toolbar row is the drag region
+    (`data-tauri-drag-region="deep"`, which buttons block by themselves)
+  - [x] window stays resizable: the shadow keeps the DWM frame, and tao
+    hit-tests the top edge itself
+  - [x] maintain the standard window border and rounded corners
+  - [x] keep the app icon to the left, next to the window title — imported
+    through the `@icons` alias, not a copy that would go stale
+  - [x] no maximize button (double-click still maximizes, as Windows does)
+  - [x] window minimize & close buttons use SVG icons
+    - [x] merge the buttons next to the current Fast / Grouped / Refresh buttons
+    - [x] Minimize icon looks like FontAwesome chevron down icon
+    - [x] Close icon is a red cross (like fontawesome times icon)
+  - [x] `allow-minimize` and `allow-start-dragging` added to the capability
+    file; close goes through `close()`, so the placement is still saved
+  - [x] Checked in the running app: rounded corners and border intact, the
+    buttons render and minimize works
 - [ ] Toolbar: settings button
 - [ ] Sortable table columns (name, size, Workshop, playtime, last played, library)
 - [ ] Resizable treemap / table split
 - [ ] Dialogs: settings (`<dialog>`), about
-- [ ] Custom title bar with minimize and close buttons
 - [ ] Packaging
   - [ ] `npx tauri build` → portable `SteamDirStats.exe`
   - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)
