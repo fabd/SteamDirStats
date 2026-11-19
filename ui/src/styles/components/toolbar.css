@@ -70,6 +70,10 @@
   cursor: pointer;
 }
 
+/* The icons come in two kinds. Ours are drawn as strokes, so they are styled
+   as outlines; a FontAwesome path is a solid shape and needs the opposite
+   (--filled), or it renders as a hairline tracing of itself. Both take their
+   colour from the button, so hover and the close button's red still apply. */
 .sd-Toolbar-windowButton svg {
   width: 14px;
   height: 14px;
@@ -80,13 +84,14 @@
   stroke-linejoin: round;
 }
 
+.sd-Toolbar-windowIcon--filled svg {
+  fill: currentColor;
+  stroke: none;
+}
+
 .sd-Toolbar-windowButton:hover {
   background: var(--sd-row-hover);
   color: var(--sd-text);
-}
-
-.sd-Toolbar-windowButton--close {
-  color: var(--sd-danger);
 }
 
 .sd-Toolbar-windowButton--close:hover {

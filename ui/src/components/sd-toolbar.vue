@@ -43,14 +43,16 @@
       <span class="sd-Toolbar-separator"></span>
 
       <button
-        class="sd-Toolbar-windowButton"
+        class="sd-Toolbar-windowButton sd-Toolbar-windowIcon--filled"
         type="button"
         title="Minimize"
         aria-label="Minimize"
         @click="onMinimize"
       >
-        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M3 6l5 5 5-5" />
+        <svg viewBox="0 0 448 448" aria-hidden="true">
+          <path
+            d="M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z"
+          />
         </svg>
       </button>
 
@@ -71,15 +73,13 @@
       </button>
 
       <button
-        class="sd-Toolbar-windowButton sd-Toolbar-windowButton--close"
+        class="sd-Toolbar-windowButton sd-Toolbar-windowIcon--filled sd-Toolbar-windowButton--close"
         type="button"
         title="Close"
         aria-label="Close"
         @click="onClose"
       >
-        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M4 4l8 8M12 4l-8 8" />
-        </svg>
+        <svg viewBox="0 0 384 512"><path d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"/></svg>
       </button>
     </template>
   </header>
