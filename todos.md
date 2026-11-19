@@ -99,7 +99,20 @@ See [plan.md](plan.md) for details on each item.
   - [x] Checked in the running app: rounded corners and border intact, the
     buttons render and minimize works
 - [ ] Sortable table columns (name, size, Workshop, playtime, last played, library)
-- [ ] Resizable treemap / table split
+- [x] Resizable treemap / table split
+  - [x] `sd-splitter.vue`: a 7px handle on its own grid row, pointer capture
+    so the drag survives the canvas and the table, arrow keys to nudge it and
+    a double-click to reset
+  - [x] `app.vue` holds the geometry: the split is a fraction, written inline
+    as `minmax(0, Nfr) auto minmax(0, 1-Nfr)`, so the panes keep their
+    proportions when the window is resized
+  - [x] Both panes keep a 90px minimum; a window too short for two of them
+    drops the clamp rather than pinning the handle
+  - [x] Not persisted: the split is `app.vue`'s own state and every run
+    starts at the default 60/40
+  - [x] The legend wraps to as many rows as the libraries need
+    (`.sd-App-map` is `minmax(0, 1fr) auto`, so the treemap gives way to it
+    instead of the legend being clipped)
 - [ ] Dialog: about (`<dialog>`)
   - [ ] TODO : which looks like .... 
 - [ ] Packaging
@@ -110,7 +123,14 @@ See [plan.md](plan.md) for details on each item.
 
 ## Polishing
 
-- [ ] nice dark theme colours, inspired by Steam client
+- [ ] Add "View Store page" to the context menu
+  - [ ] Context menu also works on right click on game row in the table
+  - [ ] if it is a workshop item show "View on Steam Workshop" instead of "View Store page"
+- [ ] display the library in tooltip the same way as in the table, with a small coloured swatch
+  - [ ] do not show the full install path in the tooltip (user can simply use the "Browse local files" option to reveal it)
+- [ ] visuals
+  - [ ] nice dark theme colours, inspired by Steam client
+  - [ ] the resizable handle bg color, draggable icon/texture?
 - [ ] typography?
 - [ ] Github
   - [ ] README screenshot

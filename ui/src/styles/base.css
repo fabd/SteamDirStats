@@ -37,20 +37,24 @@ body {
   height: 100%;
 }
 
-/* Treemap above, table below. A fixed split for now; making it draggable is
-   its own item. `minmax(0, …)` keeps the rows from being pushed out by their
-   content, so the treemap can shrink and the table scrolls instead. */
+/* Table above, treemap below, with the drag handle's own row between them.
+   The row sizes are set inline by `app.vue` from the saved split; the ones
+   here are the fallback before it has mounted. `minmax(0, …)` keeps the rows
+   from being pushed out by their content, so the treemap can shrink and the
+   table scrolls instead. */
 .sd-App-content {
   display: grid;
-  grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-rows: minmax(0, 3fr) auto minmax(0, 2fr);
   overflow: hidden;
 }
 
-/* The treemap pane: canvas, with the legend pinned under it. */
+/* The treemap takes what is left over, so the legend can wrap to as many
+   rows as it needs: `auto` sizes to the wrapped height, and the treemap's
+   own `min-height: 0` lets the `1fr` row give way to it. */
 .sd-App-map {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  min-height: 0;
+  overflow: hidden;
 }
 
 .sd-App-table {

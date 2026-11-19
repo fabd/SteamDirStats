@@ -1,0 +1,20 @@
+/* The drag handle between the table and the treemap (plan.md §7). It is
+   wider than it looks: the line is 1px, the grab area is the whole row. */
+
+.sd-Splitter {
+  height: 7px;
+  background: var(--sd-surface);
+  border-top: 1px solid var(--sd-border);
+  cursor: row-resize;
+  user-select: none;
+  /* Let the handle keep a touch/pen drag instead of scrolling a pane. */
+  touch-action: none;
+}
+
+.sd-Splitter:hover,
+.sd-Splitter:focus-visible,
+.sd-Splitter.is-active {
+  background: var(--sd-accent);
+  border-top-color: var(--sd-accent);
+  outline: none;
+}

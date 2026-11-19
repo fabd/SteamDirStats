@@ -10,6 +10,7 @@
 
 @import './base.css';
 @import './components/toolbar.css';
+@import './components/splitter.css';
 @import './components/treemap.css';
 @import './components/legend.css';
 @import './components/context-menu.css';
