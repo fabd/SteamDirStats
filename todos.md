@@ -86,7 +86,10 @@ See [plan.md](plan.md) for details on each item.
   - [x] maintain the standard window border and rounded corners
   - [x] keep the app icon to the left, next to the window title — imported
     through the `@icons` alias, not a copy that would go stale
-  - [x] no maximize button (double-click still maximizes, as Windows does)
+  - [x] add a maximize button between minimize and close: it toggles, and the
+    icon switches to the restore one while maximized (a resize listener, as
+    there is no maximized event, so double-clicking the drag region reports
+    the same way); `core:window:allow-toggle-maximize` in the capability file
   - [x] window minimize & close buttons use SVG icons
     - [x] merge the buttons next to the current Fast / Grouped / Refresh buttons
     - [x] Minimize icon looks like FontAwesome chevron down icon

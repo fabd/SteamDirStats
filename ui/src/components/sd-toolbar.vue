@@ -55,6 +55,22 @@
       </button>
 
       <button
+        class="sd-Toolbar-windowButton"
+        type="button"
+        :title="isMaximized ? 'Restore' : 'Maximize'"
+        :aria-label="isMaximized ? 'Restore' : 'Maximize'"
+        @click="onToggleMaximize"
+      >
+        <svg v-if="isMaximized" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3 8h6v5H3z" />
+          <path d="M6 8V4h7v6H9" />
+        </svg>
+        <svg v-else viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3.5 3.5h9v9h-9z" />
+        </svg>
+      </button>
+
+      <button
         class="sd-Toolbar-windowButton sd-Toolbar-windowButton--close"
         type="button"
         title="Close"
@@ -75,7 +91,7 @@ import { defineComponent } from 'vue';
 import iconUrl from '@icons/32x32.png';
 
 import { hasBackend } from '@/api/bridge';
-import { close, minimize } from '@/lib/window-state';
+import { close, minimize, toggleMaximize, watchMaximized } from '@/lib/window-state';
 import { scanStore } from '@/stores/scan-store';
 import { settingsStore, update } from '@/stores/settings-store';
 
@@ -83,7 +99,22 @@ export default defineComponent({
   name: 'SdToolbar',
   emits: ['refresh'],
   data() {
-    return { scan: scanStore, settings: settingsStore, iconUrl, isInApp: hasBackend() };
+    return {
+      scan: scanStore,
+      settings: settingsStore,
+      iconUrl,
+      isInApp: hasBackend(),
+      isMaximized: false,
+      unwatchMaximized: null as (() => void) | null,
+    };
+  },
+  async mounted() {
+    this.unwatchMaximized = await watchMaximized((isMaximized) => {
+      this.isMaximized = isMaximized;
+    });
+  },
+  unmounted() {
+    this.unwatchMaximized?.();
   },
   methods: {
     toggleAccurate() {
@@ -94,6 +125,9 @@ export default defineComponent({
     },
     onMinimize() {
       void minimize();
+    },
+    onToggleMaximize() {
+      void toggleMaximize();
     },
     onClose() {
       void close();

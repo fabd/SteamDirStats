@@ -180,6 +180,54 @@ export async function minimize(): Promise<void> {
 }
 
 /**
+ * Toggle between maximized and the placement the user last gave the window.
+ *
+ * The window buttons own this; `restore()` applies the saved flag directly.
+ */
+export async function toggleMaximize(): Promise<void> {
+  if (!hasBackend()) {
+    return;
+  }
+
+  await getCurrentWindow().toggleMaximize();
+}
+
+/** Whether the window is maximized right now. */
+export async function isMaximized(): Promise<boolean> {
+  if (!hasBackend()) {
+    return false;
+  }
+
+  return getCurrentWindow().isMaximized();
+}
+
+/**
+ * Report the maximized state as it changes, so a button can show the right
+ * icon.
+ *
+ * There is no "maximized" event; maximizing resizes the window, so a resize
+ * is the signal, and double-clicking the drag region or using the keyboard
+ * gets reported the same way as our own button.
+ *
+ * Returns the unlisten function, or a no-op outside the app.
+ */
+export async function watchMaximized(
+  onChange: (isMaximized: boolean) => void,
+): Promise<() => void> {
+  if (!hasBackend()) {
+    return () => {};
+  }
+
+  const appWindow = getCurrentWindow();
+
+  onChange(await appWindow.isMaximized());
+
+  return appWindow.onResized(async () => {
+    onChange(await appWindow.isMaximized());
+  });
+}
+
+/**
  * Close the window the way the system title bar used to.
  *
  * `close()` rather than `destroy()`: it fires the close request that `watch()`
