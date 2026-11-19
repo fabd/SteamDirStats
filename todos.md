@@ -107,3 +107,11 @@ See [plan.md](plan.md) for details on each item.
   - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)
   - [ ] Run the exe on a clean Windows PC (no Node / Rust); note the WebView2 requirement
   - [ ] Check antivirus / SmartScreen behaviour; consider signing
+
+## Polishing
+
+- [ ] nice dark theme colours, inspired by Steam client
+- [ ] typography?
+- [ ] Github
+  - [ ] README screenshot
+  - [ ] Release with EXE
