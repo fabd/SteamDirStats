@@ -67,7 +67,7 @@ See [plan.md](plan.md) for details on each item.
   - [x] Full cycle checked: move to 500,300 → close → placement saved, process exits 0 → relaunch restores 500,300 exactly
   - [x] `isOnScreen()` fails closed: monitors that cannot be enumerated (which happens while the window is hidden) keep the saved position rather than centring the window
   - [ ] Check display scaling at 125% / 150%
-  - [ ] Check the `%APPDATA%` fallback with the exe in a read-only folder
+  - [x] Check the `%APPDATA%` fallback with the exe in a read-only folder
 - [x] Checked in the running app
   - [x] Real scan: 53 games, 3 libraries, 493.7 GB
   - [x] Workshop item names fetched through the http plugin and cached next to the exe

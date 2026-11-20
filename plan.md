@@ -34,7 +34,7 @@ A WinDirStat-style desktop app that shows, as a treemap, how much disk space eac
 
 ## Architecture
 
-All the logic — VDF parsing, libraries, manifests, Workshop, accounts, settings shape — is TypeScript in `core/`, written once and run in two places: the Tauri webview, and Node for the CLI. Rust is a thin shell: five commands and three plugins, about 250 lines.
+All the logic — VDF parsing, libraries, manifests, Workshop, accounts, settings shape — is TypeScript in `core/`, written once and run in two places: the Tauri webview, and Node for the CLI. Rust is a thin shell: six commands and three plugins, about 265 lines.
 
 ```
 core/               Host-agnostic TypeScript. No node:*, no @tauri-apps/*, no DOM.
@@ -67,7 +67,7 @@ src-tauri/          The Rust shell. Small on purpose; see "What Rust is for".
   capabilities/default.json  which plugin commands the window may call
   src/main.rs       entry point
   src/lib.rs        builder: plugins, command registration
-  src/commands.rs   read_registry, allow_steam_folder, dir_sizes, disk_usage, data_dir
+  src/commands.rs   read_registry, allow_steam_folder, dir_sizes, open_folder, disk_usage, data_dir
 ui/                 Vue 3 + Vite project; imports core/ through the `@core` alias
   src/api/bridge.ts   builds the Tauri host, runs scan(), and the three opener actions
   src/lib/window-state.ts  save and restore the window placement (§8)
@@ -78,17 +78,18 @@ vite.config.ts      Vite with `root: 'ui'`, aliases `@` → ui/src and `@core` �
 
 ### What Rust is for
 
-Everything else is TypeScript. Rust earns its place in exactly five commands:
+Everything else is TypeScript. Rust earns its place in exactly six commands:
 
 | Command                           | Why it cannot be TypeScript                                                                                                                                                                                                                  |
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `read_registry(hive, key, value)` | Reads `HKCU\Software\Valve\Steam\SteamPath` and the HKLM fallbacks (`winreg`). Only those two hives and only string values, so the page cannot name a hive of its own.                                                                       |
 | `allow_steam_folder(path)`        | Only the Rust side can widen the file scope at runtime, and it allows a folder only if it really holds a `steamapps` directory (§7d). The same command serves the Steam folder and every library.                                            |
 | `dir_sizes(paths)`                | Accurate mode. The fs plugin's `readDir` carries no sizes, so TypeScript would need one `stat` call per file across the IPC bridge — hundreds of thousands of round trips. `walkdir` does it on a blocking thread and emits progress events. |
+| `open_folder(path)`               | The opener plugin's path scope is static, written in the capability file, which cannot name library drives it has never seen. Rust opens the folder through the same plugin, gated on the runtime fs scope the scan already granted (§7d).   |
 | `disk_usage(path)`                | Free and total space for the legend (`GetDiskFreeSpaceExW`); no plugin exposes it.                                                                                                                                                           |
 | `data_dir()`                      | The folder of `current_exe()` (§9), which the fs plugin has no notion of, plus the scope grant for it.                                                                                                                                       |
 
-The window itself, the actions (open folder, uninstall, Workshop page) and the window-state save/restore are all TypeScript on top of the official plugins.
+The window itself, the uninstall and Workshop-page links and the window-state save/restore are all TypeScript on top of the official plugins; only opening a folder needs the Rust side, for the scope reason above.
 
 ### Host ports
 
@@ -120,7 +121,7 @@ export interface Host {
 ```
 
 - `core/hosts/node.ts` implements it with `node:fs/promises`, `reg query` through `node:child_process`, global `fetch`, and a recursive walk of its own. `allowFolder` is a no-op: a Node process already reads whatever the user can.
-- `core/hosts/tauri.ts` implements it with the fs and http plugins and `invoke()` for the five Rust commands.
+- `core/hosts/tauri.ts` implements it with the fs and http plugins and `invoke()` for the six Rust commands.
 - `allowFolder` is why the scope flow (§7d) lives in `core/` rather than in the UI: `locate.ts` asks before probing a candidate Steam folder, `libraries.ts` before touching a library, and the Node host simply says yes.
 - Swapping the backend again means writing a third adapter, not touching `core/`.
 
@@ -211,8 +212,8 @@ Each game's total is split into categories:
 - Squarified treemap, one tile per game: all games from all libraries combined, grouped by library with a toggle for mixed (see General features 1–3).
 - Colour by library (fixed colour per library, stable across rescans). Hover tooltip with name, size, library, path, appid.
 - Legend + a sortable table view as an alternative to the treemap.
-- Actions on a game, both through `tauri-plugin-opener` from TypeScript:
-  - **Open folder**: `openPath(game.path)` (Explorer).
+- Actions on a game, both triggered from TypeScript:
+  - **Open folder**: the `open_folder` command (Explorer, via the opener plugin on the Rust side, scope-checked).
   - **Uninstall**: `openUrl('steam://uninstall/' + appid)`.
 - Refresh button (top right, feature 6); fast/accurate toggle.
 
@@ -258,8 +259,8 @@ Tauri denies everything that is not explicitly allowed, and the folders we need 
 5. `core/libraries.ts` calls `allowFolder()` on each one, which passes the same check. Otherwise the front end could use it to unlock any folder on the machine.
 6. From then on the fs plugin can read anything under those libraries, and `dir_sizes` refuses any path outside them.
 
-- `capabilities/default.json` lists the commands the window may call (`fs:allow-read-text-file`, `fs:allow-read-file`, `fs:allow-read-dir`, `fs:allow-exists`, `fs:allow-write-text-file`, `http:default`, `opener:allow-open-path`, `opener:allow-open-url`) with **no static filesystem scope**: an allowed command with an empty scope still reads nothing.
-- The http scope is narrowed to `https://api.steampowered.com/*`; the opener's url scope to `steam://*`.
+- `capabilities/default.json` lists the commands the window may call (`fs:allow-read-text-file`, `fs:allow-read-file`, `fs:allow-read-dir`, `fs:allow-exists`, `fs:allow-stat`, `fs:allow-write-text-file`, `http:default`, `opener:allow-open-url`) with **no static filesystem scope**: an allowed command with an empty scope still reads nothing.
+- The http scope is narrowed to `https://api.steampowered.com/*`; the opener's url scope to `steam://*`. There is no `opener:allow-open-path`: folders are opened by the `open_folder` command, which checks the runtime fs scope first.
 - Runtime grants are **not persisted** — they are rebuilt on every launch, which is what we want: a library that has gone away is never allowed again.
 - `dir_sizes` checks the scope itself (`fs_scope().is_allowed`) before walking, so the one command that could measure the whole disk is held to the same folders as the reads.
 - Validation lives in Rust rather than TypeScript, because the webview is the untrusted side of this boundary.

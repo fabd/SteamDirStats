@@ -1,8 +1,23 @@
 # SteamDirStats
 
-A WinDirStat-style view of the disk space used by installed Steam games, across all Steam libraries. See [plan.md](plan.md) for the full plan.
+A WinDirStat-style view of the disk space used by installed Steam games, across all Steam libraries. Useful when you have a bunch of games installed on multiple libraries and you want to free space, in particular with Workshop items that can be quite large (eg. SteamVR).
 
-## Setting up
+- status bar displays the total space taken by all games across all libraries combined
+- view workshop items for a game, by size descending; a "View on Steam Workshop" link takes you to the page in Steam where you can unsubscribe the item
+- treemap view to see at a glance games that take the most space, grouped by library or mixed together
+- context menu with options: Uninstall, and Browse local files
+- the app does NOT touch any Steam files, the Uninstall option simply triggers the uninstall dialog in Steam where you can confirm/cancel
+
+See [plan.md](plan.md) for the full plan.
+
+## App Info
+
+- Built with Rust/Tauri, GUI in TypeScript/HTML/CSS
+- Portable app
+  - Settings are written to `settings.json` next to the executable
+  - falling back to `%APPDATA%\SteamDirStats\` when that folder is read-only
+
+## Development
 
 Requires Node.js 22.18+ (it runs the TypeScript directly), Rust and the
 Microsoft C++ Build Tools. Commands are for Git Bash.
@@ -12,24 +27,33 @@ npm install
 ```
 
 Create the app icons
+
 ```bash
 npx tauri icon app-icon.png
 ```
 
 One `package.json` at the project root covers the UI, the CLI and the Tauri
-CLI. The Rust side (`src-tauri/`) builds itself on the first `tauri dev`.
+CLI. The Rust side (`src-tauri/`) builds itself on the first `npx tauri dev`.
 
-## The desktop app
+## Dev & Release Builds
+
+Development, starts the Vite dev server and runs the app in debug mode
 
 ```bash
 npx tauri dev                        # Vite dev server + the app window, hot reload
-npx tauri build                      # -> src-tauri/target/release/SteamDirStats.exe
-
-npm run dev                          # the UI alone, in a browser, on ui/fixture.json
 ```
 
-Settings are written to `settings.json` next to the executable, falling back to
-`%APPDATA%\SteamDirStats\` when that folder is read-only.
+Run the UI alone, in a browser, on `ui/fixture.json` (instead of the real Steam installation):
+
+```
+npm run dev                          # 
+```
+
+Build the app => `src-tauri/target/release/SteamDirStats.exe`
+
+```bash
+npx tauri build
+```
 
 To screenshot what the window is showing (the page, not the window frame), in
 two terminals:
@@ -43,8 +67,7 @@ Either order works: the script polls for up to 30 seconds.
 
 ## Command-line scanner
 
-The same `core/` the app runs, on the Node host instead of the Tauri one. No
-build step and no dependencies.
+A CLI version with no build step and no dependencies. Uses the same `core/` the GUI app runs, on the Node host instead of the Tauri one.
 
 ```bash
 node tools/steamdirstats-cli.ts                     # list games by library
@@ -55,23 +78,6 @@ node tools/steamdirstats-cli.ts --json > ui/fixture.json   # refresh the dev fix
 
 npm test                                            # node --test over core/
 npm run typecheck                                   # all three tsconfigs
-```
-
-From other TypeScript:
-
-```ts
-import { createNodeHost } from './core/hosts/node.ts';
-import { scan } from './core/scanner.ts';
-
-const { data } = await scan(createNodeHost());
-
-for (const library of data.libraries) {
-  console.log(library.path, library.size_on_disk);
-
-  for (const game of library.games) {
-    console.log('  ', game.name, game.total_size);
-  }
-}
 ```
 
 ## Layout
