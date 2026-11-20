@@ -88,4 +88,4 @@ npm run typecheck                                   # all three tsconfigs
 | `core/hosts/`| The two adapters (`node.ts`, `tauri.ts`) that give `core/` its IO     |
 | `ui/`        | The Vue 3 + Vite app                                                  |
 | `tools/`     | The CLI and the screenshot helper                                     |
-| `src-tauri/` | The Rust shell: five commands and three plugins                       |
+| `src-tauri/` | The Rust shell: six commands and three plugins                       |
