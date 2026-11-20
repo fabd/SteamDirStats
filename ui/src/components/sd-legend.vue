@@ -15,7 +15,7 @@ import { defineComponent } from 'vue';
 import { formatShare, formatSize } from '@core/format.ts';
 import { libraryColor } from '@/lib/colors';
 import { libraryLabel } from '@/lib/libraries';
-import { libraries, scanStore } from '@/stores/scan-store';
+import { libraries } from '@/stores/scan-store';
 
 interface Entry {
   path: string;
@@ -27,21 +27,21 @@ interface Entry {
 
 export default defineComponent({
   name: 'SdLegend',
-  data() {
-    return { scan: scanStore };
-  },
   computed: {
     /** One row per library, matching the treemap's colours. */
     entries(): Entry[] {
-      const total = (this.scan.data?.size_on_disk ?? 0) + (this.scan.data?.workshop_size ?? 0);
       return libraries.value.map((library) => {
         const size = library.size_on_disk + library.workshop_size;
+        // How much of its own drive the library takes; blank for a library on
+        // a drive we could not measure (unplugged, or disk_usage refused).
+        const share = formatShare(size, library.disk_total ?? 0);
+
         return {
           path: library.path,
           label: libraryLabel(library),
           color: libraryColor(library.path),
           size: formatSize(size),
-          share: formatShare(size, total),
+          share: share ? `(${share} of disk)` : '',
         };
       });
     },

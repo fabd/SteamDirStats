@@ -131,7 +131,7 @@ export interface Host {
 User-facing features, in plain terms. Implementation details are in the functional requirements below.
 
 1. **Combined default view.** On launch, the treemap shows every installed game from all libraries together in one view, sized by disk space.
-2. **One colour per library.** Each library gets its own distinct colour, so the space taken by each library is visible at a glance. A legend maps each colour to its library (path/drive and total size).
+2. **One colour per library.** Each library gets its own distinct colour, so the space taken by each library is visible at a glance. A legend maps each colour to its library: label, total size, and what share of that library's own drive it takes (`294 GB (56% of disk)`), which is what `disk_usage` is for.
 3. **Grouped or mixed layout (toggle).** Default is **grouped**: each library's games form one contiguous block, so the block's area shows that library's share. A toggle switches to **mixed**: all games laid out by size regardless of library, which makes the biggest games easier to compare. Tile areas are exact in both layouts. The choice is remembered in settings.
 4. **Right-click menu on a game.** Right-clicking a game tile opens a small context menu with:
    - **View Workshop Items**: expands that game's Workshop items in the table (feature 5), exactly as the row's own expand control does. Shown **only** on games that have Workshop items, so the menu has one entry fewer on most games.
