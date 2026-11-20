@@ -10,7 +10,6 @@ import { computed, reactive } from 'vue';
 
 import { hasBackend, scan } from '@/api/bridge';
 import type { Game, Library, SteamData } from '@core/models.ts';
-import { libraryColors } from '@/lib/colors';
 
 /** What the status bar shows while an accurate scan runs. */
 export interface ScanProgress {
@@ -61,11 +60,6 @@ export const games = computed<Game[]>(() =>
 
 export const libraries = computed<Library[]>(() =>
   (scanStore.data?.libraries ?? []).filter((lib) => lib.available),
-);
-
-/** Library path → colour, stable while the set of libraries is unchanged. */
-export const colors = computed(() =>
-  libraryColors((scanStore.data?.libraries ?? []).map((lib) => lib.path)),
 );
 
 /** The library a game belongs to; games carry no back-reference. */

@@ -97,11 +97,3 @@
 .sd-GameTable-danger:hover {
   text-decoration: underline;
 }
-
-/* The library's colour, as it will appear on the treemap tiles. */
-.sd-GameTable-swatch {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-}

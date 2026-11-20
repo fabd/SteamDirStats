@@ -1,9 +1,8 @@
 <template>
   <ul class="sd-Legend flex flex-wrap items-center gap-x-5 gap-y-1 px-3 py-2">
-    <li v-for="entry in entries" :key="entry.path" class="sd-Legend-item flex items-center gap-2">
-      <span class="sd-Legend-swatch" :style="{ background: entry.color }" />
+    <li v-for="entry in entries" :key="entry.path" class="flex items-center gap-2">
+      <span class="sd-LibrarySwatch" :style="{ background: entry.color }" />
       <span class="sd-Legend-label">{{ entry.label }}</span>
-      <span class="sd-Legend-path">{{ entry.path }}</span>
       <span class="sd-Legend-size">{{ entry.size }}</span>
       <span v-if="entry.share" class="sd-Legend-share">{{ entry.share }}</span>
     </li>
@@ -13,8 +12,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { formatPath, formatShare, formatSize } from '@core/format.ts';
-import { colors, libraries, scanStore } from '@/stores/scan-store';
+import { formatShare, formatSize } from '@core/format.ts';
+import { libraryColor } from '@/lib/colors';
+import { libraryLabel } from '@/lib/libraries';
+import { libraries, scanStore } from '@/stores/scan-store';
 
 interface Entry {
   path: string;
@@ -36,11 +37,9 @@ export default defineComponent({
       return libraries.value.map((library) => {
         const size = library.size_on_disk + library.workshop_size;
         return {
-          path: formatPath(library.path),
-          // A library Steam gave no label is identified by its path alone, so
-          // the path is not repeated as a label.
-          label: library.label || '',
-          color: colors.value.get(library.path) ?? 'transparent',
+          path: library.path,
+          label: libraryLabel(library),
+          color: libraryColor(library.path),
           size: formatSize(size),
           share: formatShare(size, total),
         };

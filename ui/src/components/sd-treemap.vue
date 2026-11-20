@@ -18,8 +18,10 @@
         {{ formatSize(tooltip.game.size_on_disk) }} game files +
         {{ formatSize(tooltip.game.workshop_size) }} Workshop
       </span>
-      <span class="sd-Treemap-tooltipDim">{{ tooltip.libraryLabel }}</span>
-      <span class="sd-Treemap-tooltipDim">{{ formatPath(tooltip.game.install_path) }}</span>
+      <span class="sd-Treemap-tooltipDim flex items-center gap-2">
+        <span class="sd-LibrarySwatch" :style="{ background: gameColor(tooltip.game) }" />
+        {{ tooltip.libraryLabel }}
+      </span>
       <span class="sd-Treemap-tooltipDim">appid {{ tooltip.game.appid }}</span>
     </div>
 
@@ -35,7 +37,9 @@ import SdContextMenu from '@/components/sd-context-menu.vue';
 
 import type { Game } from '@core/models.ts';
 import { formatPath, formatSize } from '@core/format.ts';
-import { colors, expandWorkshop, libraries, scanStore, select } from '@/stores/scan-store';
+import { colors, gameColor } from '@/lib/colors';
+import { libraryLabel } from '@/lib/libraries';
+import { expandWorkshop, libraries, scanStore, select } from '@/stores/scan-store';
 import { settingsStore } from '@/stores/settings-store';
 
 /** Height of the strip holding a library's name in the grouped layout. */
@@ -131,7 +135,7 @@ export default defineComponent({
       return libraries.value
         .map((library) => ({
           path: library.path,
-          label: library.label || formatPath(library.path),
+          label: libraryLabel(library),
           games: library.games
             .filter((game) => game.total_size > 0)
             .slice()
@@ -187,6 +191,7 @@ export default defineComponent({
   methods: {
     formatSize,
     formatPath,
+    gameColor,
 
     buildLayout(): Layout {
       const empty: Layout = { tiles: [], groups: [] };

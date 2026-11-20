@@ -9,6 +9,7 @@
 @import 'tailwindcss/preflight.css' layer(base);
 
 @import './base.css';
+@import './components/misc.css';
 @import './components/toolbar.css';
 @import './components/splitter.css';
 @import './components/treemap.css';

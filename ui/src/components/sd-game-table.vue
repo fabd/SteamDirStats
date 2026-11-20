@@ -50,9 +50,9 @@
           </td>
           <td class="sd-GameTable-cell sd-GameTable-cell--dim">
             <span
-              class="sd-GameTable-swatch mr-2 align-middle"
-              :style="{ background: colorOf(row.game) }"
-            />{{ libraryLabel(row.game) }}
+              class="sd-LibrarySwatch mr-2 align-middle"
+              :style="{ background: gameColor(row.game) }"
+            />{{ libraryLabelFromGame(row.game) }}
           </td>
         </tr>
 
@@ -90,14 +90,14 @@
 import { defineComponent } from 'vue';
 
 import { workshopPage } from '@/api/bridge';
+import { gameColor } from '@/lib/colors';
+import { libraryLabelFromGame } from '@/lib/libraries';
 import type { Game, WorkshopItem } from '@core/models.ts';
-import { formatLastPlayed, formatPath, formatPlaytime, formatSize } from '@core/format.ts';
+import { formatLastPlayed, formatPlaytime, formatSize } from '@core/format.ts';
 import {
   clearRevealed,
-  colors,
   games,
   isExpanded,
-  libraryOf,
   notify,
   scanStore,
   select,
@@ -166,23 +166,8 @@ export default defineComponent({
     select,
     isExpanded,
     toggleExpanded,
-
-    colorOf(game: Game): string {
-      const library = libraryOf(game);
-
-      return library ? (colors.value.get(library.path) ?? 'transparent') : 'transparent';
-    },
-
-    /** The library's label, or its path when Steam stored no label. */
-    libraryLabel(game: Game): string {
-      const library = libraryOf(game);
-
-      if (!library) {
-        return '';
-      }
-
-      return library.label || formatPath(library.path);
-    },
+    gameColor,
+    libraryLabelFromGame,
 
     /** Items whose name the lookup could not resolve show their id instead. */
     itemName(item: WorkshopItem): string {
