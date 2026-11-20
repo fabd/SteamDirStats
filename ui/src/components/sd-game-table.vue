@@ -2,12 +2,27 @@
   <table ref="table" class="sd-GameTable">
     <thead>
       <tr>
-        <th class="sd-GameTable-header">Game</th>
-        <th class="sd-GameTable-header text-right">Size</th>
-        <th class="sd-GameTable-header text-right">Workshop</th>
-        <th class="sd-GameTable-header text-right">Playtime</th>
-        <th class="sd-GameTable-header">Last played</th>
-        <th class="sd-GameTable-header">Library</th>
+        <th
+          v-for="column in columns"
+          :key="column.key"
+          scope="col"
+          class="sd-GameTable-header"
+          :class="{
+            'is-sorted': sortKey === column.key,
+            'is-ascending': sortKey === column.key && isAscending,
+          }"
+          :aria-sort="ariaSort(column.key)"
+        >
+          <button
+            type="button"
+            class="sd-GameTable-sort flex w-full items-center gap-1"
+            :class="{ 'justify-end': column.isNumeric }"
+            @click="sortBy(column.key)"
+          >
+            {{ column.label }}
+            <span class="sd-GameTable-sortIcon" aria-hidden="true">&#9662;</span>
+          </button>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -114,24 +129,88 @@ type Row =
   | { kind: 'game'; key: string; game: Game }
   | { kind: 'item'; key: string; game: Game; item: WorkshopItem };
 
+/** The column a click on a header sorts the game rows by. */
+type SortKey = 'name' | 'size' | 'workshop' | 'playtime' | 'lastPlayed' | 'library';
+
+interface Column {
+  key: SortKey;
+  label: string;
+  /** Right-aligned, and sorted largest first on the first click. */
+  isNumeric: boolean;
+}
+
+const COLUMNS: Column[] = [
+  { key: 'name', label: 'Game', isNumeric: false },
+  { key: 'size', label: 'Size', isNumeric: true },
+  { key: 'workshop', label: 'Workshop', isNumeric: true },
+  { key: 'playtime', label: 'Playtime', isNumeric: true },
+  { key: 'lastPlayed', label: 'Last played', isNumeric: false },
+  { key: 'library', label: 'Library', isNumeric: false },
+];
+
+/** Numeric so "Portal 2" follows "Portal", not "Portal 12". */
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+/**
+ * One comparator per column, all of them ascending; the header flips the
+ * result when the sort is descending.
+ *
+ * A game that was never played has no playtime and no last-played date, and
+ * a game without mods has no Workshop size, so those columns cluster every
+ * such game together; the tie-break in `sortedGames` orders the cluster.
+ */
+const COMPARATORS: Record<SortKey, (a: Game, b: Game) => number> = {
+  name: (a, b) => collator.compare(a.name, b.name),
+  size: (a, b) => a.total_size - b.total_size,
+  workshop: (a, b) => a.workshop_size - b.workshop_size,
+  playtime: (a, b) => (a.playtime ?? 0) - (b.playtime ?? 0),
+  lastPlayed: (a, b) => (a.last_played ?? 0) - (b.last_played ?? 0),
+  // The label the cell shows, not the path, or the order looks arbitrary.
+  library: (a, b) => collator.compare(libraryLabelFromGame(a), libraryLabelFromGame(b)),
+};
+
 export default defineComponent({
   name: 'SdGameTable',
 
   data() {
-    return { scan: scanStore };
+    return {
+      scan: scanStore,
+      // Largest first, which is the order the scan store already hands us,
+      // so the table looks the same until a header is clicked. Deliberately
+      // not persisted: every run starts here, like the treemap / table split.
+      sortKey: 'size' as SortKey,
+      isAscending: false,
+    };
   },
 
   computed: {
+    columns(): Column[] {
+      return COLUMNS;
+    },
+
+    sortedGames(): Game[] {
+      const compare = COMPARATORS[this.sortKey];
+      const direction = this.isAscending ? 1 : -1;
+
+      return [...games.value].sort((a, b) => {
+        const order = compare(a, b) * direction;
+
+        // Ties keep the biggest games at the top of their cluster, and give
+        // the sort a stable order of its own.
+        return order || b.total_size - a.total_size;
+      });
+    },
+
     rows(): Row[] {
-      return games.value.flatMap((game) => {
+      return this.sortedGames.flatMap((game) => {
         const gameRow: Row = { kind: 'game', key: `game-${game.appid}`, game };
 
         if (!isExpanded(game.appid)) {
           return [gameRow];
         }
 
-        // Largest first, like the game rows, and independently of them. The
-        // scan's own order is left alone: it is shared with the treemap.
+        // Always largest first, whatever the game rows are sorted by: an
+        // item row is a child of its game, not a peer of the other rows.
         const items = [...game.workshop_items].sort((a, b) => b.size - a.size);
 
         return [
@@ -168,6 +247,26 @@ export default defineComponent({
     toggleExpanded,
     gameColor,
     libraryLabelFromGame,
+
+    /** Clicking the sorted column flips it; a new one starts its own way. */
+    sortBy(key: SortKey): void {
+      if (this.sortKey === key) {
+        this.isAscending = !this.isAscending;
+
+        return;
+      }
+
+      this.sortKey = key;
+      this.isAscending = !COLUMNS.find((column) => column.key === key)?.isNumeric;
+    },
+
+    ariaSort(key: SortKey): 'ascending' | 'descending' | 'none' {
+      if (this.sortKey !== key) {
+        return 'none';
+      }
+
+      return this.isAscending ? 'ascending' : 'descending';
+    },
 
     /** Items whose name the lookup could not resolve show their id instead. */
     itemName(item: WorkshopItem): string {

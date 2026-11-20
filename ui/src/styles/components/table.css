@@ -4,7 +4,7 @@
 }
 
 .sd-GameTable-header {
-  padding: 0.25rem 0.75rem;
+  padding: 0;
   position: sticky;
   top: 0;
   background: var(--sd-surface-raised);
@@ -13,6 +13,45 @@
   font-weight: 600;
   text-align: left;
   white-space: nowrap;
+}
+
+/* The sort control fills its header, so the whole cell is the hit area and
+   every column is reachable from the keyboard. The padding lives here
+   rather than on the header for that reason. */
+.sd-GameTable-sort {
+  padding: 0.25rem 0.75rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sd-GameTable-sort:hover,
+.sd-GameTable-header.is-sorted {
+  color: var(--sd-text);
+}
+
+/* Always in the markup, so the column keeps its width and the header row
+   does not reflow when the sort moves to another column. */
+.sd-GameTable-sortIcon {
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0;
+}
+
+.sd-GameTable-sort:hover > .sd-GameTable-sortIcon {
+  opacity: 0.5;
+}
+
+.sd-GameTable-header.is-sorted .sd-GameTable-sortIcon {
+  opacity: 1;
+}
+
+.sd-GameTable-header.is-ascending .sd-GameTable-sortIcon {
+  transform: rotate(180deg);
 }
 
 .sd-GameTable-cell {

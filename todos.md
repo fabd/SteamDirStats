@@ -98,7 +98,27 @@ See [plan.md](plan.md) for details on each item.
     file; close goes through `close()`, so the placement is still saved
   - [x] Checked in the running app: rounded corners and border intact, the
     buttons render and minimize works
-- [ ] Sortable table columns (name, size, Workshop, playtime, last played, library)
+- [x] Sortable table columns (name, size, Workshop, playtime, last played, library)
+  - [x] The sort lives in `sd-game-table.vue`, not the store: the treemap
+    builds its layout from `libraries` and the status bar only counts, so
+    nothing else sees it, and `games` stays the canonical largest-first list
+  - [x] Clicking the sorted column flips it; a new column starts descending
+    for the numeric ones (Size, Workshop, Playtime) and ascending for Game
+    and Library
+  - [x] **Workshop** sorts games by their total Workshop size. Workshop item
+    rows are children, not peers: they stay with their game and are always
+    largest first, whatever the game rows are sorted by
+  - [x] Names and library labels compare with an `Intl.Collator` set to
+    `numeric`, so Portal 2 follows Portal rather than Portal 12; the library
+    sorts on the label the cell shows, not the path
+  - [x] Unplayed games (no playtime, no last-played) and games without mods
+    cluster at 0; total_size descending breaks the tie, so the big entries
+    stay at the top of their cluster and the order is stable
+  - [x] Each header is a button filling its cell, with `aria-sort` and a
+    chevron that is always in the markup — invisible until the column is
+    sorted — so the header row does not reflow when the sort moves
+  - [x] Not persisted: every run starts at size descending, like the split
+  - [x] Checked in the running app
 - [x] Resizable treemap / table split
   - [x] `sd-splitter.vue`: a 7px handle on its own grid row, pointer capture
     so the drag survives the canvas and the table, arrow keys to nudge it and
@@ -127,11 +147,16 @@ See [plan.md](plan.md) for details on each item.
   - [ ] Context menu also works on right click on game row in the table
   - [ ] if it is a workshop item show "View on Steam Workshop" instead of "View Store page"
 - [ ] display the library in tooltip the same way as in the table, with a small coloured swatch
-  - [ ] do not show the full install path in the tooltip (user can simply use the "Browse local files" option to reveal it)
+  - [x] do not show the full install path in the tooltip (user can simply use the "Browse local files" option to reveal it)
 - [ ] visuals
+  - [ ] fix the expand/collapse icon next to workshop size in game row
   - [ ] nice dark theme colours, inspired by Steam client
   - [ ] the resizable handle bg color, draggable icon/texture?
 - [ ] typography?
 - [ ] Github
   - [ ] README screenshot
   - [ ] Release with EXE
+
+## Fixes
+
+- [ ] double check E:/steam/steam 267 GB reported by Explorer, 294 GB shown in app
