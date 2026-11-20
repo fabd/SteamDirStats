@@ -50,18 +50,27 @@ export async function readLibraries(host: Host, steamPath: string): Promise<Libr
   }
 
   const libraries: Library[] = [];
-  const seen = new Set<string>();
+  const seen = new Map<string, Library>();
 
   for (const entry of entries) {
     const path = normalize(entry.path);
     const key = normcase(path);
+    const known = seen.get(key);
 
-    if (seen.has(key)) {
+    // The main Steam folder is added above without a label, but it is also
+    // listed in libraryfolders.vdf, where the user's label lives.
+    if (known) {
+      if (!known.label && entry.label) {
+        known.label = entry.label;
+      }
+
       continue;
     }
 
-    seen.add(key);
-    libraries.push(await makeLibrary(host, path, entry.label));
+    const library = await makeLibrary(host, path, entry.label);
+
+    seen.set(key, library);
+    libraries.push(library);
   }
 
   return libraries;
