@@ -37,6 +37,9 @@ Node (the CLI). Keeping it host-agnostic is what makes that possible.
 
 ### CSS
 
+- use modern syntax with nested CSS
+  - keep CSS selector specificity as low as possible
+  - use nesting only for pseudo-classes and pseudo-elements (eg. :hover) to reduce repetition of the selectors
 - prefix CSS classes with `sd-` (eg. `sd-Dialog` for a `Dialog` component)
 - use the pattern `sd-(component name)-(descendant)--(modifier)` (eg. `sd-Dialog-title`)
 - BEM modifier `--` for component variants, eg. `sd-Dialog--small`
