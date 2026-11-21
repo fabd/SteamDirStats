@@ -27,9 +27,12 @@
   font-weight: inherit;
   white-space: nowrap;
   cursor: pointer;
+
+  &:hover {
+    color: var(--sd-text);
+  }
 }
 
-.sd-GameTable-sort:hover,
 .sd-GameTable-header.is-sorted {
   color: var(--sd-text);
 }
@@ -105,11 +108,11 @@
   background: none;
   color: var(--sd-text-dim);
   cursor: pointer;
-}
 
-.sd-GameTable-toggle:hover {
-  background: var(--sd-surface-raised);
-  color: var(--sd-text);
+  &:hover {
+    background: var(--sd-surface-raised);
+    color: var(--sd-text);
+  }
 }
 
 .sd-GameTable-chevron {
@@ -131,8 +134,8 @@
   color: var(--sd-danger);
   cursor: pointer;
   font: inherit;
-}
 
-.sd-GameTable-danger:hover {
-  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
 }

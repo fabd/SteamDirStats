@@ -9,12 +9,12 @@
   user-select: none;
   /* Let the handle keep a touch/pen drag instead of scrolling a pane. */
   touch-action: none;
-}
 
-.sd-Splitter:hover,
-.sd-Splitter:focus-visible,
-.sd-Splitter.is-active {
-  background: var(--sd-accent);
-  border-top-color: var(--sd-accent);
-  outline: none;
+  &:hover,
+  &:focus-visible,
+  &.is-active {
+    background: var(--sd-accent);
+    border-top-color: var(--sd-accent);
+    outline: none;
+  }
 }

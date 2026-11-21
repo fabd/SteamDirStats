@@ -28,12 +28,12 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-}
 
-.sd-ContextMenu-item:hover,
-.sd-ContextMenu-item:focus-visible {
-  background: var(--sd-row-hover);
-  outline: none;
+  &:hover,
+  &:focus-visible {
+    background: var(--sd-row-hover);
+    outline: none;
+  }
 }
 
 .sd-ContextMenu-separator {

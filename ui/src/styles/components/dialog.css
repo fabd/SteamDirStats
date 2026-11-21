@@ -8,15 +8,15 @@
   margin: auto;
   min-width: 30rem;
   padding: 1.5rem 2.5rem 1.75rem;
-  background: linear-gradient( 312deg, #1b2838 0%, #1f3e57 100%);
+  background: linear-gradient(312deg, #1b2838 0%, #1f3e57 100%);
   color: var(--sd-text);
   border: 1px solid var(--sd-border);
   border-radius: 8px;
   text-align: center;
-}
 
-.sd-AboutDialog::backdrop {
-  background: rgb(0 0 0 / 55%);
+  &::backdrop {
+    background: rgb(0 0 0 / 55%);
+  }
 }
 
 /* The gradient is wider than the text and slides across it, so the blue/cyan
@@ -73,8 +73,8 @@
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
-}
 
-.sd-AboutDialog-link:hover {
-  filter: brightness(1.2);
+  &:hover {
+    filter: brightness(1.2);
+  }
 }

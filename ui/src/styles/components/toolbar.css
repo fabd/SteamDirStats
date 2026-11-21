@@ -17,15 +17,20 @@
   border: 1px solid var(--sd-border);
   border-radius: 4px;
   cursor: pointer;
-}
 
-.sd-Toolbar-button:hover {
-  background: var(--sd-row-hover);
-}
+  &:hover {
+    background: var(--sd-row-hover);
+  }
 
-.sd-Toolbar-button.is-active {
-  background: var(--sd-selected);
-  border-color: var(--sd-accent);
+  &.is-active {
+    background: var(--sd-selected);
+    border-color: var(--sd-accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 }
 
 .sd-Toolbar-button--refresh {
@@ -33,16 +38,11 @@
   border-color: var(--sd-accent);
   color: #0f1216;
   font-weight: 600;
-}
 
-.sd-Toolbar-button--refresh:hover {
-  filter: brightness(1.1);
-  background: var(--sd-accent);
-}
-
-.sd-Toolbar-button:disabled {
-  opacity: 0.5;
-  cursor: default;
+  &:hover {
+    filter: brightness(1.1);
+    background: var(--sd-accent);
+  }
 }
 
 .sd-Toolbar-icon {
@@ -68,6 +68,11 @@
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
+
+  &:hover {
+    background: var(--sd-row-hover);
+    color: var(--sd-text);
+  }
 }
 
 /* The icons come in two kinds. Ours are drawn as strokes, so they are styled
@@ -87,11 +92,6 @@
 .sd-Toolbar-windowIcon--filled svg {
   fill: currentColor;
   stroke: none;
-}
-
-.sd-Toolbar-windowButton:hover {
-  background: var(--sd-row-hover);
-  color: var(--sd-text);
 }
 
 .sd-Toolbar-windowButton--close:hover {
