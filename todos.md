@@ -66,7 +66,7 @@ See [plan.md](plan.md) for details on each item.
   - [x] Needed `core:window:allow-destroy` too: attaching `onCloseRequested` hands the closing to the page, so without it the title bar's close button saved the placement and then did nothing
   - [x] Full cycle checked: move to 500,300 → close → placement saved, process exits 0 → relaunch restores 500,300 exactly
   - [x] `isOnScreen()` fails closed: monitors that cannot be enumerated (which happens while the window is hidden) keep the saved position rather than centring the window
-  - [ ] Check display scaling at 125% / 150%
+  - [x] Check display scaling at 125% / 150%
   - [x] Check the `%APPDATA%` fallback with the exe in a read-only folder
 - [x] Checked in the running app
   - [x] Real scan: 53 games, 3 libraries, 493.7 GB
