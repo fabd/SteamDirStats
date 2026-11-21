@@ -19,7 +19,6 @@ See [plan.md](plan.md) for details on each item.
   - [x] README: Node + Rust setup, `npx tauri dev`, `node tools/steamdirstats-cli.ts`
   - [x] CLAUDE.md: `core/` rules (no `node:*`, no `@tauri-apps/*`, erasable syntax) and Rust conventions
   - [x] `tools/shot.mjs` kept, and checked against the WebView2 devtools port
-  - [ ] Delete the leftovers git never tracked: `.venv/`, `.webview-dev-profile/`, `.tools/vdf_viewer.py`
 - [x] Project layout and toolchain
   - [x] One `package.json` + `node_modules/` at the project root
   - [x] `vite.config.ts` at the root with `root: 'ui'`, `@` → `ui/src`, `@core` → `core`, `clearScreen: false`
@@ -183,8 +182,10 @@ See [plan.md](plan.md) for details on each item.
 - [ ] visuals
   - [x] fix the expand/collapse icon next to workshop size in game row
   - [x] expanded workshop item for selected game have a darker shade of background colour
-  - [ ] add icons to the context menu
-    - [ ] Steam icon for the "View workshop/store" links
+  - [ ] add icons to the context menu. the item labels remain aligned, so there is extra padding on the left, which is space for an icon
+    - [ ] Steam icon for the "View on Steam Workshop" and "View Store page" links
+    - [ ] garbage icon for uninstall
+    - [ ] uninstall in dark red text
   - [ ] nice dark theme colours, inspired by Steam client
   - [ ] the resizable handle bg color, draggable icon/texture?
 - [ ] typography?
