@@ -13,6 +13,7 @@ See [plan.md](plan.md) for the full plan.
 ## App Info
 
 - Built with Rust/Tauri, GUI in TypeScript/HTML/CSS
+- Uses **WebView2** which should be included in most Windows 10/11 Home PCs
 - Portable app
   - Settings are written to `settings.json` next to the executable
   - falling back to `%APPDATA%\SteamDirStats\` when that folder is read-only

@@ -148,10 +148,9 @@ See [plan.md](plan.md) for details on each item.
   - [x] **Github** hands the URL to the shell (`openUrl`), with
     `https://github.com/fabd/SteamDirStats` added to the opener's url scope;
     in a plain browser it opens a tab instead
-  - [ ] Checked in the running app
 - [ ] Packaging
-  - [ ] `npx tauri build` → portable `SteamDirStats.exe`
-  - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)
+  - [x] `npx tauri build` → portable `SteamDirStats.exe`
+  - [x] app icon (placeholder icon made by Claude... looks fine)
   - [ ] Run the exe on a clean Windows PC (no Node / Rust); note the WebView2 requirement
   - [ ] Check antivirus / SmartScreen behaviour; consider signing
 
