@@ -175,6 +175,11 @@ See [plan.md](plan.md) for details on each item.
   - [x] check context menu at bottom of table (shows on top of the treemap, no issue)
 - [x] display the library in tooltip the same way as in the table, with a small coloured swatch
   - [x] do not show the full install path in the tooltip (user can simply use the "Browse local files" option to reveal it)
+- [x] tooltip clips at bottom of view, keep it in view
+  - [x] the tooltip flips above the cursor when it would run past the bottom
+    edge, and is clamped inside the treemap either way; its height is measured
+    after each render (`updated()`), as the box grows a line for a game with
+    Workshop items
 - [ ] visuals
   - [ ] fix the expand/collapse icon next to workshop size in game row
   - [ ] expanded workshop item rows have a darker blue background colour than the game row above

@@ -11,7 +11,7 @@
 
     <p v-if="message" class="sd-Treemap-message">{{ message }}</p>
 
-    <div v-if="tooltip" class="sd-Treemap-tooltip p-2" :style="tooltipStyle">
+    <div v-if="tooltip" ref="tooltip" class="sd-Treemap-tooltip p-2" :style="tooltipStyle">
       <strong class="sd-Treemap-tooltipName">{{ tooltip.game.name }}</strong>
       <span class="sd-Treemap-tooltipSize">{{ formatSize(tooltip.game.total_size) }}</span>
       <span v-if="tooltip.game.workshop_size" class="sd-Treemap-tooltipDim">
@@ -108,6 +108,8 @@ export default defineComponent({
       /** True while the context menu is up; the tooltip stands down for it. */
       isMenuOpen: false,
       pointer: { x: 0, y: 0 },
+      /** The tooltip's rendered height, measured so it can flip above the cursor. */
+      tooltipHeight: 0,
       observer: null as ResizeObserver | null,
     };
   },
@@ -165,7 +167,17 @@ export default defineComponent({
           ? Math.max(0, this.pointer.x - 14 - TOOLTIP_WIDTH)
           : this.pointer.x + 14;
 
-      return { left: `${left}px`, top: `${this.pointer.y + 16}px`, width: `${TOOLTIP_WIDTH}px` };
+      // The height is what the last render measured, so a tooltip that grew a
+      // line settles on the next frame rather than hanging off the bottom.
+      const below = this.pointer.y + 16;
+      const top =
+        below + this.tooltipHeight > this.height ? this.pointer.y - 12 - this.tooltipHeight : below;
+
+      return {
+        left: `${left}px`,
+        top: `${Math.max(0, Math.min(top, this.height - this.tooltipHeight))}px`,
+        width: `${TOOLTIP_WIDTH}px`,
+      };
     },
   },
 
@@ -184,6 +196,10 @@ export default defineComponent({
     this.observer.observe(this.$el as Element);
   },
 
+  updated() {
+    this.measureTooltip();
+  },
+
   beforeUnmount() {
     this.observer?.disconnect();
   },
@@ -192,6 +208,21 @@ export default defineComponent({
     formatSize,
     formatPath,
     gameColor,
+
+    /**
+     * Keep `tooltipHeight` in step with what is on screen.
+     *
+     * Guarded by the comparison: writing the same value back would re-render
+     * and land here again.
+     */
+    measureTooltip(): void {
+      const element = this.$refs.tooltip as HTMLElement | undefined;
+      const height = element ? element.offsetHeight : 0;
+
+      if (height !== this.tooltipHeight) {
+        this.tooltipHeight = height;
+      }
+    },
 
     buildLayout(): Layout {
       const empty: Layout = { tiles: [], groups: [] };
