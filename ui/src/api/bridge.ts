@@ -64,6 +64,17 @@ export function uninstall(appid: number): Promise<void> {
   return openUrl(`steam://uninstall/${Math.trunc(appid)}`);
 }
 
+/**
+ * Open a game's store page in the Steam client.
+ *
+ * Built here from the numeric appid, like `uninstall()`, and the opener's
+ * permission scope only allows `steam://`, so a bad id cannot become some
+ * other scheme.
+ */
+export function storePage(appid: number): Promise<void> {
+  return openUrl(`steam://store/${Math.trunc(appid)}`);
+}
+
 /** Open a Workshop item's page in Steam, where it can be unsubscribed. */
 export function workshopPage(itemid: number): Promise<void> {
   return openUrl(`steam://url/CommunityFilePage/${Math.trunc(itemid)}`);

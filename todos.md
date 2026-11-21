@@ -156,13 +156,30 @@ See [plan.md](plan.md) for details on each item.
 
 ## Polishing
 
-- [ ] Add "View Store page" to the context menu
-  - [ ] Context menu also works on right click on game row in the table
-  - [ ] if it is a workshop item show "View on Steam Workshop" instead of "View Store page"
-- [ ] display the library in tooltip the same way as in the table, with a small coloured swatch
+- [x] Context menu also works on right click on game row in the table
+  - [x] `sd-context-menu.vue` takes a target — a game, or one of a game's
+    Workshop items — instead of a game, so one component serves both kinds of
+    row and the treemap's tiles
+  - [x] The table mounts its own instance, as a sibling of the `<table>`: a
+    `<div>` cannot live inside one, and the menu is a fixed-position popover in
+    the top layer, so it needs no box of its own and the scroller cannot clip
+    or move it
+  - [x] Add "View Store page" to the context menu (`steam://store/<appid>`,
+    already inside the opener's url scope, so no capability change)
+  - [x] if it is a workshop item show "View on Steam Workshop" instead of
+    "View Store page", and "Browse local files" opens the item's own folder;
+    no uninstall entry, as Steam has no per-item protocol action
+  - [x] The item row keeps its inline "View on Steam Workshop" link: there is
+    room for it, and a link is more discoverable than a context menu
+  - [x] Checked in the running app
+  - [x] check context menu at bottom of table (shows on top of the treemap, no issue)
+- [x] display the library in tooltip the same way as in the table, with a small coloured swatch
   - [x] do not show the full install path in the tooltip (user can simply use the "Browse local files" option to reveal it)
 - [ ] visuals
   - [ ] fix the expand/collapse icon next to workshop size in game row
+  - [ ] expanded workshop item rows have a darker blue background colour than the game row above
+  - [ ] add icons to the context menu
+    - [ ] Steam icon for the "View workshop/store" links
   - [ ] nice dark theme colours, inspired by Steam client
   - [ ] the resizable handle bg color, draggable icon/texture?
 - [ ] typography?

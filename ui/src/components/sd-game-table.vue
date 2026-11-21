@@ -34,6 +34,7 @@
           :data-appid="row.game.appid"
           @click="select(row.game.appid)"
           @dblclick="onGameDoubleClick(row.game)"
+          @contextmenu.prevent="onGameContextMenu($event, row.game)"
         >
           <td class="sd-GameTable-cell">{{ row.game.name }}</td>
           <td class="sd-GameTable-cell sd-GameTable-cell--size">
@@ -76,6 +77,7 @@
           class="sd-GameTable-row sd-GameTable-row--item"
           :class="{ 'is-selected': row.game.appid === scan.selected }"
           @click="select(row.game.appid)"
+          @contextmenu.prevent="onItemContextMenu($event, row.game, row.item)"
         >
           <td class="sd-GameTable-cell sd-GameTable-cell--item">
             {{ itemName(row.item) }}
@@ -99,10 +101,14 @@
       </template>
     </tbody>
   </table>
+
+  <SdContextMenu ref="menu" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+
+import SdContextMenu from '@/components/sd-context-menu.vue';
 
 import { workshopPage } from '@/api/bridge';
 import { gameColor } from '@/lib/colors';
@@ -171,6 +177,7 @@ const COMPARATORS: Record<SortKey, (a: Game, b: Game) => number> = {
 
 export default defineComponent({
   name: 'SdGameTable',
+  components: { SdContextMenu },
 
   data() {
     return {
@@ -271,6 +278,26 @@ export default defineComponent({
     /** Items whose name the lookup could not resolve show their id instead. */
     itemName(item: WorkshopItem): string {
       return item.name || `Item ${item.itemid}`;
+    },
+
+    /**
+     * Right-click a row for the same menu the treemap opens on a tile.
+     *
+     * The table has its own instance rather than sharing the treemap's: the
+     * menu keeps no state between right-clicks, and a right-click elsewhere
+     * light-dismisses the other popover, so only one is ever up.
+     */
+    onGameContextMenu(event: MouseEvent, game: Game): void {
+      this.menu().open(event, { kind: 'game', game });
+    },
+
+    /** An item row's menu acts on the item, not on the game above it. */
+    onItemContextMenu(event: MouseEvent, game: Game, item: WorkshopItem): void {
+      this.menu().open(event, { kind: 'item', game, item });
+    },
+
+    menu(): InstanceType<typeof SdContextMenu> {
+      return this.$refs.menu as InstanceType<typeof SdContextMenu>;
     },
 
     onGameDoubleClick(game: Game): void {

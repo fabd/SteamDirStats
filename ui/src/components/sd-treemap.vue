@@ -472,7 +472,7 @@ export default defineComponent({
       }
 
       this.hovered = tile;
-      (this.$refs.menu as InstanceType<typeof SdContextMenu>).open(event, tile.game);
+      (this.$refs.menu as InstanceType<typeof SdContextMenu>).open(event, { kind: 'game', game: tile.game });
     },
   },
 });
