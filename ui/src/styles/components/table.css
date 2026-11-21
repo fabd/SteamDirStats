@@ -96,33 +96,31 @@
 }
 
 /* The expand/collapse control, on games that have Workshop items. */
-.sd-GameTable-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border: 0;
-  border-radius: 2px;
-  background: none;
+.sd-GameTable-button {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.3rem;
+  background: #fff2;
   color: var(--sd-text-dim);
+  border: 1px solid transparent;
+  border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    background: var(--sd-surface-raised);
+    background: #fff4;
     color: var(--sd-text);
   }
-}
 
-.sd-GameTable-chevron {
-  font-size: 10px;
-  line-height: 1;
-  transition: transform 0.1s ease-out;
-}
+  &.is-expanded .sd-GameTable-buttonIcon {
+    transform: rotate(180deg);
+  }
 
-.sd-GameTable-toggle.is-expanded > .sd-GameTable-chevron {
-  transform: rotate(90deg);
+  svg {
+    fill: currentColor;
+    stroke: none;
+  }
 }
 
 /* "View on Steam Workshop": a link in all but the markup, where it is a
