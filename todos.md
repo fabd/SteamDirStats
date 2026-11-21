@@ -133,8 +133,22 @@ See [plan.md](plan.md) for details on each item.
   - [x] The legend wraps to as many rows as the libraries need
     (`.sd-App-map` is `minmax(0, 1fr) auto`, so the treemap gives way to it
     instead of the legend being clipped)
-- [ ] Dialog: about (`<dialog>`)
-  - [ ] TODO : which looks like .... 
+- [x] Dialog: about (`<dialog>`)
+  - [x] `sd-about-dialog.vue` on native `<dialog>` + `showModal()`, so the
+    backdrop, the top layer and Esc are the browser's
+  - [x] An info button in the title bar, left of the window buttons; the
+    dialog itself lives in `app.vue`, not in the toolbar, because that row is
+    the drag region and `deep` walks up from the click, so a dialog nested in
+    it would drag the window
+  - [x] The close button reuses the title bar's own red cross, classes and all
+  - [x] The name carries a blue/cyan gradient that cycles through it
+    (`background-clip: text`, held still under `prefers-reduced-motion`)
+  - [x] The version comes from `tauri.conf.json` through a Vite `define`
+    (`__APP_VERSION__`), so the dialog shows what the exe carries
+  - [x] **Github** hands the URL to the shell (`openUrl`), with
+    `https://github.com/fabd/SteamDirStats` added to the opener's url scope;
+    in a plain browser it opens a tab instead
+  - [ ] Checked in the running app
 - [ ] Packaging
   - [ ] `npx tauri build` → portable `SteamDirStats.exe`
   - [ ] Real app icon (the current one is a placeholder generated into `src-tauri/icons/`)

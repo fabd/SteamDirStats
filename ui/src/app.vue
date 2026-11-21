@@ -1,6 +1,6 @@
 <template>
   <div class="sd-App">
-    <SdToolbar @refresh="onRefresh" />
+    <SdToolbar @about="onAbout" @refresh="onRefresh" />
     <main ref="content" class="sd-App-content" :style="contentStyle">
       <div class="sd-App-table">
         <SdGameTable />
@@ -12,12 +12,14 @@
       </div>
     </main>
     <SdStatusBar />
+    <SdAboutDialog ref="about" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import SdAboutDialog from '@/components/dialogs/sd-about-dialog.vue';
 import SdGameTable from '@/components/sd-game-table.vue';
 import SdLegend from '@/components/sd-legend.vue';
 import SdSplitter from '@/components/sd-splitter.vue';
@@ -38,7 +40,15 @@ const MIN_PANE = 90;
 
 export default defineComponent({
   name: 'SdApp',
-  components: { SdGameTable, SdLegend, SdSplitter, SdStatusBar, SdToolbar, SdTreemap },
+  components: {
+    SdAboutDialog,
+    SdGameTable,
+    SdLegend,
+    SdSplitter,
+    SdStatusBar,
+    SdToolbar,
+    SdTreemap,
+  },
 
   data() {
     return { split: DEFAULT_SPLIT };
@@ -65,6 +75,10 @@ export default defineComponent({
   },
 
   methods: {
+    onAbout(): void {
+      (this.$refs.about as InstanceType<typeof SdAboutDialog>).open();
+    },
+
     onRefresh() {
       refresh({ accurate: settingsStore.accurate });
     },

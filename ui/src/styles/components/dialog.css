@@ -1,0 +1,80 @@
+/* Modal dialogs. Native <dialog>, so the centering and the backdrop are the
+   browser's. */
+
+/* `margin: auto` is how a modal <dialog> centres itself in the viewport,
+   set it here because Tailwind's preflight resets the margin on every element */
+.sd-AboutDialog {
+  position: relative;
+  margin: auto;
+  min-width: 30rem;
+  padding: 1.5rem 2.5rem 1.75rem;
+  background: var(--sd-surface-raised);
+  color: var(--sd-text);
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.sd-AboutDialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+
+/* The gradient is wider than the text and slides across it, so the blue/cyan
+   cycles through the name `background-clip: text` needs a transparent fill
+   to show through. */
+.sd-AboutDialog-name {
+  background: linear-gradient(
+    100deg,
+    var(--sd-accent) 0%,
+    #7ce7f5 25%,
+    #ffffff 40%,
+    #7ce7f5 55%,
+    var(--sd-accent) 80%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: sd-AboutDialog-cycle 5s linear infinite;
+}
+
+@keyframes sd-AboutDialog-cycle {
+  from {
+    background-position: 150% 0;
+  }
+
+  to {
+    background-position: -150% 0;
+  }
+}
+
+/* A cycling name is decoration, not information: hold it still and let the
+   gradient's own colours stand. */
+@media (prefers-reduced-motion: reduce) {
+  .sd-AboutDialog-name {
+    animation: none;
+  }
+}
+
+.sd-AboutDialog-version {
+  margin-left: 0.5rem;
+  color: var(--sd-text-dim);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* A button, because it hands the URL to the shell rather than navigating the
+   page; it should still read as the link it is. */
+.sd-AboutDialog-link {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--sd-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sd-AboutDialog-link:hover {
+  filter: brightness(1.2);
+}

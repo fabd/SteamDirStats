@@ -322,25 +322,41 @@ Installed games and their sizes are shared by all accounts on the PC, but some d
 - The exe needs the **WebView2 runtime**, which ships with Windows 11 and with up-to-date Windows 10; the installer can bootstrap it, while a bare portable exe assumes it is present.
 - Unsigned exes can still trigger antivirus or SmartScreen warnings; code signing is the only real fix.
 
-## Build & run
 
-Prerequisites: Node.js 22.18+ (24.20 here, for running TypeScript directly), Rust (rustup) and the Microsoft C++ Build Tools on Windows; Git Bash as the shell.
+## About Dialog
 
-```bash
-# one-time setup
-npm install
+- Modal dialog, a small close button in the top right (reuse the one from the main window)
+- ESC closes the modal
 
-# development
-npx tauri dev                                   # Vite dev server + the app window, hot reload
-npm run dev                                     # UI only, in a browser, against ui/fixture.json
+Contents of the dialog (centered):
 
-# the scanner on the command line (no build step, no dependencies)
-node tools/steamdirstats-cli.ts
-node tools/steamdirstats-cli.ts --json --accurate
-node tools/steamdirstats-cli.ts --json > ui/fixture.json
-npm test                                        # node --test over core/
-npm run typecheck                               # all three tsconfigs
+```text
+     SteamDirStats v1.0
 
-# release exe
-npx tauri build                                 # -> src-tauri/target/release/SteamDirStats.exe
+     by fabd
+     
+     Source code on [Github]
 ```
+
+- have a blue/cyan gradient cycle through the SteamDirStats name.
+
+Implementation (`ui/src/components/dialogs/sd-about-dialog.vue`):
+
+- Native `<dialog>` with `showModal()`, so the centring, the backdrop and Esc
+  are the browser's; `app.vue` owns the element and calls `open()` on it.
+- The trigger is an info button in the title bar, left of the window buttons
+  (§7e). The dialog is **not** nested in that row: the row is the drag region
+  and `data-tauri-drag-region="deep"` walks up from whatever was clicked, so a
+  dialog inside it would drag the window instead of taking the click.
+- The close button is the title bar's own red cross, reusing its classes
+  rather than a second one styled from scratch.
+- The version is injected by Vite's `define` as `__APP_VERSION__`, read from
+  `src-tauri/tauri.conf.json` — the same number the exe carries, so the dialog
+  cannot drift from the build.
+- The gradient is `background-clip: text` over a background three times the
+  width of the name, slid across it by a keyframe animation; it is held still
+  under `prefers-reduced-motion`, being decoration rather than information.
+- **Github** hands `https://github.com/fabd/SteamDirStats` to `openUrl()`, so
+  it opens in the user's browser. That one URL is added to the opener's url
+  scope, which until now allowed only `steam://*`. In a plain browser there is
+  no shell to hand it to and `bridge.ts` opens a tab instead.

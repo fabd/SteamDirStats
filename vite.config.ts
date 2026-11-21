@@ -1,13 +1,20 @@
+import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
+// The about dialog shows the same version the exe carries.
+const { version } = JSON.parse(
+  readFileSync(new URL('./src-tauri/tauri.conf.json', import.meta.url), 'utf8'),
+) as { version: string };
+
 // The Vue app lives in ui/; core/ and tools/ sit beside it in the same package,
 // which keeps them inside Vite's workspace root (no server.fs.allow needed).
 export default defineConfig({
   root: 'ui',
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [vue(), tailwindcss()],
   // Tauri shows the Rust compiler's output in the same terminal.
   clearScreen: false,

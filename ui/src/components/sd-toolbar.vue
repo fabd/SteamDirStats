@@ -38,6 +38,20 @@
       Refresh
     </button>
 
+    <button
+      class="sd-Toolbar-windowButton sd-Toolbar-windowIcon--filled"
+      type="button"
+      title="About SteamDirStats"
+      aria-label="About SteamDirStats"
+      @click="$emit('about')"
+    >
+      <svg viewBox="0 0 512 512" aria-hidden="true">
+        <path
+          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
+        />
+      </svg>
+    </button>
+
     <!-- Only in the app: in a browser there is no window to act on. -->
     <template v-if="isInApp">
       <span class="sd-Toolbar-separator"></span>
@@ -79,7 +93,11 @@
         aria-label="Close"
         @click="onClose"
       >
-        <svg viewBox="0 0 384 512"><path d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"/></svg>
+        <svg viewBox="0 0 384 512">
+          <path
+            d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"
+          />
+        </svg>
       </button>
     </template>
   </header>
@@ -97,7 +115,7 @@ import { settingsStore, update } from '@/stores/settings-store';
 
 export default defineComponent({
   name: 'SdToolbar',
-  emits: ['refresh'],
+  emits: ['about', 'refresh'],
   data() {
     return {
       scan: scanStore,

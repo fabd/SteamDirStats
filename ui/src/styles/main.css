@@ -17,6 +17,7 @@
 @import './components/context-menu.css';
 @import './components/table.css';
 @import './components/status-bar.css';
+@import './components/dialog.css';
 
 /* Tokens Tailwind should know about, so `bg-surface` and friends work
    alongside the custom CSS below. */

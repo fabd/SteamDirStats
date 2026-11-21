@@ -28,6 +28,8 @@ export function hasBackend(): boolean {
   return '__TAURI_INTERNALS__' in window;
 }
 
+const REPO_URL = 'https://github.com/fabd/SteamDirStats';
+
 let cachedHost: Host | null = null;
 
 /** The one host for this page. */
@@ -65,6 +67,23 @@ export function uninstall(appid: number): Promise<void> {
 /** Open a Workshop item's page in Steam, where it can be unsubscribed. */
 export function workshopPage(itemid: number): Promise<void> {
   return openUrl(`steam://url/CommunityFilePage/${Math.trunc(itemid)}`);
+}
+
+/**
+ * Open the project's page on Github, from the about dialog.
+ *
+ * The URL is a constant here and narrowed again in the capability file, so
+ * the page cannot turn this into an opener for an address of its own. In a
+ * plain browser there is no shell to hand it to, and a new tab does the job.
+ */
+export function openRepo(): Promise<void> {
+  if (!hasBackend()) {
+    window.open(REPO_URL, '_blank', 'noopener');
+
+    return Promise.resolve();
+  }
+
+  return openUrl(REPO_URL);
 }
 
 /** The item's page on the web, for a browser rather than the Steam client. */
