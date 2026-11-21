@@ -181,8 +181,8 @@ See [plan.md](plan.md) for details on each item.
     after each render (`updated()`), as the box grows a line for a game with
     Workshop items
 - [ ] visuals
-  - [ ] fix the expand/collapse icon next to workshop size in game row
-  - [ ] expanded workshop item rows have a darker blue background colour than the game row above
+  - [x] fix the expand/collapse icon next to workshop size in game row
+  - [x] expanded workshop item for selected game have a darker shade of background colour
   - [ ] add icons to the context menu
     - [ ] Steam icon for the "View workshop/store" links
   - [ ] nice dark theme colours, inspired by Steam client

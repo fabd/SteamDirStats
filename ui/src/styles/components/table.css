@@ -89,6 +89,11 @@
   background: var(--sd-selected);
 }
 
+/* Workshop items of a selected game: a darker shade of the selection. */
+.sd-GameTable-row--item.is-selected > .sd-GameTable-cell {
+  background: var(--sd-selected-deep);
+}
+
 /* Right-aligned numbers inside the Workshop cell, which also holds the
    expand control, so the cell itself cannot simply be text-align: right. */
 .sd-GameTable-num {
