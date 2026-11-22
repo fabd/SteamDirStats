@@ -9,30 +9,79 @@
   >
     <template v-if="target?.kind === 'game'">
       <button
+        type="button"
+        class="sd-ContextMenu-item flex w-full items-center gap-2 px-3 py-1"
+        @click="onViewStorePage"
+      >
+        <span class="sd-ContextMenu-itemCol1">
+          <svg
+            class="sd-ContextMenu-icon"
+            :viewBox="icons.steam.viewBox"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path :d="icons.steam.path" />
+          </svg>
+        </span>
+        <span class="sd-ContextMenu-itemCol2">View Store page</span>
+      </button>
+      <button
         v-if="hasWorkshopItems"
         type="button"
-        class="sd-ContextMenu-item px-3 py-1"
+        class="sd-ContextMenu-item flex w-full items-center gap-2 px-3 py-1"
         @click="onViewWorkshop"
       >
-        View Workshop Items
-      </button>
-      <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onViewStorePage">
-        View Store page
+        <span class="sd-ContextMenu-itemCol1"></span>
+        <span class="sd-ContextMenu-itemCol2">View Workshop Items</span>
       </button>
     </template>
 
-    <button v-else type="button" class="sd-ContextMenu-item px-3 py-1" @click="onViewOnWorkshop">
-      View on Steam Workshop
+    <button
+      v-else
+      type="button"
+      class="sd-ContextMenu-item flex w-full items-center gap-2 px-3 py-1"
+      @click="onViewOnWorkshop"
+    >
+      <span class="sd-ContextMenu-itemCol1">
+        <svg
+          class="sd-ContextMenu-icon"
+          :viewBox="icons.steam.viewBox"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path :d="icons.steam.path" />
+        </svg>
+      </span>
+      <span class="sd-ContextMenu-itemCol2">View on Steam Workshop</span>
     </button>
 
-    <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onOpenFolder">
-      Browse local files
+    <button
+      type="button"
+      class="sd-ContextMenu-item flex w-full items-center gap-2 px-3 py-1"
+      @click="onOpenFolder"
+    >
+      <span class="sd-ContextMenu-itemCol1"></span>
+      <span class="col-start-2">Browse local files</span>
     </button>
 
     <template v-if="target?.kind === 'game'">
       <hr class="sd-ContextMenu-separator" />
-      <button type="button" class="sd-ContextMenu-item px-3 py-1" @click="onUninstall">
-        Uninstall…
+      <button
+        type="button"
+        class="sd-ContextMenu-item sd-ContextMenu-item--danger flex w-full items-center gap-2 px-3 py-1"
+        @click="onUninstall"
+      >
+        <span class="sd-ContextMenu-itemCol1">
+          <svg
+            class="sd-ContextMenu-icon"
+            :viewBox="icons.trash.viewBox"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path :d="icons.trash.path" />
+          </svg>
+        </span>
+        <span class="sd-ContextMenu-itemCol2">Uninstall…</span>
       </button>
     </template>
   </div>
@@ -42,6 +91,7 @@
 import { defineComponent } from 'vue';
 
 import { openFolder, storePage, uninstall, workshopPage } from '@/api/bridge';
+import { ICONS } from '@/lib/icons';
 import type { Game, WorkshopItem } from '@core/models.ts';
 import { expandWorkshop, notify, select } from '@/stores/scan-store';
 
@@ -64,6 +114,7 @@ export default defineComponent({
 
   data() {
     return {
+      icons: ICONS,
       target: null as MenuTarget | null,
       left: 0,
       top: 0,

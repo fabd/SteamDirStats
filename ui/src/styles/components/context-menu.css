@@ -19,11 +19,11 @@
   font-size: 13px;
 }
 
+/* The layout is Tailwind's: a 16px icon column and the label, so the labels
+   stay aligned whether or not an entry carries an icon. */
 .sd-ContextMenu-item {
-  display: block;
-  width: 100%;
   background: transparent;
-  color: inherit;
+  color: #ddd;
   border: 0;
   font: inherit;
   text-align: left;
@@ -31,8 +31,36 @@
 
   &:hover,
   &:focus-visible {
+    color: #fff;
     background: var(--sd-row-hover);
     outline: none;
+  }
+}
+
+.sd-ContextMenu-itemCol1 {
+  @apply h-4 w-5;
+}
+
+.sd-ContextMenu-itemCol2 {
+  @apply flex-1;
+}
+
+/* Drawn with `fill`, never `stroke`, so a FontAwesome path can take over
+   without a change here. */
+.sd-ContextMenu-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Uninstall: the only entry that destroys anything. The red is in the text,
+   not in a hover fill, so it reads as a warning without shouting. */
+.sd-ContextMenu-item--danger {
+  color: var(--sd-danger);
+  &:hover,
+  &:focus-visible {
+    color: oklch(from var(--sd-danger) calc(l + 0.06) calc(c + 0.04) h);
   }
 }
 

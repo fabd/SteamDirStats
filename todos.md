@@ -182,17 +182,25 @@ See [plan.md](plan.md) for details on each item.
 - [ ] visuals
   - [x] fix the expand/collapse icon next to workshop size in game row
   - [x] expanded workshop item for selected game have a darker shade of background colour
-  - [ ] add icons to the context menu. the item labels remain aligned, so there is extra padding on the left, which is space for an icon
-    - [ ] Steam icon for the "View on Steam Workshop" and "View Store page" links
-    - [ ] garbage icon for uninstall
-    - [ ] uninstall in dark red text
+  - [x] add icons to the context menu. the item labels remain aligned, so there
+    is extra padding on the left, which is space for an icon
+    - [x] Paths live in a shared `ui/src/lib/icons.ts`: a record of
+      `{ viewBox, path }`, one single-path entry per icon, lifted from
+      FontAwesome Free (solid, plus the Steam brand mark). Inline SVG, like the
+      toolbar's own icons — no sprite, no icon font, no runtime dependency
+    - [x] Steam icon for the "View on Steam Workshop" and "View Store page" links
+    - [x] garbage icon for uninstall
+    - [x] uninstall in dark red text
+    - [x] no icon for "Browse local files" and "View Workshop Items"
   - [ ] nice dark theme colours, inspired by Steam client
   - [ ] the resizable handle bg color, draggable icon/texture?
+- [ ] prevent columns resizing when expanding workshop items
 - [ ] typography?
 - [ ] Github
   - [ ] README screenshot
   - [ ] Release with EXE
 
 ## Fixes
+
 
 - [ ] double check E:/steam/steam 267 GB reported by Explorer, 294 GB shown in app
