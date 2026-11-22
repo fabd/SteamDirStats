@@ -134,7 +134,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--sd-danger);
+  color: var(--sd-link);
   cursor: pointer;
   font: inherit;
 
