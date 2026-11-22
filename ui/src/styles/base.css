@@ -57,11 +57,15 @@ body {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
+
+  /* thin border between treemap and the splitter bar */
+  border-top: 1px solid #000;
 }
 
 .sd-App-table {
   overflow: auto;
   border-top: 1px solid var(--sd-border);
+  border-bottom: 1px solid var(--sd-border);
 }
 
 ::selection {

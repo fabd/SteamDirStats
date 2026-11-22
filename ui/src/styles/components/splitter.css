@@ -2,29 +2,40 @@
    wider than it looks: the line is 1px, the grab area is the whole row. */
 
 .sd-Splitter {
-  height: 10px;
+  /* Border-box, so the two dot rows of the handle get 10px to live in. */
+  height: 12px;
   background: var(--sd-surface);
   cursor: row-resize;
   user-select: none;
   /* Let the handle keep a touch/pen drag instead of scrolling a pane. */
   touch-action: none;
 
-  background: #272b31;
-  border-top: 1px solid #1e2126;
-  border-bottom: 1px solid #1e2126;
-
+  background: var(--sd-surface-raised);
 
   &:hover,
   &:focus-visible,
   &.is-active {
-    background: var(--sd-accent);
-    border-top-color: var(--sd-accent);
-    border-bottom-color: var(--sd-accent);
+    background: color-mix(in srgb, var(--sd-surface-raised), #fff 5%);
     outline: none;
   }
 }
 
+/* Two rows of dots, the usual "grab me" texture. Each layer is one row: a
+   4px dot tile repeated across, pinned 1px from the top and bottom edges.
+   The bar's height sets the gap between the rows, so it has to stay tall
+   enough (10px of handle) for the two not to run together. */
 .sd-Splitter-handle {
-  background: #474b51;
   width: 6rem;
+  height: 6px;
+  margin: 3px 0;
+  background-color: #474b51;
+  --sd-grip: #8a9099;
+  /*
+    1pixel in a 5x5, repeating for a dot grid pattern
+    <svg xmlns="http://www.w3.org/2000/svg" width="5" height="5">
+      <rect width="1" height="1" fill="#888"></rect>
+    </svg>
+  */
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==')
+    repeat 0 0;
 }

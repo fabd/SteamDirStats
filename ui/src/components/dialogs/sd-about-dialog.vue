@@ -25,9 +25,17 @@
     <!-- The @2x file at half its pixel size, so it stays crisp under display
          scaling; imported through the alias, like the title bar's icon, so it
          follows whatever the exe carries. -->
-    <img class="mx-auto mb-4 mt-4 block border border-stone-700" :src="iconUrl" alt="" width="128" height="128" />
+    <img
+      class="mx-auto mb-4 mt-4 block border border-stone-700"
+      :src="iconUrl"
+      alt=""
+      width="128"
+      height="128"
+    />
 
-    <p class="text-[var(--sd-text-dim)] mb-1">by Fabrice D. (<span class="font-bold">fabd</span>)</p>
+    <p class="text-[var(--sd-text-dim)] mb-1">
+      by Fabrice D. (<span class="font-bold">fabd</span>)
+    </p>
 
     <p class="text-[var(--sd-text-dim)] mb-1">
       Source code on
