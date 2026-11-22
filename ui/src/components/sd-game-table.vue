@@ -1,5 +1,8 @@
 <template>
   <table ref="table" class="sd-GameTable">
+    <colgroup>
+      <col v-for="column in columns" :key="column.key" :style="{ width: column.width }" />
+    </colgroup>
     <thead>
       <tr>
         <th
@@ -91,8 +94,7 @@
             {{ formatSize(row.item.size) }}
           </td>
           <td class="sd-GameTable-cell" />
-          <td class="sd-GameTable-cell" />
-          <td class="sd-GameTable-cell">
+          <td class="sd-GameTable-cell" colspan="2">
             <button
               type="button"
               class="sd-GameTable-danger"
@@ -148,15 +150,25 @@ interface Column {
   label: string;
   /** Right-aligned, and sorted largest first on the first click. */
   isNumeric: boolean;
+  /**
+   * The column's width under `table-layout: fixed`, or undefined to take
+   * whatever the others leave over.
+   *
+   * Every column but Game holds a formatted value of a known shape, so a
+   * fixed width is enough for all of them and the layout no longer depends
+   * on the rows on screen: expanding a game's Workshop items cannot move
+   * the columns any more, and long names truncate instead.
+   */
+  width?: string;
 }
 
 const COLUMNS: Column[] = [
   { key: 'name', label: 'Game', isNumeric: false },
-  { key: 'size', label: 'Size', isNumeric: true },
-  { key: 'workshop', label: 'Workshop', isNumeric: true },
-  { key: 'playtime', label: 'Playtime', isNumeric: true },
-  { key: 'lastPlayed', label: 'Last played', isNumeric: false },
-  { key: 'library', label: 'Library', isNumeric: false },
+  { key: 'size', label: 'Size', isNumeric: true, width: '9rem' },
+  { key: 'workshop', label: 'Workshop', isNumeric: true, width: '9rem' },
+  { key: 'playtime', label: 'Playtime', isNumeric: true, width: '9rem' },
+  { key: 'lastPlayed', label: 'Last played', isNumeric: false, width: '9rem' },
+  { key: 'library', label: 'Library', isNumeric: false, width: '13rem' },
 ];
 
 /** Numeric so "Portal 2" follows "Portal", not "Portal 12". */

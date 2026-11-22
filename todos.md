@@ -195,7 +195,7 @@ See [plan.md](plan.md) for details on each item.
   - [ ] nice dark theme colours with a blue hint, inspired by Steam client
   - [x] improve the resizable handle
     - [x] Dot-grid texture on the handle to show it is draggable
-- [ ] prevent columns resizing when expanding workshop items
+- [x] prevent columns resizing when expanding workshop items
 - [ ] typography?
 - [ ] Github
   - [ ] README screenshot

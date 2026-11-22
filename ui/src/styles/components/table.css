@@ -1,6 +1,14 @@
+/* Fixed layout, with the widths declared by the colgroup: the columns then
+   depend on the table's width alone, not on the rows currently on screen,
+   so expanding a game's Workshop items cannot shift them. It is also what
+   makes the cells' text-overflow below take effect. The min-width keeps the
+   Game column readable once the splitter gets narrow; the pane scrolls
+   horizontally from there. */
 .sd-GameTable {
+  table-layout: fixed;
   border-collapse: collapse;
   width: 100%;
+  min-width: 56rem;
 }
 
 .sd-GameTable-header {
