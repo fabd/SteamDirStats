@@ -14,11 +14,7 @@
       aria-label="Close"
       @click="close"
     >
-      <svg viewBox="0 0 384 512" aria-hidden="true">
-        <path
-          d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"
-        />
-      </svg>
+      <IconWindowClose aria-hidden="true" focusable="false" />
     </button>
 
     <h2 class="text-2xl font-semibold mb-0">
@@ -45,11 +41,14 @@ import { defineComponent } from 'vue';
 
 import iconUrl from '@icons/128x128@2x.png';
 
+import IconWindowClose from '@/assets/icons/window-close.svg?component';
+
 import { openRepo } from '@/api/bridge';
 import { notify } from '@/stores/scan-store';
 
 export default defineComponent({
   name: 'SdAboutDialog',
+  components: { IconWindowClose },
 
   data() {
     return {
