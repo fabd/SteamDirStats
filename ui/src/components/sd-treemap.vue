@@ -242,8 +242,11 @@ export default defineComponent({
         .tile(treemapSquarify)
         .size([this.width, this.height])
         .paddingInner(1)
-        .paddingOuter(isGrouped ? 2 : 0)
-        .paddingTop(isGrouped ? GROUP_HEADER : 0)
+        // The paddings belong to the library blocks, not to the root: at
+        // depth 0 they would ring the whole map with empty background, and
+        // the header strip they reserve there has nothing to draw in it.
+        .paddingOuter((node) => (isGrouped && node.depth > 0 ? 2 : 0))
+        .paddingTop((node) => (isGrouped && node.depth > 0 ? GROUP_HEADER : 0))
         .round(true)(
         hierarchy(root, (node) => node.children)
           .sum((node) => node.value ?? 0)
