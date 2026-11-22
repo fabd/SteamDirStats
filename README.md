@@ -1,24 +1,34 @@
 # SteamDirStats
 
-A WinDirStat-style view of the disk space used by installed Steam games, across all Steam libraries. Useful when you have a bunch of games installed on multiple libraries and you want to free space, in particular with Workshop items that can be quite large (eg. SteamVR).
+A WinDirStat-style view of the disk space used by installed Steam games, across all your Steam libraries. Useful for managing free space when you have a bunch of games installed on multiple libraries.
+
+<p align="center">
+  <img src=".github/assets/screenshot.png" alt="SteamDirStats listing installed Steam games by size, with a treemap of the disk space each one uses" width="840">
+</p>
+
+**Features**:
 
 - status bar displays the total space taken by all games across all libraries combined
+- the list of games can be sorted by Size, Playtime, Last played, etc.
 - view workshop items for a game, by size descending; a "View on Steam Workshop" link takes you to the page in Steam where you can unsubscribe the item
 - treemap view to see at a glance games that take the most space, grouped by library or mixed together
-- context menu with options: Uninstall, and Browse local files
-- the app does NOT touch any Steam files, the Uninstall option simply triggers the uninstall dialog in Steam where you can confirm/cancel
-
-See [plan.md](plan.md) for the full plan.
+- context menu with options:
+  - "View Store page" or "View on Steam Workshop" for a Workshop item
+  - Browse local files
+  - Uninstall (triggers Steam's own Uninstall dialog, where you can confirm/cancel)
+- the app does NOT modify or write anything to your Steam folders, only parse data from the libraries
 
 ## App Info
 
-- Built with Rust/Tauri, GUI in TypeScript/HTML/CSS
-- Uses **WebView2** which should be included in most Windows 10/11 Home PCs
+- ~6 MB Windows native application built with [Tauri](https://v2.tauri.app/).
 - Portable app
-  - Settings are written to `settings.json` next to the executable
+  - Settings are saved in the same folder as the executable
   - falling back to `%APPDATA%\SteamDirStats\` when that folder is read-only
+- The app works offline, but requires internet connection to look up the full name of Workshop items from a Steam API. Otherwise the items will show up as eg. `Item 3794102006`. The Workshop item names are cached to a local file so the lookup is done only once or for new items.
 
 ## Development
+
+See [plan.md](plan.md) for the full plan.
 
 Requires Node.js 22.18+ (it runs the TypeScript directly), Rust and the
 Microsoft C++ Build Tools. Commands are for Git Bash.
@@ -46,8 +56,8 @@ npx tauri dev                        # Vite dev server + the app window, hot rel
 
 Run the UI alone, in a browser, on `ui/fixture.json` (instead of the real Steam installation):
 
-```
-npm run dev                          # 
+```bash
+npm run dev
 ```
 
 Build the app => `src-tauri/target/release/SteamDirStats.exe`
