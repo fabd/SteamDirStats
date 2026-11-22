@@ -63,11 +63,7 @@
         aria-label="Minimize"
         @click="onMinimize"
       >
-        <svg viewBox="0 0 448 448" aria-hidden="true">
-          <path
-            d="M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z"
-          />
-        </svg>
+        <IconWindowMinimize aria-hidden="true" focusable="false" />
       </button>
 
       <button
@@ -77,13 +73,8 @@
         :aria-label="isMaximized ? 'Restore' : 'Maximize'"
         @click="onToggleMaximize"
       >
-        <svg v-if="isMaximized" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M3 8h6v5H3z" />
-          <path d="M6 8V4h7v6H9" />
-        </svg>
-        <svg v-else viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M3.5 3.5h9v9h-9z" />
-        </svg>
+        <IconWindowRestore v-if="isMaximized" aria-hidden="true" focusable="false" />
+        <IconWindowMaximize v-else aria-hidden="true" focusable="false" />
       </button>
 
       <button
@@ -93,11 +84,7 @@
         aria-label="Close"
         @click="onClose"
       >
-        <svg viewBox="0 0 384 512">
-          <path
-            d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"
-          />
-        </svg>
+        <IconWindowClose aria-hidden="true" focusable="false" />
       </button>
     </template>
   </header>
@@ -108,6 +95,11 @@ import { defineComponent } from 'vue';
 
 import iconUrl from '@icons/32x32.png';
 
+import IconWindowClose from '@/assets/icons/window-close.svg?component';
+import IconWindowMaximize from '@/assets/icons/window-maximize.svg?component';
+import IconWindowMinimize from '@/assets/icons/window-minimize.svg?component';
+import IconWindowRestore from '@/assets/icons/window-restore.svg?component';
+
 import { hasBackend } from '@/api/bridge';
 import { close, minimize, toggleMaximize, watchMaximized } from '@/lib/window-state';
 import { scanStore } from '@/stores/scan-store';
@@ -115,6 +107,7 @@ import { settingsStore, update } from '@/stores/settings-store';
 
 export default defineComponent({
   name: 'SdToolbar',
+  components: { IconWindowClose, IconWindowMaximize, IconWindowMinimize, IconWindowRestore },
   emits: ['about', 'refresh'],
   data() {
     return {

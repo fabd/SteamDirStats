@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
+import svgLoader from 'vite-svg-loader';
 
 // The about dialog shows the same version the exe carries.
 const { version } = JSON.parse(
@@ -15,7 +16,10 @@ const { version } = JSON.parse(
 export default defineConfig({
   root: 'ui',
   define: { __APP_VERSION__: JSON.stringify(version) },
-  plugins: [vue(), tailwindcss()],
+  // `import Icon from '...svg?component'` gives an inline <svg> Vue component,
+  // so icons take their colour from CSS. SVGO is off: the files are already
+  // minimal, and its defaults can strip the viewBox the CSS sizing relies on.
+  plugins: [vue(), tailwindcss(), svgLoader({ svgo: false, defaultImport: 'url' })],
   // Tauri shows the Rust compiler's output in the same terminal.
   clearScreen: false,
   resolve: {

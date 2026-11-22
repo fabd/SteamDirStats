@@ -14,14 +14,7 @@
         @click="onViewStorePage"
       >
         <span class="sd-ContextMenu-itemCol1">
-          <svg
-            class="sd-ContextMenu-icon"
-            :viewBox="icons.steam.viewBox"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path :d="icons.steam.path" />
-          </svg>
+          <IconSteam class="sd-ContextMenu-icon" aria-hidden="true" focusable="false" />
         </span>
         <span class="sd-ContextMenu-itemCol2">View Store page</span>
       </button>
@@ -43,14 +36,7 @@
       @click="onViewOnWorkshop"
     >
       <span class="sd-ContextMenu-itemCol1">
-        <svg
-          class="sd-ContextMenu-icon"
-          :viewBox="icons.steam.viewBox"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path :d="icons.steam.path" />
-        </svg>
+        <IconSteam class="sd-ContextMenu-icon" aria-hidden="true" focusable="false" />
       </span>
       <span class="sd-ContextMenu-itemCol2">View on Steam Workshop</span>
     </button>
@@ -72,14 +58,7 @@
         @click="onUninstall"
       >
         <span class="sd-ContextMenu-itemCol1">
-          <svg
-            class="sd-ContextMenu-icon"
-            :viewBox="icons.trash.viewBox"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path :d="icons.trash.path" />
-          </svg>
+          <IconTrash class="sd-ContextMenu-icon" aria-hidden="true" focusable="false" />
         </span>
         <span class="sd-ContextMenu-itemCol2">Uninstall…</span>
       </button>
@@ -90,8 +69,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import IconSteam from '@/assets/icons/steam.svg?component';
+import IconTrash from '@/assets/icons/trash.svg?component';
+
 import { openFolder, storePage, uninstall, workshopPage } from '@/api/bridge';
-import { ICONS } from '@/lib/icons';
 import type { Game, WorkshopItem } from '@core/models.ts';
 import { expandWorkshop, notify, select } from '@/stores/scan-store';
 
@@ -109,12 +90,13 @@ const EDGE_MARGIN = 4;
 export default defineComponent({
   name: 'SdContextMenu',
 
+  components: { IconSteam, IconTrash },
+
   /** So the view that owns the menu can hide its own hover affordances. */
   emits: ['open-change'],
 
   data() {
     return {
-      icons: ICONS,
       target: null as MenuTarget | null,
       left: 0,
       top: 0,
