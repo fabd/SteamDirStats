@@ -200,7 +200,10 @@ See [plan.md](plan.md) for details on each item.
   - [ ] README screenshot
   - [ ] Release with EXE
 
-## Fixes
+## Additional Tests
 
+- [ ] create a dummy fixture with only one library to see if treemap displays correctly
+
+## Fixes
 
 - [ ] double check E:/steam/steam 267 GB reported by Explorer, 294 GB shown in app

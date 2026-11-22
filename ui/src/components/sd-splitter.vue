@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sd-Splitter"
+    class="sd-Splitter flex justify-center"
     :class="{ 'is-active': isDragging }"
     role="separator"
     aria-orientation="horizontal"
@@ -13,7 +13,9 @@
     @pointercancel="onPointerCancel"
     @dblclick="$emit('reset')"
     @keydown="onKeyDown"
-  />
+  >
+    <div class="sd-Splitter-handle"></div>
+  </div>
 </template>
 
 <script lang="ts">
