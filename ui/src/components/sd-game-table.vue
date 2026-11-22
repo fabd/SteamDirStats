@@ -51,11 +51,11 @@
                 :title="`${row.game.workshop_items.length} Workshop items`"
                 @click.stop="toggleExpanded(row.game.appid)"
               >
-                <svg viewBox="0 0 448 512" class="sd-GameTable-buttonIcon">
-                  <path
-                    d="M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
-                  />
-                </svg>
+                <IconChevronDown
+                  class="sd-GameTable-buttonIcon"
+                  aria-hidden="true"
+                  focusable="false"
+                />
               </button>
               <span class="sd-GameTable-num">
                 {{ row.game.workshop_size ? formatSize(row.game.workshop_size) : '' }}
@@ -112,6 +112,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import IconChevronDown from '@/assets/icons/chevron-down.svg?component';
 import SdContextMenu from '@/components/sd-context-menu.vue';
 
 import { workshopPage } from '@/api/bridge';
@@ -181,7 +182,7 @@ const COMPARATORS: Record<SortKey, (a: Game, b: Game) => number> = {
 
 export default defineComponent({
   name: 'SdGameTable',
-  components: { SdContextMenu },
+  components: { IconChevronDown, SdContextMenu },
 
   data() {
     return {

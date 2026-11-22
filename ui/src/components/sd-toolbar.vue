@@ -45,11 +45,7 @@
       aria-label="About SteamDirStats"
       @click="$emit('about')"
     >
-      <svg viewBox="0 0 512 512" aria-hidden="true">
-        <path
-          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
-        />
-      </svg>
+      <IconInfo aria-hidden="true" focusable="false" />
     </button>
 
     <!-- Only in the app: in a browser there is no window to act on. -->
@@ -95,6 +91,7 @@ import { defineComponent } from 'vue';
 
 import iconUrl from '@icons/32x32.png';
 
+import IconInfo from '@/assets/icons/info.svg?component';
 import IconWindowClose from '@/assets/icons/window-close.svg?component';
 import IconWindowMaximize from '@/assets/icons/window-maximize.svg?component';
 import IconWindowMinimize from '@/assets/icons/window-minimize.svg?component';
@@ -107,7 +104,13 @@ import { settingsStore, update } from '@/stores/settings-store';
 
 export default defineComponent({
   name: 'SdToolbar',
-  components: { IconWindowClose, IconWindowMaximize, IconWindowMinimize, IconWindowRestore },
+  components: {
+    IconInfo,
+    IconWindowClose,
+    IconWindowMaximize,
+    IconWindowMinimize,
+    IconWindowRestore,
+  },
   emits: ['about', 'refresh'],
   data() {
     return {
