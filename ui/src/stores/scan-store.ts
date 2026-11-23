@@ -11,6 +11,15 @@ import { computed, reactive } from 'vue';
 import { hasBackend, scan } from '@/api/bridge';
 import type { Game, Library, SteamData } from '@core/models.ts';
 
+/**
+ * DEV HACK: force the fixture even inside the app window.
+ *
+ * Flip to true to run `npx tauri dev` against `ui/fixture.json` instead of a
+ * real scan — useful for screenshots, so the status bar keeps quiet about it
+ * rather than showing the fixture note. Dev builds only; set it back to false.
+ */
+const FORCE_FIXTURE = false;
+
 /** What the status bar shows while an accurate scan runs. */
 export interface ScanProgress {
   done: number;
@@ -79,8 +88,11 @@ export async function load(options: { accurate?: boolean } = {}): Promise<void> 
   scanStore.error = '';
   scanStore.progress = null;
 
+  const isForced = FORCE_FIXTURE && import.meta.env.DEV;
+  const isFixture = isForced || !hasBackend();
+
   try {
-    if (hasBackend()) {
+    if (!isFixture) {
       // workshopNames: the item rows in the table are useless without them,
       // and the lookup is cached on disk, so only new items cost a request.
       const { data } = await scan({
@@ -98,7 +110,7 @@ export async function load(options: { accurate?: boolean } = {}): Promise<void> 
       scanStore.data = await loadFixture();
     }
 
-    scanStore.isFixture = !hasBackend();
+    scanStore.isFixture = isFixture && !isForced;
   } catch (err) {
     scanStore.error = err instanceof Error ? err.message : String(err);
   } finally {
