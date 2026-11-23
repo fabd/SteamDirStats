@@ -18,6 +18,7 @@ ui/fixture.json
 # local files
 .*
 !.claude
+!.github
 !.gitignore
 !.prettierrc.json
 !.prettierignore
