@@ -28,10 +28,23 @@ A WinDirStat-style view of the disk space used by installed Steam games, across 
 
 ## Development
 
-See [plan.md](plan.md) for the full plan.
+The app is developed and built on Windows with Git Bash, no need for WSL.
 
-Requires Node.js 22.18+ (it runs the TypeScript directly), Rust and the
-Microsoft C++ Build Tools. Commands are for Git Bash.
+Requires Node.js 22.18+, Rust and the Microsoft C++ Build Tools.
+
+Quick cheatsheet for the tooling:
+
+- install **Git for Windows** (includes Git Bash) and set a `.bash_profile` `winget install -e --id Git.Git`. Add a profile in **Windows Terminal** for Git Bash for a nice terminal experience
+- **Github CLI** `winget install --id GitHub.cli --source winget`
+- **VS Code** + *Claude Code for VS Code* extension
+- **Claude Code** `winget install Anthropic.ClaudeCode`
+- **Node & NPM** `winget install OpenJS.NodeJS.LTS`
+- [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) required to build app with Tauri (for building the Rust shell)
+- **Rust** (for Tauri) `winget install --id Rustlang.Rustup`
+- **Python** is often used by Claude Code `winget install Python.Python.3.13`
+
+See [docs/plan.md](docs/plan.md) for the full plan, and [docs/todos.md](docs/todos.md) for the implementation checklist.
+
 
 ```bash
 npm install

@@ -2,8 +2,8 @@
 
 ## Documentation
 
-- plan.md : describes the application
-- todos.md : checklist for implementation
+- docs/plan.md : describes the application
+- docs/todos.md : checklist for implementation
 
 ## Coding Standards
 
