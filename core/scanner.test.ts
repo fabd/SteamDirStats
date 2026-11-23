@@ -26,7 +26,7 @@ import {
   writeBytes,
 } from './test-support.ts';
 
-const RECENT = '76561198034268291'; // accountid 74002563
+const RECENT = '76561198123456789'; // accountid 163191061
 
 function vdfPath(p: string): string {
   return p.replace(/\\/g, '\\\\');
@@ -198,14 +198,14 @@ test('playtime comes from the account that signed in most recently', async (t) =
     loginusers([[RECENT, { AccountName: 'me', MostRecent: '1' }]]),
   );
   await write(
-    path.join(fixture.steam, 'userdata', '74002563', 'config', 'localconfig.vdf'),
+    path.join(fixture.steam, 'userdata', '163191061', 'config', 'localconfig.vdf'),
     localconfig({ 20: { LastPlayed: '1794440326', Playtime: '35443' } }),
   );
 
   const { data } = await scan(testHost(fixture.root), { steamPath: fixture.steam });
   const games = byAppid(data);
 
-  assert.equal(data.account?.accountid, 74002563);
+  assert.equal(data.account?.accountid, 163191061);
   assert.equal(data.account?.steamid64, RECENT);
   assert.equal(games.get(20)?.playtime, 35443);
   assert.equal(games.get(20)?.last_played, 1794440326);

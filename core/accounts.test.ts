@@ -7,12 +7,12 @@ import { formatLastPlayed, formatPlaytime, formatSize } from './format.ts';
 import { localconfig, loginusers, tempDir, testHost, write } from './test-support.ts';
 
 const OTHER = '76561198000000000'; // accountid 39734272
-const RECENT = '76561198034268291'; // accountid 74002563
+const RECENT = '76561198123456789'; // accountid 163191061
 
 async function steamWith(
   t: Parameters<typeof tempDir>[0],
   users: string,
-  userdataFor: string[] = ['74002563'],
+  userdataFor: string[] = ['163191061'],
 ): Promise<string> {
   const root = await tempDir(t);
   const steam = path.join(root, 'Steam');
@@ -36,7 +36,7 @@ test('MostRecent picks the account, whatever the timestamps say', async (t) => {
   );
   const account = await findAccount(testHost(steam), steam);
 
-  assert.equal(account?.accountid, 74002563);
+  assert.equal(account?.accountid, 163191061);
   assert.equal(account?.account_name, 'me');
   assert.equal(account?.persona_name, 'fabd');
   assert.equal(account?.steamid64, RECENT);
@@ -51,7 +51,7 @@ test('without MostRecent, the highest timestamp wins', async (t) => {
     ]),
   );
 
-  assert.equal((await findAccount(testHost(steam), steam))?.accountid, 74002563);
+  assert.equal((await findAccount(testHost(steam), steam))?.accountid, 163191061);
 });
 
 test('an account with no userdata folder is not used', async (t) => {
@@ -72,7 +72,7 @@ test('playtime, two-week playtime and last played', async (t) => {
   const account = await findAccount(host, steam);
 
   await write(
-    path.join(steam, 'userdata', '74002563', 'config', 'localconfig.vdf'),
+    path.join(steam, 'userdata', '163191061', 'config', 'localconfig.vdf'),
     localconfig({
       20: { Playtime: '35443', Playtime2wks: '120', LastPlayed: '1794440326' },
       30: { LastPlayed: '86400' }, // the "never played" placeholder
