@@ -41,7 +41,7 @@ export default defineComponent({
       return libraries.value;
     },
     total(): number {
-      return this.scan.data?.size_on_disk ?? 0;
+      return this.scan.data?.total_size ?? 0;
     },
     workshopTotal(): number {
       return this.scan.data?.workshop_size ?? 0;

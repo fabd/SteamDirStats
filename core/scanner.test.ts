@@ -95,7 +95,7 @@ test('libraries and the games in them', async (t) => {
     main?.games.map((game) => game.name),
     ['Small Game', 'Big Game'],
   );
-  assert.equal(main?.size_on_disk, 11000);
+  assert.equal(main?.total_size, 11000);
   assert.equal(
     main?.games[0]?.install_path,
     path.join(fixture.steam, 'steamapps', 'common', 'Small'),
@@ -108,7 +108,7 @@ test('libraries and the games in them', async (t) => {
   assert.equal(missing?.available, false);
   assert.deepEqual(missing?.games, []);
 
-  assert.equal(data.size_on_disk, 11300);
+  assert.equal(data.total_size, 11300);
   assert.equal(data.workshop_size, 5000);
   assert.equal(allGames(data).length, 3);
 });

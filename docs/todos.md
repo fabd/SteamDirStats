@@ -214,3 +214,6 @@ See [plan.md](plan.md) for details on each item.
     `library.workshop_size` on top of `library.size_on_disk`, which
     `recalculate()` already fills from each game's `total_size` (game files
     *plus* Workshop).
+  - That name collision is what invited the mistake, so the library and global
+    field is now `total_size` like the game's own, and `size_on_disk` means
+    game files only, on a `Game` and nowhere else.

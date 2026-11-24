@@ -125,7 +125,7 @@ function printReport(data: SteamData, stats: NameStats | null, options: Options)
     }
 
     out.push(
-      `${header}  (${plural(library.games.length, 'game')}, ${formatSize(library.size_on_disk)})`,
+      `${header}  (${plural(library.games.length, 'game')}, ${formatSize(library.total_size)})`,
     );
 
     if (library.disk_total) {
@@ -166,7 +166,7 @@ function printReport(data: SteamData, stats: NameStats | null, options: Options)
   const workshop = data.workshop_size ? ` (Workshop: ${formatSize(data.workshop_size)})` : '';
   out.push('');
   out.push(
-    `Total: ${plural(allGames(data).length, 'game')}, ${formatSize(data.size_on_disk)} ` +
+    `Total: ${plural(allGames(data).length, 'game')}, ${formatSize(data.total_size)} ` +
       `in ${available} ${available === 1 ? 'library' : 'libraries'}${workshop}`,
   );
 

@@ -61,7 +61,7 @@ export async function scan(host: Host, options: ScanOptions = {}): Promise<ScanR
     steam_path: steamPath,
     account: await findAccount(host, steamPath),
     accurate: options.accurate === true,
-    size_on_disk: 0,
+    total_size: 0,
     workshop_size: 0,
     libraries,
   };

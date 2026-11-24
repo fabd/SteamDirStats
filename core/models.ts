@@ -52,7 +52,7 @@ export interface Library {
   disk_total: number | null;
   disk_free: number | null;
   /** Game files plus Workshop content, for every game in this library. */
-  size_on_disk: number;
+  total_size: number;
   workshop_size: number;
   games: Game[];
 }
@@ -76,7 +76,8 @@ export interface SteamData {
   account: Account | null;
   /** True when the sizes were walked on disk rather than read from manifests. */
   accurate: boolean;
-  size_on_disk: number;
+  /** Game files plus Workshop content, across every library. */
+  total_size: number;
   workshop_size: number;
   libraries: Library[];
 }
@@ -134,13 +135,13 @@ export function recalculate(data: SteamData): SteamData {
       libraryWorkshop += game.workshop_size;
     }
 
-    library.size_on_disk = librarySize;
+    library.total_size = librarySize;
     library.workshop_size = libraryWorkshop;
     total += librarySize;
     workshop += libraryWorkshop;
   }
 
-  data.size_on_disk = total;
+  data.total_size = total;
   data.workshop_size = workshop;
 
   return data;

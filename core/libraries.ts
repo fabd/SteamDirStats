@@ -90,7 +90,7 @@ async function makeLibrary(host: Host, path: string, label: string): Promise<Lib
     available,
     disk_total: usage ? usage.total : null,
     disk_free: usage ? usage.free : null,
-    size_on_disk: 0,
+    total_size: 0,
     workshop_size: 0,
     games: [],
   };
