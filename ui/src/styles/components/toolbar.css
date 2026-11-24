@@ -2,8 +2,7 @@
    not be selectable: dragging the window should not sweep a text selection
    along with it. */
 .sd-Toolbar {
-  background: var(--sd-surface-raised);
-  border-bottom: 1px solid var(--sd-border);
+  background: var(--sd-steam-dark);
   user-select: none;
 }
 

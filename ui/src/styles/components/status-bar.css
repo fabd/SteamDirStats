@@ -1,5 +1,5 @@
 .sd-StatusBar {
-  background: var(--sd-surface-raised);
+  background: var(--sd-steam-dark);
   border-top: 1px solid var(--sd-border);
   color: var(--sd-text-dim);
   font-variant-numeric: tabular-nums;

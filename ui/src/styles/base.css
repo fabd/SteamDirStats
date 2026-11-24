@@ -2,13 +2,14 @@
    scrolling, the panes scroll instead. */
 
 :root {
+  --sd-steam-dark: #171d25;
   --sd-surface: #1e2126;
   --sd-surface-raised: #272b31;
   --sd-border: #3a3f47;
   --sd-text: #e6e8ea;
   --sd-text-dim: #9aa1aa;
   --sd-accent: #4a9edd;
-  --sd-row-hover: #2f343b;
+  --sd-row-hover: #2d333c;
   --sd-selected: #31506e;
   --sd-selected-deep: #223850;
   --sd-danger: #c04a4a;

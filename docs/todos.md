@@ -192,18 +192,18 @@ See [plan.md](plan.md) for details on each item.
     - [x] garbage icon for uninstall
     - [x] uninstall in dark red text
     - [x] no icon for "Browse local files" and "View Workshop Items"
-  - [ ] nice dark theme colours with a blue hint, inspired by Steam client
+  - [x] nice dark theme colours with a blue hint, inspired by Steam client
   - [x] improve the resizable handle
     - [x] Dot-grid texture on the handle to show it is draggable
 - [x] prevent columns resizing when expanding workshop items
 - [ ] typography?
 - [ ] Github
-  - [ ] README screenshot
+  - [x] README screenshot
   - [ ] Release with EXE
 
 ## Additional Tests
 
-- [ ] create a dummy fixture with only one library to see if treemap displays correctly
+- [x] create a dummy fixture with only one library to see if treemap displays correctly
 
 ## Fixes
 
