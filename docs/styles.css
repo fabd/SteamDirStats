@@ -1,3 +1,17 @@
 @import 'tailwindcss';
 
 @source "./index.html";
+
+/* Steam store palette: blue-tinted dark */
+@theme {
+  --color-steam-bg: #1b2838;
+  --color-steam-bg-deep: #16202d;
+  --color-steam-bar: #171a21;
+  --color-steam-panel: #223549;
+  --color-steam-text: #c6d4df;
+  --color-steam-muted: #8f98a0;
+  --color-steam-heading: #ffffff;
+  --color-steam-accent: #66c0f4;
+  --color-steam-button-from: #47bfff;
+  --color-steam-button-to: #1a44c2;
+}

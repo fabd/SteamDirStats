@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
     <title>SteamDirStats - Manage free space for your installed games</title>
     <meta
       name="description"
@@ -12,31 +13,39 @@
     <link rel="stylesheet" href="styles.min.css" />
   </head>
 
-  <body class="bg-white text-slate-700 antialiased">
+  <body
+    class="bg-steam-bg bg-linear-to-b from-steam-bg to-steam-bg-deep text-steam-text antialiased"
+  >
     <div class="mx-auto flex min-h-screen max-w-4xl flex-col px-4">
-      <header class="flex items-center justify-between gap-4 py-6">
+      <header class="flex items-center justify-between gap-4 border-b border-white/10 py-6">
         <div class="flex items-center gap-3">
           <img src="icon.png" alt="" width="32" height="32" class="size-8 rounded" />
-          <span class="text-lg font-semibold text-slate-900">SteamDirStats</span>
+          <span class="text-steam-heading text-lg font-semibold">SteamDirStats</span>
         </div>
 
         <a
           href="https://github.com/fabd/SteamDirStats"
-          class="text-sm font-medium text-slate-500 hover:text-slate-900"
+          class="text-steam-muted hover:text-steam-accent flex items-center gap-2 text-sm font-medium"
         >
+          <!-- GitHub mark: Font Awesome Free 6.7.2, icons under CC BY 4.0 -->
+          <svg viewBox="0 0 496 512" fill="currentColor" aria-hidden="true" class="size-5 shrink-0">
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+            />
+          </svg>
           View on GitHub
         </a>
       </header>
 
       <main class="flex-1">
         <section class="pt-10 pb-12 text-center">
-          <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+          <h1 class="text-steam-heading text-4xl font-bold tracking-tight sm:text-5xl">
             See which Steam games<br />are eating your disk space
           </h1>
 
-          <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600">
-            A WinDirStat-style view of the disk space used by installed Steam games, across all your
-            Steam libraries. Sort games by size, dig into Workshop items that quietly grow to
+          <p class="text-steam-text mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
+            See at a glance which games use the most space, across all your
+            Steam libraries. View and manage Workshop items that quietly grow to
             gigabytes, and uninstall straight from the list.
           </p>
 
@@ -45,14 +54,14 @@
               href="https://github.com/fabd/SteamDirStats/releases/latest/download/SteamDirStats-1.0.0.exe"
               class="inline-block rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-700"
             >
-              Download for Windows 10/11 (6MB)
+              Download v1.0.0 for Windows 10/11 (6MB)
             </a>
 
-            <p class="mt-4 text-sm text-slate-500">
-              Portable, no installer — or browse
+            <p class="text-steam-muted mt-4 text-sm">
+              Portable app, no installer. Browse
               <a
                 href="https://github.com/fabd/SteamDirStats/releases"
-                class="underline hover:text-slate-900"
+                class="text-steam-accent underline hover:text-white"
                 >all releases</a
               >.
             </p>
@@ -65,64 +74,69 @@
             alt="SteamDirStats listing installed Steam games by size, with a treemap of the disk space each one uses"
             width="840"
             height="580"
-            class="mx-auto w-full rounded-lg border border-slate-200 shadow-sm"
+            class="mx-auto w-full rounded-lg"
           />
         </section>
 
         <section class="pb-16">
-          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Features</h2>
+          <h2 class="text-steam-heading text-2xl font-bold tracking-tight">Features</h2>
 
-          <ul class="mt-6 list-disc space-y-3 pl-6 leading-relaxed">
+          <ul class="mt-6 list-disc space-y-3 pl-6 leading-relaxed marker:text-steam-accent">
             <li>
               Status bar displays the total space taken by all games across all libraries combined.
             </li>
             <li>The list of games can be sorted by Size, Playtime, Last played, etc.</li>
             <li>
-              View Workshop items for a game, by size descending; a “View on Steam Workshop” link
-              takes you to the page in Steam where you can unsubscribe from the item.
+              <strong>View Workshop items</strong> for a game, by size descending; a “View on Steam
+              Workshop” link takes you to the page in Steam where you can unsubscribe from the item.
             </li>
             <li>
-              Treemap view to see at a glance which games take the most space, grouped by library or
-              mixed together.
+              <strong>Treemap view</strong> to see at a glance which games take the most space,
+              grouped by library or mixed together.
             </li>
             <li>
-              Context menu to view the Store page, browse local files, or uninstall — which triggers
-              Steam’s own Uninstall dialog, where you can confirm or cancel.
+              <strong>Context menu</strong> to view the Store page, browse local files, or uninstall
+              — which triggers Steam’s own Uninstall dialog, where you can confirm or cancel.
             </li>
-            <li>
-              The app does <strong>not</strong> modify or write anything to your Steam folders, it
-              only parses data from the libraries.
+            <li class="text-steam-muted">
+              The app does <strong class="text-steam-heading">not</strong> modify or write anything
+              to your Steam folders, it only parses data from the libraries.
             </li>
-            <li>
-              Works offline. An internet connection is only needed to look up the full name of
-              Workshop items, and those names are cached locally.
+            <li class="text-steam-muted">
+              Per Steam account data such as <strong>Playtime</strong> and <strong>Last played</strong> comes from <em>the last account that signed into Steam</em>.
+            <li class="text-steam-muted">
+              Works offline. An internet connection is only needed to look up the full name of Workshop items. Those are cached locally so the lookup is done only when necessary.
             </li>
-            <li>
+            <li class="text-steam-muted">
               Portable: settings are saved next to the executable, falling back to
-              <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm">%APPDATA%</code> when that
-              folder is read-only.
+              <code class="bg-steam-panel text-steam-accent rounded px-1.5 py-0.5 text-sm"
+                >%APPDATA%</code
+              >
+              when that folder is read-only.
             </li>
           </ul>
         </section>
       </main>
 
-      <footer class="border-t border-slate-200 py-8 text-sm text-slate-500">
+      <footer class="text-steam-muted border-t border-white/10 py-8 text-sm flex items-center">
         <p>
-          © SteamDirStats. Released under the
+          © Fabrice D. Released under the
           <a
             href="https://github.com/fabd/SteamDirStats/blob/main/LICENSE"
-            class="underline hover:text-slate-900"
+            class="text-steam-accent underline hover:text-white"
             >MIT License</a
           >.
         </p>
 
-        <p class="mt-2 flex gap-4">
-          <a href="https://github.com/fabd/SteamDirStats" class="underline hover:text-slate-900"
+        <p class="ml-auto">
+          <a
+            href="https://github.com/fabd/SteamDirStats"
+            class="text-steam-accent underline hover:text-white"
             >GitHub Repository</a
           >
           <a
             href="https://github.com/fabd/SteamDirStats/issues"
-            class="underline hover:text-slate-900"
+            class="text-steam-accent underline hover:text-white ml-4"
             >Report an Issue</a
           >
         </p>
