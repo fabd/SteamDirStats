@@ -61,7 +61,13 @@ sed -i "0,/^version = \"/s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/
 # Keep the lockfile in step, so a build does not have to rewrite it.
 sed -i "/^name = \"steamdirstats\"$/{n;s/^version = \".*\"/version = \"$VERSION\"/}" src-tauri/Cargo.lock
 
-git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock
+# The landing page links the exe of the release it is built for.
+LINK="/download/SteamDirStats-$VERSION.exe"
+grep -q "/download/SteamDirStats-[0-9.]*\.exe" docs/index.html ||
+  fail "no download link in docs/index.html"
+sed -i "s|/download/SteamDirStats-[0-9.]*\.exe|$LINK|" docs/index.html
+
+git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock docs/index.html
 git commit -q -m "Bump version to $VERSION"
 
 echo "==> Committed:"
