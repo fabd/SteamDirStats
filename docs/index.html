@@ -44,16 +44,29 @@
           </h1>
 
           <p class="text-steam-text mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
-            See at a glance which games use the most space, across all your
-            Steam libraries. View and manage Workshop items that quietly grow to
-            gigabytes, and uninstall straight from the list.
+            See at a glance which games use the most space, across all your Steam libraries. View
+            and manage Workshop items that quietly grow to gigabytes, and uninstall straight from
+            the list.
           </p>
 
-          <div class="mt-10">
+          <div class="mt-10 flex flex-col">
             <a
               href="https://github.com/fabd/SteamDirStats/releases/latest/download/SteamDirStats-1.0.0.exe"
-              class="inline-block rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-700"
+              class="flex items-center gap-2 mx-auto rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-700"
             >
+              <svg
+                class="w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                ></path>
+              </svg>
               Download v1.0.0 for Windows 10/11 (6MB)
             </a>
 
@@ -103,9 +116,14 @@
               to your Steam folders, it only parses data from the libraries.
             </li>
             <li class="text-steam-muted">
-              Per Steam account data such as <strong>Playtime</strong> and <strong>Last played</strong> comes from <em>the last account that signed into Steam</em>.
+              Per Steam account data such as <strong>Playtime</strong> and
+              <strong>Last played</strong> comes from
+              <em>the last account that signed into Steam</em>.
+            </li>
+
             <li class="text-steam-muted">
-              Works offline. An internet connection is only needed to look up the full name of Workshop items. Those are cached locally so the lookup is done only when necessary.
+              Works offline. An internet connection is only needed to look up the full name of
+              Workshop items. Those are cached locally so the lookup is done only when necessary.
             </li>
             <li class="text-steam-muted">
               Portable: settings are saved next to the executable, falling back to
