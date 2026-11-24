@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SteamDirStats - Manage free space for your installed games</title>
+    <meta
+      name="description"
+      content="A WinDirStat-style view of the disk space used by installed Steam games, across all your Steam libraries. Free, portable, ~6 MB Windows app."
+    />
+    <link rel="icon" href="icon.png" />
+    <link rel="stylesheet" href="styles.min.css" />
+  </head>
+
+  <body class="bg-white text-slate-700 antialiased">
+    <div class="mx-auto flex min-h-screen max-w-4xl flex-col px-4">
+      <header class="flex items-center justify-between gap-4 py-6">
+        <div class="flex items-center gap-3">
+          <img src="icon.png" alt="" width="32" height="32" class="size-8 rounded" />
+          <span class="text-lg font-semibold text-slate-900">SteamDirStats</span>
+        </div>
+
+        <a
+          href="https://github.com/fabd/SteamDirStats"
+          class="text-sm font-medium text-slate-500 hover:text-slate-900"
+        >
+          View on GitHub
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <section class="pt-10 pb-12 text-center">
+          <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            See which Steam games<br />are eating your disk space
+          </h1>
+
+          <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600">
+            A WinDirStat-style view of the disk space used by installed Steam games, across all your
+            Steam libraries. Sort games by size, dig into Workshop items that quietly grow to
+            gigabytes, and uninstall straight from the list.
+          </p>
+
+          <div class="mt-10">
+            <a
+              href="https://github.com/fabd/SteamDirStats/releases/latest/download/SteamDirStats-1.0.0.exe"
+              class="inline-block rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-700"
+            >
+              Download for Windows 10/11 (6MB)
+            </a>
+
+            <p class="mt-4 text-sm text-slate-500">
+              Portable, no installer — or browse
+              <a
+                href="https://github.com/fabd/SteamDirStats/releases"
+                class="underline hover:text-slate-900"
+                >all releases</a
+              >.
+            </p>
+          </div>
+        </section>
+
+        <section class="pb-16">
+          <img
+            src="screenshot.png"
+            alt="SteamDirStats listing installed Steam games by size, with a treemap of the disk space each one uses"
+            width="840"
+            height="580"
+            class="mx-auto w-full rounded-lg border border-slate-200 shadow-sm"
+          />
+        </section>
+
+        <section class="pb-16">
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Features</h2>
+
+          <ul class="mt-6 list-disc space-y-3 pl-6 leading-relaxed">
+            <li>
+              Status bar displays the total space taken by all games across all libraries combined.
+            </li>
+            <li>The list of games can be sorted by Size, Playtime, Last played, etc.</li>
+            <li>
+              View Workshop items for a game, by size descending; a “View on Steam Workshop” link
+              takes you to the page in Steam where you can unsubscribe from the item.
+            </li>
+            <li>
+              Treemap view to see at a glance which games take the most space, grouped by library or
+              mixed together.
+            </li>
+            <li>
+              Context menu to view the Store page, browse local files, or uninstall — which triggers
+              Steam’s own Uninstall dialog, where you can confirm or cancel.
+            </li>
+            <li>
+              The app does <strong>not</strong> modify or write anything to your Steam folders, it
+              only parses data from the libraries.
+            </li>
+            <li>
+              Works offline. An internet connection is only needed to look up the full name of
+              Workshop items, and those names are cached locally.
+            </li>
+            <li>
+              Portable: settings are saved next to the executable, falling back to
+              <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm">%APPDATA%</code> when that
+              folder is read-only.
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="border-t border-slate-200 py-8 text-sm text-slate-500">
+        <p>
+          © SteamDirStats. Released under the
+          <a
+            href="https://github.com/fabd/SteamDirStats/blob/main/LICENSE"
+            class="underline hover:text-slate-900"
+            >MIT License</a
+          >.
+        </p>
+
+        <p class="mt-2 flex gap-4">
+          <a href="https://github.com/fabd/SteamDirStats" class="underline hover:text-slate-900"
+            >GitHub Repository</a
+          >
+          <a
+            href="https://github.com/fabd/SteamDirStats/issues"
+            class="underline hover:text-slate-900"
+            >Report an Issue</a
+          >
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

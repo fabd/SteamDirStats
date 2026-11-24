@@ -12,7 +12,8 @@
     "cli": "node tools/steamdirstats-cli.ts",
     "test": "node --test \"core/**/*.test.ts\"",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "docs": "npx @tailwindcss/cli -i ./docs/styles.css -o ./docs/styles.min.css --minify"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.9.0",
@@ -23,6 +24,7 @@
     "vue": "^3.5.44"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
     "@tailwindcss/vite": "^4.3.5",
     "@tauri-apps/cli": "^2.9.5",
     "@types/d3-hierarchy": "^3.1.7",

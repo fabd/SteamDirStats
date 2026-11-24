@@ -196,10 +196,10 @@ See [plan.md](plan.md) for details on each item.
   - [x] improve the resizable handle
     - [x] Dot-grid texture on the handle to show it is draggable
 - [x] prevent columns resizing when expanding workshop items
-- [ ] typography?
 - [ ] Github
   - [x] README screenshot
-  - [ ] Release with EXE
+  - [ ] docs/index.html  for Github Pages with main screenshot and features
+  - [x] Release v1.0.0 with EXE
 
 ## Additional Tests
 

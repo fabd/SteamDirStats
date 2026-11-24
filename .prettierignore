@@ -8,3 +8,5 @@ package-lock.json
 
 # hand-written docs: prettier reflows tables and lists
 *.md
+
+docs/styles.min.css

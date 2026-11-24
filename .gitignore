@@ -22,3 +22,4 @@ ui/fixture.json
 !.gitignore
 !.prettierrc.json
 !.prettierignore
+!docs/.nojekyll
