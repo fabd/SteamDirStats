@@ -207,4 +207,10 @@ See [plan.md](plan.md) for details on each item.
 
 ## Fixes
 
-- [ ] double check E:/steam/steam 267 GB reported by Explorer, 294 GB shown in app
+- [x] error in calculating the total space used by library
+  - E:/steam/steam 267 GB reported by Explorer, which includes Steam itself
+  - 294.3 GB reported by the app
+  - The legend was double-counting Workshop content: `sd-legend.vue` added
+    `library.workshop_size` on top of `library.size_on_disk`, which
+    `recalculate()` already fills from each game's `total_size` (game files
+    *plus* Workshop).

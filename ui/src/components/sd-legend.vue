@@ -31,7 +31,8 @@ export default defineComponent({
     /** One row per library, matching the treemap's colours. */
     entries(): Entry[] {
       return libraries.value.map((library) => {
-        const size = library.size_on_disk + library.workshop_size;
+        // note `Library.size_on_disk` already holds game files plus Workshop content
+        const size = library.size_on_disk;
         // How much of its own drive the library takes; blank for a library on
         // a drive we could not measure (unplugged, or disk_usage refused).
         const share = formatShare(size, library.disk_total ?? 0);
