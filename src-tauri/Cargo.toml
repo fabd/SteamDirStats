@@ -1,6 +1,6 @@
 [package]
 name = "steamdirstats"
-version = "0.1.0"
+version = "1.0.0"
 description = "Disk space used by installed Steam games"
 authors = ["fabd"]
 edition = "2021"
