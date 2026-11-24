@@ -314,6 +314,7 @@ Installed games and their sizes are shared by all accounts on the PC, but some d
 
 - Non-Steam shortcuts are not in the manifests (out of scope).
 - Workshop content left behind by an uninstalled game (an `appworkshop_<appid>.acf` with no matching `appmanifest`) belongs to no game, so it is not counted. On the dev machine this was 3.4 MB in total, so it is not worth a report of its own.
+- The same goes for **game folders** left behind in `steamapps/common/`: a folder with no `appmanifest` belongs to no game, so neither mode counts it, and a scan is therefore smaller than what Explorer shows for `common/`. Measured here on `D:\Steam`: Explorer 235 GB against the scan's 232.9 GB, the difference being ten orphan folders (MTGA 1.7 GB, Sacred 2 Gold 0.7 GB, the rest a few MB of empty shells). This is correct — those bytes belong to no installed game — but it is the first thing to check when a library total looks low against Explorer.
 - Exact on-disk size (cluster size, NTFS compression, hard links) only matters for high accuracy; logical file sizes are fine for v1.
 - A fast scan reads a few dozen small files over the IPC bridge, which is fine. Anything that would read *per file* belongs in Rust (§5), and that rule is the main thing to watch as features are added.
 - `account.steamid64` is a **string** in the JSON. It is larger than `Number.MAX_SAFE_INTEGER`, so a number would quietly lose its last digits (the Python version's JSON did). Nothing displays it, but it is exact.

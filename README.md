@@ -28,6 +28,10 @@ Installed games and their sizes are shared by all accounts on the PC, but some d
   - falling back to `%APPDATA%\SteamDirStats\` when that folder is read-only
 - The app works offline; an internet connection is only needed to look up the full name of Workshop items from a Steam API. Otherwise the items will show up as e.g. `Item 3794102006`. The Workshop item names are cached to a local file so the lookup is done only once or for new items.
 
+## Known limitations
+
+- **game folders** left behind in `steamapps/common/` after uninstalling are not counted, these can sometimes be sizable (eg. ~1.6GB left after uninstalling MTGA). Maybe an idea for a future feature: report space taken by left over folders.
+
 ## Development
 
 The app is developed and built on Windows with Git Bash, no need for WSL.
