@@ -2,6 +2,16 @@
 
 A WinDirStat-style view of the disk space used by installed Steam games, across all your Steam libraries. Useful for managing free space when you have a bunch of games installed on multiple libraries, and also for managing Workshop items which can take a lot of space (e.g. SteamVR).
 
+<div align="center">
+
+[**<ins>Download</ins>**](https://github.com/fabd/SteamDirStats/releases/latest)
+
+[![Latest release](https://img.shields.io/github/v/release/fabd/SteamDirStats?style=flat-square&color=F05C1A&label=release)](https://github.com/fabd/SteamDirStats/releases/latest)
+![Windows 10 · 11](https://img.shields.io/badge/Windows-10%20%C2%B7%2011-2B2B2B?style=flat-square)
+![Portable EXE 6 MB](https://img.shields.io/badge/Portable_EXE-6%20MB-2B2B2B?style=flat-square)
+
+</div>
+
 <p align="center">
   <img src=".github/assets/screenshot.png" alt="SteamDirStats listing installed Steam games by size, with a treemap of the disk space each one uses" width="840">
 </p>
